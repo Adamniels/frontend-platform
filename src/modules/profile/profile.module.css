@@ -1,0 +1,20 @@
+.card {
+  max-width: 480px;
+}
+
+.dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: var(--space-2) var(--space-4);
+  font-size: 0.9375rem;
+}
+
+.dl dt {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.dl dd {
+  margin: 0;
+}
