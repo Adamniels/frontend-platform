@@ -1,0 +1,255 @@
+.layout {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 40px;
+  display: flex;
+  gap: 24px;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.side {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 48px;
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .side {
+    width: 100%;
+    padding-top: 0;
+  }
+}
+
+.h2 {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 4px;
+}
+
+.card,
+.cardMuted {
+  padding: 20px 22px;
+}
+
+.cardMuted {
+  opacity: 0.85;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+
+.accentRow {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.accentBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  outline-offset: 3px;
+  transition: all 0.15s ease;
+}
+
+.accentLabel {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.brightness {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.range {
+  width: 120px;
+  accent-color: var(--accent);
+}
+
+.brightnessVal {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  width: 36px;
+  text-align: right;
+}
+
+.toggleOn,
+.toggleOff {
+  width: 42px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.2s ease;
+}
+
+.toggleOn {
+  background: var(--accent);
+}
+
+.toggleOff {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.toggleKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(232, 237, 248, 0.45);
+  transition: left 0.2s ease;
+}
+
+.toggleOn .toggleKnob {
+  left: 21px;
+  background: #000;
+}
+
+.toggleOff .toggleKnob {
+  left: 3px;
+}
+
+.serverNote {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.accountRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c5cbf, var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.accountName {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+.accountPlan {
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.fullBtn {
+  width: 100%;
+  justify-content: center;
+}
+
+.privacyRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.privacyRow:last-child {
+  border-bottom: none;
+}
+
+.miniBtn {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+.metaGrid {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 2.2;
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.metaVal {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.ok {
+  color: #34d399;
+  font-weight: 500;
+}
+
+.errorPage {
+  padding: 40px;
+  color: var(--color-danger);
+}

@@ -1,5 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach } from "vitest";
 import { describe, expect, it } from "vitest";
+import { PendingInputProvider } from "@/components/layout/PendingInputContext";
 import { DashboardView } from "@/modules/dashboard";
 import { NewsView } from "@/modules/news";
 import { SideLearningView } from "@/modules/side-learning";
@@ -7,40 +10,43 @@ import { WorkflowRunsView } from "@/modules/workflow-runs";
 import { SavedItemsView } from "@/modules/saved-items";
 import { SettingsView } from "@/modules/settings";
 import { ProfileView } from "@/modules/profile";
+import { StatsView } from "@/modules/stats";
+import { InsightsView } from "@/modules/insights";
+import { InputNeededView } from "@/modules/input-needed";
+import type { StatsPayload } from "@/lib/api/adapters/stats";
+import type { MemoryInsight } from "@/lib/api/adapters/insights";
+import type { InputNeededItem } from "@/lib/api/adapters/input-needed";
+
+function withShell(node: ReactElement) {
+  return render(<PendingInputProvider>{node}</PendingInputProvider>);
+}
+
+afterEach(() => {
+  cleanup();
+});
 
 describe("route group: dashboard", () => {
-  it("renders dashboard heading", () => {
+  it("renders dashboard hero", () => {
     render(
       <DashboardView
         data={{ greeting: "Hello", activeRuns: 1, itemsNeedingAttention: 0 }}
       />,
     );
-    expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
+    expect(screen.getByText(/let's continue/i)).toBeInTheDocument();
+    expect(screen.getByText(/building/i)).toBeInTheDocument();
   });
 });
 
 describe("route group: content (news + side learning)", () => {
-  it("renders news list", () => {
-    render(
-      <NewsView
-        items={[
-          {
-            id: "1",
-            title: "T",
-            source: "S",
-            publishedAt: new Date().toISOString(),
-          },
-        ]}
-      />,
-    );
-    expect(screen.getByRole("heading", { name: "News" })).toBeInTheDocument();
-    expect(screen.getByText("T")).toBeInTheDocument();
+  it("renders news feed chrome", () => {
+    render(<NewsView />);
+    expect(screen.getByRole("heading", { name: /personalized feed/i })).toBeInTheDocument();
   });
 
   it("renders side learning topics", () => {
-    render(<SideLearningView topics={[{ id: "1", title: "Topic", progressPercent: 50 }]} />);
-    expect(screen.getByRole("heading", { name: "Side learning" })).toBeInTheDocument();
-    expect(screen.getByText("Topic")).toBeInTheDocument();
+    render(<SideLearningView />);
+    expect(screen.getByRole("heading", { name: /learning topics/i })).toBeInTheDocument();
+    expect(screen.getByText(/AI Ethics in Practice/i)).toBeInTheDocument();
   });
 });
 
@@ -58,27 +64,15 @@ describe("route group: workflows", () => {
         ]}
       />,
     );
-    expect(screen.getByRole("heading", { name: "Workflow runs" })).toBeInTheDocument();
     expect(screen.getByText("Run A")).toBeInTheDocument();
+    expect(screen.getByText("Running")).toBeInTheDocument();
   });
 });
 
 describe("route group: library (saved items)", () => {
-  it("renders saved items", () => {
-    render(
-      <SavedItemsView
-        items={[
-          {
-            id: "1",
-            title: "Item",
-            kind: "article",
-            savedAt: new Date().toISOString(),
-          },
-        ]}
-      />,
-    );
-    expect(screen.getByRole("heading", { name: "Saved items" })).toBeInTheDocument();
-    expect(screen.getByText("Item")).toBeInTheDocument();
+  it("renders saved library", () => {
+    render(<SavedItemsView />);
+    expect(screen.getByRole("heading", { name: /saved library/i })).toBeInTheDocument();
   });
 });
 
@@ -92,5 +86,40 @@ describe("route group: account (settings + profile)", () => {
     render(<ProfileView profile={{ displayName: "Ada", email: "ada@example.com" }} />);
     expect(screen.getByRole("heading", { name: "Profile" })).toBeInTheDocument();
     expect(screen.getByText("Ada")).toBeInTheDocument();
+  });
+});
+
+describe("route group: stats", () => {
+  it("renders stats tiles", () => {
+    const data: StatsPayload = {
+      tiles: [
+        { label: "X", value: 1, unit: "", color: "var(--accent)", sub: "s" },
+      ],
+      progress: [],
+      activity: [],
+    };
+    render(<StatsView data={data} />);
+    expect(screen.getByRole("heading", { name: "Stats" })).toBeInTheDocument();
+  });
+});
+
+describe("route group: insights", () => {
+  it("renders insights list", () => {
+    const items: MemoryInsight[] = [
+      { id: 1, label: "L", content: "C", strength: 50, confirmed: true },
+    ];
+    render(<InsightsView items={items} />);
+    expect(screen.getByRole("heading", { name: /what we know/i })).toBeInTheDocument();
+  });
+});
+
+describe("route group: input needed", () => {
+  it("renders input queue", () => {
+    const items: InputNeededItem[] = [
+      { id: 1, text: "Do thing", type: "Rating", urgent: true, detail: "Details here." },
+    ];
+    withShell(<InputNeededView items={items} />);
+    expect(screen.getByRole("heading", { name: /input needed/i })).toBeInTheDocument();
+    expect(screen.getByText("Do thing")).toBeInTheDocument();
   });
 });

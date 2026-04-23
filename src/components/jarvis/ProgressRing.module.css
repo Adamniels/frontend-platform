@@ -1,0 +1,36 @@
+.wrap {
+  position: relative;
+}
+
+.svg {
+  display: block;
+}
+
+.progress {
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.value {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.pct {
+  opacity: 0.6;
+}
+
+.label {
+  font-size: 9px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}

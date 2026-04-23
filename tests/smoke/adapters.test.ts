@@ -6,6 +6,9 @@ import { fetchWorkflowRuns } from "@/lib/api/adapters/workflow-runs";
 import { fetchSavedItems } from "@/lib/api/adapters/saved-items";
 import { fetchUserSettings } from "@/lib/api/adapters/settings";
 import { fetchUserProfile } from "@/lib/api/adapters/profile";
+import { fetchStats } from "@/lib/api/adapters/stats";
+import { fetchInsights } from "@/lib/api/adapters/insights";
+import { fetchInputNeededItems } from "@/lib/api/adapters/input-needed";
 
 describe("placeholder adapters", () => {
   it("returns dashboard summary", async () => {
@@ -43,5 +46,20 @@ describe("placeholder adapters", () => {
   it("returns profile", async () => {
     const profile = await fetchUserProfile();
     expect(profile.email).toContain("@");
+  });
+
+  it("returns stats payload", async () => {
+    const s = await fetchStats();
+    expect(s.tiles.length).toBeGreaterThan(0);
+  });
+
+  it("returns insights", async () => {
+    const list = await fetchInsights();
+    expect(list[0]?.label).toBeDefined();
+  });
+
+  it("returns input needed items", async () => {
+    const list = await fetchInputNeededItems();
+    expect(list.length).toBeGreaterThan(0);
   });
 });

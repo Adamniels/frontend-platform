@@ -1,61 +1,58 @@
 import type { WorkflowRunSummary } from "@/types/workflow";
-import { Card, CardBody } from "@/components/ui/Card";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { ErrorState } from "@/components/ui/ErrorState";
-import { WorkflowStatusBadge } from "@/components/ui/StatusBadge";
+import { JarvisCard } from "@/components/jarvis/JarvisCard";
+import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import styles from "./workflow-runs.module.css";
+
+function statusTag(run: WorkflowRunSummary) {
+  const map: Record<WorkflowRunSummary["status"], { label: string; color?: string }> = {
+    pending: { label: "Pending" },
+    running: { label: "Running", color: "var(--accent)" },
+    needs_input: { label: "Needs input", color: "#ff9500" },
+    completed: { label: "Completed", color: "#34d399" },
+    failed: { label: "Failed", color: "#ef4444" },
+  };
+  return map[run.status];
+}
 
 type WorkflowRunsViewProps = { runs: WorkflowRunSummary[] } | { error: unknown };
 
 export function WorkflowRunsView(props: WorkflowRunsViewProps) {
   if ("error" in props) {
     return (
-      <>
-        <SectionHeader
-          title="Workflow runs"
-          description="Status, lifecycle, and needs-input surfaces for runs."
-        />
-        <ErrorState error={props.error} />
-      </>
+      <div className={`${styles.page} screenEnter`}>
+        <p className={styles.err}>Could not load workflow runs.</p>
+      </div>
     );
   }
 
   if (props.runs.length === 0) {
     return (
-      <>
-        <SectionHeader
-          title="Workflow runs"
-          description="Status, lifecycle, and needs-input surfaces for runs."
-        />
-        <EmptyState title="No runs" description="Runs will appear here once the backend tracks them." />
-      </>
+      <div className={`${styles.page} screenEnter`}>
+        <p className={styles.empty}>No runs yet. Runs will appear here once the backend tracks them.</p>
+      </div>
     );
   }
 
   return (
-    <>
-      <SectionHeader
-        title="Workflow runs"
-        description="Status, lifecycle, and needs-input surfaces for runs."
-      />
+    <div className={`${styles.page} screenEnter`}>
       <ul className={styles.list}>
-        {props.runs.map((run) => (
-          <li key={run.id}>
-            <Card>
-              <CardBody>
+        {props.runs.map((run) => {
+          const st = statusTag(run);
+          return (
+            <li key={run.id}>
+              <JarvisCard hover={false} className={styles.card}>
                 <div className={styles.row}>
                   <div>
                     <p className={styles.name}>{run.name}</p>
                     <p className={styles.meta}>Updated {new Date(run.updatedAt).toLocaleString()}</p>
                   </div>
-                  <WorkflowStatusBadge status={run.status} />
+                  <JarvisTag label={st.label} color={st.color} />
                 </div>
-              </CardBody>
-            </Card>
-          </li>
-        ))}
+              </JarvisCard>
+            </li>
+          );
+        })}
       </ul>
-    </>
+    </div>
   );
 }

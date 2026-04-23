@@ -1,0 +1,19 @@
+.card {
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 20px 22px;
+  backdrop-filter: blur(12px);
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.cardHoverable:hover {
+  background: rgba(255, 255, 255, 0.065);
+  border-color: var(--color-border-strong);
+}
+
+.clickable {
+  cursor: pointer;
+}

@@ -1,42 +1,37 @@
-/* Design tokens — no utility framework; use var(--token) in CSS Modules or here. */
+/* JARVIS-style design tokens — CSS Modules + variables only (no Tailwind). */
 :root {
-  --color-bg: #f4f4f5;
-  --color-surface: #ffffff;
-  --color-surface-muted: #fafafa;
-  --color-border: #e4e4e7;
-  --color-text: #18181b;
-  --color-text-muted: #71717a;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-danger: #dc2626;
-  --color-success: #16a34a;
-  --color-warning: #ca8a04;
+  --accent: #00d4ff;
+  --color-bg: #070c14;
+  --color-sidebar: #0a0f1a;
+  --color-surface: rgba(255, 255, 255, 0.045);
+  --color-surface-hover: rgba(255, 255, 255, 0.065);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.12);
+  --color-text: #e8edf8;
+  --color-text-muted: rgba(232, 237, 248, 0.45);
+  --color-text-dim: rgba(232, 237, 248, 0.25);
+  --color-purple: #7c5cbf;
+  --color-green: #34d399;
+  --color-danger: #ef4444;
+  --color-warning: #ff9500;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 6%);
+  --radius-xl: 16px;
+  --radius-pill: 999px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 24px;
   --space-6: 32px;
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --sidebar-width: 240px;
+  --space-8: 40px;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+  --sidebar-width: 200px;
   --topbar-height: 56px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #0c0c0e;
-    --color-surface: #141416;
-    --color-surface-muted: #1a1a1d;
-    --color-border: #27272a;
-    --color-text: #fafafa;
-    --color-text-muted: #a1a1aa;
-    --shadow-sm: 0 1px 2px rgb(0 0 0 / 35%);
-  }
+  /* 1 = baseline (matches settings slider at 60). */
+  --shell-brightness: 1;
 }
 
 *,
@@ -61,8 +56,13 @@ body {
   line-height: 1.5;
 }
 
+/* Legacy token aliases for gradual migration */
+:root {
+  --color-accent: var(--accent);
+}
+
 a {
-  color: var(--color-accent);
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -71,6 +71,96 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(232, 237, 248, 0.35);
+}
+
+input,
+textarea {
+  color: var(--color-text);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes auroraFloat1 {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(-40px, 30px) scale(1.1);
+  }
+}
+@keyframes auroraFloat2 {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(30px, -20px) scale(0.95);
+  }
+}
+@keyframes streakPulse {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes particleFade {
+  from {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+}
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes bootPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+@keyframes bootSpin {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -251;
+  }
+}
+
+.screenEnter {
+  animation: fadeSlideUp 0.3s cubic-bezier(0.23, 1, 0.32, 1) both;
 }

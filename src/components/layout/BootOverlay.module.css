@@ -1,0 +1,44 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: #070c14;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  transition: opacity 0.4s ease;
+}
+
+.svg {
+  display: block;
+}
+
+.spin {
+  animation: bootSpin 1.8s linear infinite;
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: rgba(232, 237, 248, 0.5);
+  letter-spacing: 2px;
+  animation: bootPulse 1.5s ease-in-out infinite;
+}
+
+.barWrap {
+  width: 160px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 1px;
+  transition: width 0.25s ease;
+  box-shadow: 0 0 8px var(--accent);
+}

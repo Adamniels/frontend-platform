@@ -1,22 +1,74 @@
 .bar {
   height: var(--topbar-height);
   flex-shrink: 0;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(7, 12, 20, 0.7);
+  backdrop-filter: blur(10px);
 }
 
-.inner {
-  padding: 0 var(--space-5);
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .title {
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.sub {
+  font-size: 13px;
   color: var(--color-text-muted);
-  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sep {
+  opacity: 0.85;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.date {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+}
+
+.clock {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.bellBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.045);
+  padding: 0;
+}
+
+.bellBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
