@@ -4,18 +4,21 @@
 
 - **Routes** live under `src/app`. Route files stay thin: render a module `*Screen` server component or compose layout only.
 - **Feature modules** live under `src/modules/<name>`. A module owns its UI (`*View` and/or client `*Experience` components), async data orchestration (`*Screen`), and thin `api/*` wrappers that call into `src/lib/api`.
+- **Server-first data:** core module `*Screen` files are **async server components** that fetch via `api/*` (calling adapters), then render client `*View` with either `data` or a serialized `loadError` string. Interactive-only routes (e.g. news experience) may render client experiences directly without a server fetch.
 - **App shell** is client-heavy: `src/components/layout/AppShell.tsx` provides sidebar, top bar, boot overlay, command-palette search (`Cmd/Ctrl+K`), and `src/components/layout/PendingInputContext.tsx` for the **Input needed** badge count. The shell must not import feature modules.
 - **JARVIS-style primitives** live under `src/components/jarvis/` (glass cards, buttons, tags, icons, aurora, chat bar, progress). These are presentation-only and must not import feature modules.
-- **Legacy shared UI** may remain under `src/components/ui/` for older patterns; new work should prefer `jarvis` + CSS Modules.
+- **Shared UI** under `src/components/ui/` holds cross-cutting primitives (for example `LoadingState`); prefer `jarvis` + CSS Modules for product chrome.
 - **HTTP and contracts** live in `src/lib/api` (`apiRequest`, errors) and `src/lib/api/adapters` (per-domain calls, including placeholders). UI and modules must not call `fetch` directly for product APIs—go through adapters (wrapping `apiRequest` when the backend exists).
 - **Theme helpers**: `src/lib/theme/accent.ts` and `src/lib/theme/brightness.ts` persist shell accent (`--accent`) and brightness (`--shell-brightness`) to `localStorage` and the document root.
-- **Auth hooks** live in `src/lib/auth`. Replace placeholders when identity is integrated.
+- **Auth** lives in `src/lib/auth` (access gate, events). Wire bearer tokens through `apiRequest` when identity is integrated.
 
 ## Routes (Phase A paths)
 
 | Path | Module |
 |------|--------|
-| `/` | `dashboard` |
+| `/` | `start` (home / mission control) |
+| `/dashboard` | `dashboard` |
+| `/jarvis` | `jarvis` |
 | `/stats` | `stats` |
 | `/news` | `news` |
 | `/side-learning` | `side-learning` |

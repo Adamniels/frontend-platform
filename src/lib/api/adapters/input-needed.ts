@@ -8,6 +8,8 @@ export type InputNeededItem = {
   detail: string;
 };
 
+const readCache = { next: { revalidate: 30 } as const };
+
 export async function fetchInputNeededItems(): Promise<InputNeededItem[]> {
-  return apiRequest<InputNeededItem[]>("/api/v1/human-input/items");
+  return apiRequest<InputNeededItem[]>("/api/v1/human-input/items", readCache);
 }

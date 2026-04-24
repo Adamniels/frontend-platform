@@ -4,11 +4,12 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { DashboardSummary } from "@/types/dashboard";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
+import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { ProgressBar } from "@/components/jarvis/ProgressBar";
 import styles from "./dashboard-jarvis.module.css";
 
-type DashboardClientProps = { summary: DashboardSummary } | { error: unknown };
+type DashboardClientProps = { summary: DashboardSummary } | { loadError: string };
 
 export function DashboardClient(props: DashboardClientProps) {
   const router = useRouter();
@@ -40,10 +41,10 @@ export function DashboardClient(props: DashboardClientProps) {
 
   const [dismissed, setDismissed] = useState<number[]>([]);
 
-  if ("error" in props) {
+  if ("loadError" in props) {
     return (
       <div className={styles.errorPage}>
-        <p>Could not load dashboard.</p>
+        <JarvisInlineError title="Dashboard" message={props.loadError} />
       </div>
     );
   }

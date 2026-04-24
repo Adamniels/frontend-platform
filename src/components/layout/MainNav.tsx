@@ -54,7 +54,7 @@ export function MainNav({ onSearchClick }: MainNavProps) {
                 type="button"
                 className={styles.navLink}
                 onClick={onSearchClick}
-              aria-label="Open search"
+                aria-label="Open search"
               >
                 <JarvisIcon name={item.icon} size={17} color="currentColor" />
                 {item.label}

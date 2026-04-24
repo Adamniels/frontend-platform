@@ -1,16 +1,17 @@
 "use client";
 
 import type { UserSettings } from "@/lib/api/adapters/settings";
+import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { SettingsClient } from "./SettingsClient";
 import styles from "./settings-experience.module.css";
 
-type SettingsViewProps = { settings: UserSettings } | { error: unknown };
+type SettingsViewProps = { settings: UserSettings } | { loadError: string };
 
 export function SettingsView(props: SettingsViewProps) {
-  if ("error" in props) {
+  if ("loadError" in props) {
     return (
       <div className={styles.errorPage}>
-        <p>Could not load settings.</p>
+        <JarvisInlineError title="Settings" message={props.loadError} />
       </div>
     );
   }

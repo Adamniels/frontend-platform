@@ -226,3 +226,17 @@ textarea {
 .screenEnter {
   animation: fadeSlideUp 0.3s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .screenEnter {
+    animation: none;
+  }
+}

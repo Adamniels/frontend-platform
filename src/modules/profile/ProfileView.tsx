@@ -1,16 +1,17 @@
 "use client";
 
 import type { UserProfile } from "@/lib/api/adapters/profile";
+import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { ProfileClient } from "./ProfileClient";
 import styles from "./profile-experience.module.css";
 
-type ProfileViewProps = { profile: UserProfile } | { error: unknown };
+type ProfileViewProps = { profile: UserProfile } | { loadError: string };
 
 export function ProfileView(props: ProfileViewProps) {
-  if ("error" in props) {
+  if ("loadError" in props) {
     return (
       <div className={styles.page}>
-        <p className={styles.err}>Could not load profile.</p>
+        <JarvisInlineError title="Profile" message={props.loadError} />
       </div>
     );
   }

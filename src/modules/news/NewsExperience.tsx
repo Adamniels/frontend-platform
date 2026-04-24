@@ -86,14 +86,7 @@ export function NewsExperience() {
             {art.time} · {art.readTime} read
           </div>
         </JarvisCard>
-        <JarvisCard
-          className={styles.block}
-          hover={false}
-          style={{
-            borderColor: "color-mix(in srgb, var(--accent) 25%, transparent)",
-            background: "color-mix(in srgb, var(--accent) 5%, transparent)",
-          }}
-        >
+        <JarvisCard className={`${styles.block} ${styles.relevanceBlock}`} hover={false}>
           <div className={styles.relevanceLabel}>Why this is relevant</div>
           <p className={styles.body}>{art.relevance}</p>
         </JarvisCard>

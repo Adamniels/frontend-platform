@@ -131,6 +131,12 @@
   margin-bottom: 16px;
 }
 
+.relevanceBlock {
+  margin-bottom: 16px;
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
 .title {
   font-family: var(--font-sans);
   font-size: 22px;

@@ -8,6 +8,8 @@ export type MemoryInsight = {
   confirmed: boolean;
 };
 
+const readCache = { next: { revalidate: 30 } as const };
+
 export async function fetchInsights(): Promise<MemoryInsight[]> {
-  return apiRequest<MemoryInsight[]>("/api/v1/memory/insights");
+  return apiRequest<MemoryInsight[]>("/api/v1/memory/insights", readCache);
 }

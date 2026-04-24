@@ -19,7 +19,12 @@ describe("backend adapters", () => {
         const url = String(input);
         const path = new URL(url).pathname;
         const payloadByPath: Record<string, unknown> = {
-          "/api/v1/dashboard/summary": { greeting: "Welcome back", activeRuns: 2, itemsNeedingAttention: 1 },
+          "/api/v1/dashboard/summary": {
+            greeting: "Welcome back",
+            activeRuns: 2,
+            itemsNeedingAttention: 1,
+            savedItems: 43,
+          },
           "/api/v1/news/feed": [{ id: "n1", title: "headline", source: "Wire", publishedAt: new Date().toISOString() }],
           "/api/v1/side-learning/topics": [{ id: "s1", title: "Foundations", progressPercent: 40 }],
           "/api/v1/workflow-runs": [{ id: "wr1", name: "Run", status: "running", updatedAt: new Date().toISOString() }],
@@ -50,6 +55,8 @@ describe("backend adapters", () => {
     const s = await fetchDashboardSummary();
     expect(typeof s.greeting).toBe("string");
     expect(typeof s.activeRuns).toBe("number");
+    expect(typeof s.itemsNeedingAttention).toBe("number");
+    expect(s.savedItems).toBe(43);
   });
 
   it("returns news items", async () => {

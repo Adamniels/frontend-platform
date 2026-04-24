@@ -2,19 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { InputNeededItem } from "@/lib/api/adapters/input-needed";
-
-const NO_ITEMS: InputNeededItem[] = [];
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
+import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { usePendingInputCount } from "@/components/layout/PendingInputContext";
 import styles from "./input-needed.module.css";
 
-type InputNeededViewProps = { items: InputNeededItem[] } | { error: unknown };
+type InputNeededViewProps = { items: InputNeededItem[] } | { loadError: string };
 
 export function InputNeededView(props: InputNeededViewProps) {
+  const loadError = "loadError" in props ? props.loadError : null;
+  const items = useMemo((): InputNeededItem[] => {
+    if ("loadError" in props) return [];
+    return props.items;
+  }, [props]);
   const { setCount } = usePendingInputCount();
-  const items = "items" in props ? props.items : NO_ITEMS;
   const [dismissed, setDismissed] = useState<number[]>([]);
   const [acted, setActed] = useState<number[]>([]);
 
@@ -23,20 +26,18 @@ export function InputNeededView(props: InputNeededViewProps) {
     [items, dismissed, acted],
   );
 
-  const isError = "error" in props;
-
   useEffect(() => {
-    if (isError) {
+    if (loadError) {
       setCount(0);
       return;
     }
     setCount(pending.length);
-  }, [isError, pending.length, setCount]);
+  }, [loadError, pending.length, setCount]);
 
-  if ("error" in props) {
+  if (loadError) {
     return (
       <div className={styles.page}>
-        <p className={styles.err}>Could not load items.</p>
+        <JarvisInlineError title="Input needed" message={loadError} />
       </div>
     );
   }

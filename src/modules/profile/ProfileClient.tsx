@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { UserProfile } from "@/lib/api/adapters/profile";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
@@ -10,7 +10,16 @@ import styles from "./profile-experience.module.css";
 type ProfileClientProps = { profile: UserProfile };
 
 export function ProfileClient({ profile }: ProfileClientProps) {
-  void profile;
+  const depthId = useId();
+  const sessionId = useId();
+  const interestInputId = useId();
+  const initials = profile.displayName
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() || "OP";
+
   const [interests, setInterests] = useState([
     "AI Ethics",
     "Machine Learning",
@@ -25,16 +34,17 @@ export function ProfileClient({ profile }: ProfileClientProps) {
 
   return (
     <div className={`${styles.page} screenEnter`}>
+      <h2 className={styles.h2}>Profile</h2>
       <JarvisCard hover={false} className={styles.card}>
         <div className={styles.hero}>
           <div className={styles.avatarWrap}>
             <div className={styles.avatar} aria-hidden>
-              OP
+              {initials}
             </div>
           </div>
           <div>
-            <div className={styles.name}>OPERATOR</div>
-            <div className={styles.email}>JOINED APR 2026 · LEVEL 12</div>
+            <div className={styles.name}>{profile.displayName.toUpperCase()}</div>
+            <div className={styles.email}>{profile.email}</div>
             <div className={styles.tags}>
               <JarvisTag label="Advanced learner" />
               <JarvisTag label="AI focused" color="var(--accent)" />
@@ -57,7 +67,11 @@ export function ProfileClient({ profile }: ProfileClientProps) {
           ))}
         </div>
         <div className={styles.addRow}>
+          <label htmlFor={interestInputId} className={styles.srOnly}>
+            Add interest
+          </label>
           <input
+            id={interestInputId}
             className={styles.input}
             value={newInterest}
             onChange={(e) => setNewInterest(e.target.value)}
@@ -83,15 +97,25 @@ export function ProfileClient({ profile }: ProfileClientProps) {
       </JarvisCard>
       <div className={styles.grid2}>
         <JarvisCard hover={false} className={styles.card}>
-          <div className={styles.sectionTitle}>Content depth</div>
-          <div className={styles.muted}>{depthLabel}</div>
+          <label className={styles.sectionTitle} htmlFor={depthId}>
+            Content depth
+          </label>
+          <div className={styles.muted} id={`${depthId}-desc`}>
+            {depthLabel}
+          </div>
           <input
+            id={depthId}
             type="range"
             min={1}
             max={5}
             value={depth}
             onChange={(e) => setDepth(Number(e.target.value))}
             className={`${styles.range} ${styles.rangeDepth}`}
+            aria-valuemin={1}
+            aria-valuemax={5}
+            aria-valuenow={depth}
+            aria-valuetext={depthLabel}
+            aria-describedby={`${depthId}-desc`}
           />
           <div className={styles.rangeLabels}>
             <span>Overview</span>
@@ -99,9 +123,14 @@ export function ProfileClient({ profile }: ProfileClientProps) {
           </div>
         </JarvisCard>
         <JarvisCard hover={false} className={styles.card}>
-          <div className={styles.sectionTitle}>Session length</div>
-          <div className={styles.muted}>{sessionLen} minutes</div>
+          <label className={styles.sectionTitle} htmlFor={sessionId}>
+            Session length
+          </label>
+          <div className={styles.muted} id={`${sessionId}-desc`}>
+            {sessionLen} minutes
+          </div>
           <input
+            id={sessionId}
             type="range"
             min={15}
             max={120}
@@ -109,6 +138,11 @@ export function ProfileClient({ profile }: ProfileClientProps) {
             value={sessionLen}
             onChange={(e) => setSessionLen(Number(e.target.value))}
             className={`${styles.range} ${styles.rangeSession}`}
+            aria-valuemin={15}
+            aria-valuemax={120}
+            aria-valuenow={sessionLen}
+            aria-valuetext={`${sessionLen} minutes`}
+            aria-describedby={`${sessionId}-desc`}
           />
           <div className={styles.rangeLabels}>
             <span>15 min</span>

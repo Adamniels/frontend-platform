@@ -6,7 +6,7 @@ export type RouteMeta = {
 const metaByPrefix: { prefix: string; meta: RouteMeta }[] = [
   { prefix: "/", meta: { title: "Start", subtitle: "mission control" } },
   { prefix: "/dashboard", meta: { title: "Dashboard", subtitle: "personalized overview" } },
-  { prefix: "/jarvis", meta: { title: "Jarvis", subtitle: "classic dashboard" } },
+  { prefix: "/jarvis", meta: { title: "Jarvis", subtitle: "personal assistant" } },
   { prefix: "/stats", meta: { title: "Stats", subtitle: "your activity" } },
   { prefix: "/news", meta: { title: "News", subtitle: "recommended articles" } },
   { prefix: "/side-learning", meta: { title: "Learning", subtitle: "side learning module" } },

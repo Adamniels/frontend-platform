@@ -2,16 +2,17 @@
 
 import type { StatsPayload } from "@/lib/api/adapters/stats";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
+import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { ProgressBar } from "@/components/jarvis/ProgressBar";
 import styles from "./stats.module.css";
 
-type StatsViewProps = { data: StatsPayload } | { error: unknown };
+type StatsViewProps = { data: StatsPayload } | { loadError: string };
 
 export function StatsView(props: StatsViewProps) {
-  if ("error" in props) {
+  if ("loadError" in props) {
     return (
       <div className={styles.page}>
-        <p className={styles.err}>Could not load stats.</p>
+        <JarvisInlineError title="Stats" message={props.loadError} />
       </div>
     );
   }

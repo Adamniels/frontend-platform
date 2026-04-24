@@ -3,11 +3,11 @@
 import type { DashboardSummary } from "@/types/dashboard";
 import { DashboardClient } from "./DashboardClient";
 
-type DashboardViewProps = { data: DashboardSummary } | { error: unknown };
+export type DashboardViewProps = { data: DashboardSummary } | { loadError: string };
 
 export function DashboardView(props: DashboardViewProps) {
-  if ("error" in props) {
-    return <DashboardClient error={props.error} />;
+  if ("loadError" in props) {
+    return <DashboardClient loadError={props.loadError} />;
   }
   return <DashboardClient summary={props.data} />;
 }

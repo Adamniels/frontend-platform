@@ -1,5 +1,6 @@
 import type { WorkflowRunSummary } from "@/types/workflow";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
+import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import styles from "./workflow-runs.module.css";
 
@@ -14,13 +15,13 @@ function statusTag(run: WorkflowRunSummary) {
   return map[run.status];
 }
 
-type WorkflowRunsViewProps = { runs: WorkflowRunSummary[] } | { error: unknown };
+type WorkflowRunsViewProps = { runs: WorkflowRunSummary[] } | { loadError: string };
 
 export function WorkflowRunsView(props: WorkflowRunsViewProps) {
-  if ("error" in props) {
+  if ("loadError" in props) {
     return (
       <div className={`${styles.page} screenEnter`}>
-        <p className={styles.err}>Could not load workflow runs.</p>
+        <JarvisInlineError title="Workflow runs" message={props.loadError} />
       </div>
     );
   }

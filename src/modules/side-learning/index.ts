@@ -1,2 +1,2 @@
 export { SideLearningScreen } from "./SideLearningScreen";
-export { SideLearningView } from "./SideLearningView";
+export { SideLearningExperience } from "./SideLearningExperience";

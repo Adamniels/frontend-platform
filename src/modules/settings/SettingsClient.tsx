@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
+import { useId, useLayoutEffect, useState } from "react";
 import type { UserSettings } from "@/lib/api/adapters/settings";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
@@ -33,6 +33,7 @@ const ACCENTS = [
 type SettingsClientProps = { settings: UserSettings };
 
 export function SettingsClient({ settings }: SettingsClientProps) {
+  const brightnessRangeId = useId();
   const [curAccent, setCurAccent] = useState(() => readStoredAccent() ?? "#00d4ff");
   const [brightness, setBrightness] = useState(() => readStoredBrightness() ?? 60);
   const [scanLines, setScanLines] = useState(() => readStoredScanlines());
@@ -114,17 +115,24 @@ export function SettingsClient({ settings }: SettingsClientProps) {
             <SettingsToggle on={hexGrid} onChange={applyHexGrid} />
           </div>
           <div className={styles.row}>
-            <span>HUD brightness</span>
+            <label htmlFor={brightnessRangeId}>HUD brightness</label>
             <div className={styles.brightness}>
               <input
+                id={brightnessRangeId}
                 type="range"
                 min={20}
                 max={100}
                 value={brightness}
                 onChange={(e) => applyBrightness(Number(e.target.value))}
                 className={styles.range}
+                aria-valuemin={20}
+                aria-valuemax={100}
+                aria-valuenow={brightness}
+                aria-valuetext={`${brightness}%`}
               />
-              <span className={styles.brightnessVal}>{brightness}%</span>
+              <span className={styles.brightnessVal} aria-hidden>
+                {brightness}%
+              </span>
             </div>
           </div>
         </JarvisCard>

@@ -1,46 +1,13 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import type { UserSettings } from "@/lib/api/adapters/settings";
-import { LoadingState } from "@/components/ui/LoadingState";
+import { formatLoadError } from "@/lib/utils/error-message";
 import { getUserSettings } from "./api/get-settings";
 import { SettingsView } from "./SettingsView";
 
-export function SettingsScreen() {
-  const [state, setState] = useState<{
-    loading: boolean;
-    settings?: UserSettings;
-    error?: unknown;
-  }>({ loading: true });
-
-  useEffect(() => {
-    let active = true;
-    void (async () => {
-      try {
-        const settings = await getUserSettings();
-        if (!active) return;
-        setState({ loading: false, settings });
-      } catch (caught) {
-        if (!active) return;
-        setState({ loading: false, error: caught });
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  if (state.loading) {
-    return <LoadingState label="Loading settings…" />;
+export async function SettingsScreen() {
+  const result = await getUserSettings()
+    .then((settings) => ({ ok: true as const, settings }))
+    .catch((error: unknown) => ({ ok: false as const, error }));
+  if (!result.ok) {
+    return <SettingsView loadError={formatLoadError(result.error)} />;
   }
-
-  if (state.error !== undefined) {
-    return <SettingsView error={state.error} />;
-  }
-
-  if (state.settings === undefined) {
-    return <SettingsView error={new Error("Missing settings data")} />;
-  }
-
-  return <SettingsView settings={state.settings} />;
+  return <SettingsView settings={result.settings} />;
 }

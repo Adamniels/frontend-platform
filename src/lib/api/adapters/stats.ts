@@ -18,6 +18,8 @@ export type StatsPayload = {
   activity: StatActivity[];
 };
 
+const readCache = { next: { revalidate: 30 } as const };
+
 export async function fetchStats(): Promise<StatsPayload> {
-  return apiRequest<StatsPayload>("/api/v1/stats");
+  return apiRequest<StatsPayload>("/api/v1/stats", readCache);
 }

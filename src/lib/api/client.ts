@@ -1,4 +1,5 @@
 import { ApiError, normalizeFetchError } from "./errors";
+import { getIncomingRequestCookieHeader } from "@/lib/api/forward-request-cookies";
 import { getPublicApiBaseUrl } from "@/lib/utils/env";
 import { emitUnauthorizedAccess } from "@/lib/auth/access-events";
 
@@ -15,6 +16,13 @@ export type RequestOptions = {
   accessToken?: string | null;
   /** Defaults to include so session cookies are sent for backend calls. */
   credentials?: RequestCredentials;
+  /**
+   * Fetch cache mode. Defaults to `no-store` unless `next` is set (server revalidation).
+   * Adapters used from Next.js Server Components may pass `next` for ISR-style caching.
+   */
+  cache?: RequestCache;
+  /** Next.js extended fetch options (server Components / Route Handlers). */
+  next?: { revalidate?: number; tags?: string[] };
 };
 
 async function parseJsonSafe(response: Response): Promise<unknown> {
@@ -37,29 +45,46 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const base = options.baseUrl ?? getPublicApiBaseUrl();
   const url = `${base}${path.startsWith("/") ? path : `/${path}`}`;
-  const headers: Record<string, string> = {
+  const headerMap: Record<string, string> = {
     Accept: "application/json",
     ...options.headers,
   };
 
   if (options.accessToken) {
-    headers.Authorization = `Bearer ${options.accessToken}`;
+    headerMap.Authorization = `Bearer ${options.accessToken}`;
   }
+
+  const forwardedCookie = await getIncomingRequestCookieHeader();
+  if (forwardedCookie && !headerMap.Cookie) {
+    headerMap.Cookie = forwardedCookie;
+  }
+
+  /** Session-bound requests must not share one URL-keyed ISR entry across users. */
+  const hasSessionCookie = Boolean(forwardedCookie || headerMap.Cookie);
+  const nextOptions = hasSessionCookie ? undefined : options.next;
+  const cacheMode = hasSessionCookie ? "no-store" : options.cache ?? "no-store";
 
   let body: string | undefined;
   if (options.body !== undefined) {
-    headers["Content-Type"] = "application/json";
+    headerMap["Content-Type"] = "application/json";
     body = JSON.stringify(options.body);
   }
 
-  const response = await fetch(url, {
+  const fetchInit: RequestInit & { next?: { revalidate?: number; tags?: string[] } } = {
     method: options.method ?? "GET",
-    headers,
+    headers: headerMap,
     body,
     signal: options.signal,
-    cache: "no-store",
     credentials: options.credentials ?? "include",
-  });
+  };
+
+  if (nextOptions) {
+    fetchInit.next = nextOptions;
+  } else {
+    fetchInit.cache = cacheMode;
+  }
+
+  const response = await fetch(url, fetchInit);
 
   const payload = await parseJsonSafe(response);
 

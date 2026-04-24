@@ -1,43 +1,13 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { LoadingState } from "@/components/ui/LoadingState";
+import { formatLoadError } from "@/lib/utils/error-message";
 import { getInputNeededItems } from "./api/get-items";
 import { InputNeededView } from "./InputNeededView";
 
-export function InputNeededScreen() {
-  const [state, setState] = useState<{
-    loading: boolean;
-    items?: Awaited<ReturnType<typeof getInputNeededItems>>;
-    error?: unknown;
-  }>({ loading: true });
-
-  useEffect(() => {
-    let active = true;
-    void (async () => {
-      try {
-        const items = await getInputNeededItems();
-        if (!active) return;
-        setState({ loading: false, items });
-      } catch (caught) {
-        if (!active) return;
-        setState({ loading: false, error: caught });
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  if (state.loading) {
-    return <LoadingState label="Loading input queue…" />;
+export async function InputNeededScreen() {
+  const result = await getInputNeededItems()
+    .then((items) => ({ ok: true as const, items }))
+    .catch((error: unknown) => ({ ok: false as const, error }));
+  if (!result.ok) {
+    return <InputNeededView loadError={formatLoadError(result.error)} />;
   }
-
-  if (state.error !== undefined) {
-    return <InputNeededView error={state.error} />;
-  }
-  if (state.items === undefined) {
-    return <InputNeededView error={new Error("Missing items")} />;
-  }
-  return <InputNeededView items={state.items} />;
+  return <InputNeededView items={result.items} />;
 }

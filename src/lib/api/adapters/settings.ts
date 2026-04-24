@@ -5,6 +5,8 @@ export type UserSettings = {
   digestEmail: boolean;
 };
 
+const readCache = { next: { revalidate: 30 } as const };
+
 export async function fetchUserSettings(): Promise<UserSettings> {
-  return apiRequest<UserSettings>("/api/v1/settings");
+  return apiRequest<UserSettings>("/api/v1/settings", readCache);
 }

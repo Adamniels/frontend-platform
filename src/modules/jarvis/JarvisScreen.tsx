@@ -1,17 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChatBar } from "@/components/jarvis/ChatBar";
-import { JarvisButton } from "@/components/jarvis/JarvisButton";
-import { JarvisCard } from "@/components/jarvis/JarvisCard";
-import { JarvisIcon } from "@/components/jarvis/JarvisIcon";
 import { ProgressRing } from "@/components/jarvis/ProgressRing";
-import { QuickActions } from "@/components/jarvis/QuickActions";
+import { JarvisIcon } from "@/components/jarvis/JarvisIcon";
 import styles from "./jarvis-screen.module.css";
 
 export function JarvisScreen() {
   const router = useRouter();
-  const greeting = new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 17 ? "Good afternoon" : "Good evening";
+  const [prompt, setPrompt] = useState("");
+  const [ringValue, setRingValue] = useState(0);
+
+  const quickActions = [
+    { label: "Summarize latest AI news", href: "/news", icon: "news" as const },
+    { label: "Explain quantum computing", href: "/side-learning", icon: "brain" as const },
+    { label: "Plan my learning path", href: "/side-learning", icon: "dashboard" as const },
+    { label: "Analyze a document", href: "/saved-items", icon: "saved" as const },
+  ];
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setRingValue(82), 500);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   return (
     <div className={`${styles.root} screenEnter`}>
@@ -23,57 +33,91 @@ export function JarvisScreen() {
         <div className={styles.bgNoise} />
         <div className={styles.bgScanBar} />
       </div>
-      <div className={styles.top}>
-        <div className={styles.heroRow}>
+      <div className={styles.inner}>
+        <div className={styles.hero}>
           <div className={styles.heroText}>
-            <div className={styles.greet}>{greeting}, Operator</div>
             <h1 className={styles.headline}>
-              Let&apos;s continue
-              <br />
-              <span className={styles.accent}>building.</span>
+              <span className={styles.hl1}>Let&apos;s continue</span>
+              <span className={styles.hl2Wrap}>
+                <span className={styles.hl2}>building.</span>
+                <span className={styles.hlCursor}>█</span>
+              </span>
             </h1>
             <p className={styles.sub}>
               You&apos;re on a <strong>12 day streak.</strong>
               <br />
               Keep the momentum going.
             </p>
-            <JarvisButton
-              label="View recent insights"
-              variant="ghost"
-              onClick={() => router.push("/insights")}
-              icon={<JarvisIcon name="arrow" size={15} color="rgba(232,237,248,0.45)" />}
-              className={styles.cta}
-              style={{ flexDirection: "row-reverse" }}
-            />
+            <button type="button" className={styles.cta} onClick={() => router.push("/insights")}>
+              View recent insights
+              <JarvisIcon name="arrow" size={13} color="currentColor" />
+            </button>
           </div>
           <div className={styles.sessionCol}>
             <div className={styles.sessionLabel}>Continue Session</div>
-            <JarvisCard hover={false} className={styles.sessionCard}>
-              <ProgressRing value={82} size={110} stroke={8} />
-              <div className={styles.sessionCenter}>
-                <div className={styles.sessionTitle}>AI Ethics in Practice</div>
-                <p className={styles.sessionMeta}>
-                  You left off at the exercise section.
-                  <br />
-                  Estimated <strong>12 min</strong> to complete.
-                </p>
+            <div className={styles.sessionCard}>
+              <div className={styles.sessionBorder} />
+              <div className={styles.sessionBorderMask} />
+              <div className={styles.sessionContent}>
+                <ProgressRing value={ringValue} size={110} stroke={8} />
+                <div className={styles.sessionCenter}>
+                  <div className={styles.sessionTitle}>AI Ethics in Practice</div>
+                  <p className={styles.sessionMeta}>
+                    You left off at the exercise section.
+                    <br />
+                    Estimated <strong>12 min</strong> to complete.
+                  </p>
+                </div>
+                <button type="button" className={styles.resumeBtn} onClick={() => router.push("/side-learning")}>
+                  Resume session
+                  <JarvisIcon name="chevron" size={12} color="currentColor" />
+                </button>
               </div>
-              <JarvisButton
-                label="Resume session"
-                variant="ghost"
-                onClick={() => router.push("/side-learning")}
-                icon={<JarvisIcon name="chevron" size={14} color="rgba(232,237,248,0.45)" />}
-                className={styles.resume}
-                style={{ width: "100%", justifyContent: "center", flexDirection: "row-reverse" }}
-              />
-            </JarvisCard>
+            </div>
           </div>
         </div>
-      </div>
-      <div className={styles.spacer} />
-      <div className={styles.bottom}>
-        <ChatBar onSubmit={() => router.push("/news")} />
-        <QuickActions />
+
+        <div className={styles.spacer} />
+
+        <div className={styles.bottom}>
+          <div className={styles.chat}>
+            <div className={styles.chatSpark}>
+              <JarvisIcon name="sparkle" size={16} color="var(--accent)" />
+            </div>
+            <input
+              className={styles.chatInput}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="How can I help you today?"
+              aria-label="Jarvis prompt"
+            />
+            <div className={styles.chatActions}>
+              <button type="button" className={styles.chatAct}>
+                <JarvisIcon name="attach" size={12} color="currentColor" />
+                Attach
+              </button>
+              <button type="button" className={styles.chatAct}>
+                <JarvisIcon name="mic" size={12} color="currentColor" />
+                Voice
+              </button>
+              <button type="button" className={`${styles.chatSend} ${prompt.trim() ? styles.chatSendOn : ""}`}>
+                <JarvisIcon name="send" size={12} color={prompt.trim() ? "#000" : "rgba(232,237,248,0.4)"} />
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.quick}>
+            {quickActions.map((action) => (
+              <button key={action.label} type="button" className={styles.quickBtn} onClick={() => router.push(action.href)}>
+                <span className={styles.quickLeft}>
+                  <JarvisIcon name={action.icon} size={12} color="var(--accent)" />
+                  {action.label}
+                </span>
+                <JarvisIcon name="chevron" size={10} color="var(--color-text-dim)" />
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

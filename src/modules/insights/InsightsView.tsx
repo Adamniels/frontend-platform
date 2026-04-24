@@ -2,15 +2,16 @@
 
 import { useMemo, useState } from "react";
 import type { MemoryInsight } from "@/lib/api/adapters/insights";
-
-const NO_INSIGHTS: MemoryInsight[] = [];
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
+import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { ProgressBar } from "@/components/jarvis/ProgressBar";
 import styles from "./insights.module.css";
 
-type InsightsViewProps = { items: MemoryInsight[] } | { error: unknown };
+const NO_INSIGHTS: MemoryInsight[] = [];
+
+type InsightsViewProps = { items: MemoryInsight[] } | { loadError: string };
 
 export function InsightsView(props: InsightsViewProps) {
   const items = "items" in props ? props.items : NO_INSIGHTS;
@@ -21,10 +22,10 @@ export function InsightsView(props: InsightsViewProps) {
 
   const visible = useMemo(() => items.filter((m) => !corrected.includes(m.id)), [items, corrected]);
 
-  if ("error" in props) {
+  if ("loadError" in props) {
     return (
       <div className={styles.page}>
-        <p className={styles.err}>Could not load insights.</p>
+        <JarvisInlineError title="Insights" message={props.loadError} />
       </div>
     );
   }
