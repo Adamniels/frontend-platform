@@ -1,20 +1,6 @@
 import type { NewsItemSummary } from "@/types/content";
-import { delay } from "./delay";
+import { apiRequest } from "@/lib/api/client";
 
 export async function fetchNewsFeed(): Promise<NewsItemSummary[]> {
-  await delay(100);
-  return [
-    {
-      id: "n1",
-      title: "Sample headline (placeholder)",
-      source: "Wire",
-      publishedAt: new Date().toISOString(),
-    },
-    {
-      id: "n2",
-      title: "Another story placeholder",
-      source: "Digest",
-      publishedAt: new Date().toISOString(),
-    },
-  ];
+  return apiRequest<NewsItemSummary[]>("/api/v1/news/feed");
 }

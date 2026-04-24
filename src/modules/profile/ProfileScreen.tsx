@@ -1,24 +1,46 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import type { UserProfile } from "@/lib/api/adapters/profile";
+import { LoadingState } from "@/components/ui/LoadingState";
 import { getUserProfile } from "./api/get-profile";
 import { ProfileView } from "./ProfileView";
 
-export async function ProfileScreen() {
-  let profile: UserProfile | undefined;
-  let error: unknown;
+export function ProfileScreen() {
+  const [state, setState] = useState<{
+    loading: boolean;
+    profile?: UserProfile;
+    error?: unknown;
+  }>({ loading: true });
 
-  try {
-    profile = await getUserProfile();
-  } catch (caught) {
-    error = caught;
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      try {
+        const profile = await getUserProfile();
+        if (!active) return;
+        setState({ loading: false, profile });
+      } catch (caught) {
+        if (!active) return;
+        setState({ loading: false, error: caught });
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (state.loading) {
+    return <LoadingState label="Loading profile…" />;
   }
 
-  if (error !== undefined) {
-    return <ProfileView error={error} />;
+  if (state.error !== undefined) {
+    return <ProfileView error={state.error} />;
   }
 
-  if (profile === undefined) {
+  if (state.profile === undefined) {
     return <ProfileView error={new Error("Missing profile data")} />;
   }
 
-  return <ProfileView profile={profile} />;
+  return <ProfileView profile={state.profile} />;
 }

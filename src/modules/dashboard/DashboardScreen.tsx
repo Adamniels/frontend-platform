@@ -1,24 +1,46 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import type { DashboardSummary } from "@/types/dashboard";
+import { LoadingState } from "@/components/ui/LoadingState";
 import { getDashboardSummary } from "./api/get-dashboard-summary";
 import { DashboardView } from "./DashboardView";
 
-export async function DashboardScreen() {
-  let data: DashboardSummary | undefined;
-  let error: unknown;
+export function DashboardScreen() {
+  const [state, setState] = useState<{
+    loading: boolean;
+    data?: DashboardSummary;
+    error?: unknown;
+  }>({ loading: true });
 
-  try {
-    data = await getDashboardSummary();
-  } catch (caught) {
-    error = caught;
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      try {
+        const data = await getDashboardSummary();
+        if (!active) return;
+        setState({ loading: false, data });
+      } catch (caught) {
+        if (!active) return;
+        setState({ loading: false, error: caught });
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (state.loading) {
+    return <LoadingState label="Loading dashboard…" />;
   }
 
-  if (error !== undefined) {
-    return <DashboardView error={error} />;
+  if (state.error !== undefined) {
+    return <DashboardView error={state.error} />;
   }
 
-  if (data === undefined) {
+  if (state.data === undefined) {
     return <DashboardView error={new Error("Missing dashboard data")} />;
   }
 
-  return <DashboardView data={data} />;
+  return <DashboardView data={state.data} />;
 }

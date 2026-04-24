@@ -1,4 +1,4 @@
-import { delay } from "./delay";
+import { apiRequest } from "@/lib/api/client";
 
 export type UserProfile = {
   displayName: string;
@@ -6,9 +6,5 @@ export type UserProfile = {
 };
 
 export async function fetchUserProfile(): Promise<UserProfile> {
-  await delay(80);
-  return {
-    displayName: "You",
-    email: "you@example.com",
-  };
+  return apiRequest<UserProfile>("/api/v1/profile");
 }

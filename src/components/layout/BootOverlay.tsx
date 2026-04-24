@@ -3,30 +3,45 @@
 import { useEffect, useState } from "react";
 import styles from "./BootOverlay.module.css";
 
-export function BootOverlay() {
+type BootOverlayProps = {
+  onComplete?: () => void;
+};
+
+export function BootOverlay({ onComplete }: BootOverlayProps) {
   const [visible, setVisible] = useState(true);
   const [opacity, setOpacity] = useState(1);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     let p = 0;
+    let completeTimer = 0;
+    let fadeTimer = 0;
+    let doneTimer = 0;
     const iv = window.setInterval(() => {
       p += Math.random() * 22 + 8;
       const next = Math.min(p, 95);
       setProgress(next);
       if (p >= 95) {
         window.clearInterval(iv);
-        window.setTimeout(() => {
+        completeTimer = window.setTimeout(() => {
           setProgress(100);
-          window.setTimeout(() => {
+          fadeTimer = window.setTimeout(() => {
             setOpacity(0);
-            window.setTimeout(() => setVisible(false), 400);
+            doneTimer = window.setTimeout(() => {
+              setVisible(false);
+              onComplete?.();
+            }, 400);
           }, 300);
         }, 200);
       }
     }, 300);
-    return () => window.clearInterval(iv);
-  }, []);
+    return () => {
+      window.clearInterval(iv);
+      window.clearTimeout(completeTimer);
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(doneTimer);
+    };
+  }, [onComplete]);
 
   if (!visible) return null;
 

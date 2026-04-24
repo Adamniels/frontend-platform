@@ -2,11 +2,13 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { AccessGateProvider, useAccessGate } from "./AccessGateProvider";
 import { BootOverlay } from "./BootOverlay";
 import { MainNav } from "./MainNav";
 import { PendingInputProvider } from "./PendingInputContext";
 import { SearchOverlay } from "./SearchOverlay";
 import { TopBar } from "./TopBar";
+import { UnlockOverlay } from "./UnlockOverlay";
 import { applyAccentToDocument, readStoredAccent } from "@/lib/theme/accent";
 import { applyBrightnessToDocument, readStoredBrightness } from "@/lib/theme/brightness";
 import styles from "./AppShell.module.css";
@@ -16,7 +18,16 @@ type AppShellProps = {
 };
 
 export function AppShell({ children }: AppShellProps) {
+  return (
+    <AccessGateProvider>
+      <AppShellFrame>{children}</AppShellFrame>
+    </AccessGateProvider>
+  );
+}
+
+function AppShellFrame({ children }: AppShellProps) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const { status, unlockError, unlock, bootRunId, completeBoot } = useAccessGate();
 
   useEffect(() => {
     const stored = readStoredAccent();
@@ -39,7 +50,9 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <PendingInputProvider>
-      <BootOverlay />
+      {status === "booting" ? (
+        <BootOverlay key={bootRunId} onComplete={completeBoot} />
+      ) : null}
       <div className={styles.shell}>
         <aside className={styles.sidebar} aria-label="Primary">
           <div className={styles.logoRow}>
@@ -71,6 +84,14 @@ export function AppShell({ children }: AppShellProps) {
           <div className={styles.content}>{children}</div>
         </div>
       </div>
+      {status === "checking" || status === "locked" || status === "unlocking" ? (
+        <UnlockOverlay
+          checking={status === "checking"}
+          unlocking={status === "unlocking"}
+          error={unlockError}
+          onUnlock={unlock}
+        />
+      ) : null}
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </PendingInputProvider>
   );

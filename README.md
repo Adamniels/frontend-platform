@@ -16,7 +16,7 @@ npm run test:run  # Vitest CI
 
 - App shell and navigation: `src/components/layout`
 - Feature modules: `src/modules/*` (see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))
-- API surface: `src/lib/api` and `src/lib/api/adapters` (placeholders until the .NET backend exists)
+- API surface: `src/lib/api` and `src/lib/api/adapters` (wired to backend endpoints)
 
 ## Environment
 

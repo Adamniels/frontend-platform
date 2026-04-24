@@ -1,5 +1,6 @@
 import { ApiError, normalizeFetchError } from "./errors";
 import { getPublicApiBaseUrl } from "@/lib/utils/env";
+import { emitUnauthorizedAccess } from "@/lib/auth/access-events";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -12,6 +13,8 @@ export type RequestOptions = {
   baseUrl?: string;
   /** Optional bearer token for backend calls. */
   accessToken?: string | null;
+  /** Defaults to include so session cookies are sent for backend calls. */
+  credentials?: RequestCredentials;
 };
 
 async function parseJsonSafe(response: Response): Promise<unknown> {
@@ -55,11 +58,15 @@ export async function apiRequest<T>(
     body,
     signal: options.signal,
     cache: "no-store",
+    credentials: options.credentials ?? "include",
   });
 
   const payload = await parseJsonSafe(response);
 
   if (!response.ok) {
+    if (response.status === 401) {
+      emitUnauthorizedAccess();
+    }
     throw normalizeFetchError(
       response.status,
       payload,

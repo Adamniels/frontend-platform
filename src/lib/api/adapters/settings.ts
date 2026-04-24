@@ -1,4 +1,4 @@
-import { delay } from "./delay";
+import { apiRequest } from "@/lib/api/client";
 
 export type UserSettings = {
   theme: "system" | "light" | "dark";
@@ -6,6 +6,5 @@ export type UserSettings = {
 };
 
 export async function fetchUserSettings(): Promise<UserSettings> {
-  await delay(80);
-  return { theme: "system", digestEmail: true };
+  return apiRequest<UserSettings>("/api/v1/settings");
 }

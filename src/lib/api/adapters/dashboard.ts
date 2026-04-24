@@ -1,11 +1,6 @@
 import type { DashboardSummary } from "@/types/dashboard";
-import { delay } from "./delay";
+import { apiRequest } from "@/lib/api/client";
 
 export async function fetchDashboardSummary(): Promise<DashboardSummary> {
-  await delay(120);
-  return {
-    greeting: "Welcome back",
-    activeRuns: 2,
-    itemsNeedingAttention: 1,
-  };
+  return apiRequest<DashboardSummary>("/api/v1/dashboard/summary");
 }

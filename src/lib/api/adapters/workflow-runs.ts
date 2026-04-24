@@ -1,20 +1,6 @@
 import type { WorkflowRunSummary } from "@/types/workflow";
-import { delay } from "./delay";
+import { apiRequest } from "@/lib/api/client";
 
 export async function fetchWorkflowRuns(): Promise<WorkflowRunSummary[]> {
-  await delay(100);
-  return [
-    {
-      id: "wr1",
-      name: "News intelligence",
-      status: "running",
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "wr2",
-      name: "Side learning enrichment",
-      status: "needs_input",
-      updatedAt: new Date().toISOString(),
-    },
-  ];
+  return apiRequest<WorkflowRunSummary[]>("/api/v1/workflow-runs");
 }

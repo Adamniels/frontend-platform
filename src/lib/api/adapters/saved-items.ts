@@ -1,14 +1,6 @@
 import type { SavedItemSummary } from "@/types/content";
-import { delay } from "./delay";
+import { apiRequest } from "@/lib/api/client";
 
 export async function fetchSavedItems(): Promise<SavedItemSummary[]> {
-  await delay(100);
-  return [
-    {
-      id: "sv1",
-      title: "Saved article (placeholder)",
-      kind: "article",
-      savedAt: new Date().toISOString(),
-    },
-  ];
+  return apiRequest<SavedItemSummary[]>("/api/v1/saved-items");
 }
