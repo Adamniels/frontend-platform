@@ -6,31 +6,36 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(7, 12, 20, 0.45);
+  background: rgba(4, 8, 14, 0.82);
   backdrop-filter: blur(12px);
 }
 
 .panel {
-  width: min(420px, 100%);
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--color-border-strong);
-  background: rgba(10, 15, 26, 0.86);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  width: min(460px, 100%);
+  border-radius: 0;
+  border: 1px solid var(--accent-dim);
+  background: rgba(4, 8, 14, 0.95);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   padding: 24px;
+  animation: glitchIn 0.22s ease;
 }
 
 .title {
   margin: 0 0 8px;
-  font-family: var(--font-sans);
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
 }
 
 .subtitle {
   margin: 0;
-  font-size: 13px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
   color: var(--color-text-muted);
+  text-transform: uppercase;
 }
 
 .form {
@@ -40,29 +45,36 @@
 }
 
 .label {
-  font-size: 12px;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
   color: var(--color-text-muted);
 }
 
 .input {
   width: 100%;
   height: 42px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0;
+  border: 1px solid var(--accent-dim);
+  background: var(--accent-card);
   padding: 0 12px;
-  font-size: 14px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
 }
 
 .button {
   margin-top: 6px;
   height: 40px;
-  border: 0;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent), #7c5cbf);
-  color: #ffffff;
-  font-family: var(--font-sans);
-  font-size: 13px;
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  background: var(--accent);
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;
 }
@@ -75,6 +87,8 @@
 .error {
   margin: 0;
   color: #ff8d8d;
-  font-size: 12px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
 }
 

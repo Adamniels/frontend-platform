@@ -7,34 +7,41 @@ type BootOverlayProps = {
   onComplete?: () => void;
 };
 
+const BOOT_LINES = [
+  "LOADING NEURAL INTERFACE...",
+  "CALIBRATING USER MODEL...",
+  "SYNCING KNOWLEDGE GRAPH...",
+  "PERSONALIZING FEED...",
+  "SYSTEM READY",
+];
+
 export function BootOverlay({ onComplete }: BootOverlayProps) {
   const [visible, setVisible] = useState(true);
   const [opacity, setOpacity] = useState(1);
   const [progress, setProgress] = useState(0);
+  const [lineIndex, setLineIndex] = useState(0);
 
   useEffect(() => {
-    let p = 0;
-    let completeTimer = 0;
+    let i = 0;
+    const completeTimer = 0;
     let fadeTimer = 0;
     let doneTimer = 0;
     const iv = window.setInterval(() => {
-      p += Math.random() * 22 + 8;
-      const next = Math.min(p, 95);
-      setProgress(next);
-      if (p >= 95) {
+      if (i < BOOT_LINES.length) {
+        i += 1;
+        setLineIndex(i);
+        setProgress((i / BOOT_LINES.length) * 100);
+      } else {
         window.clearInterval(iv);
-        completeTimer = window.setTimeout(() => {
-          setProgress(100);
-          fadeTimer = window.setTimeout(() => {
-            setOpacity(0);
-            doneTimer = window.setTimeout(() => {
-              setVisible(false);
-              onComplete?.();
-            }, 400);
-          }, 300);
-        }, 200);
+        fadeTimer = window.setTimeout(() => {
+          setOpacity(0);
+          doneTimer = window.setTimeout(() => {
+            setVisible(false);
+            onComplete?.();
+          }, 420);
+        }, 350);
       }
-    }, 300);
+    }, 350);
     return () => {
       window.clearInterval(iv);
       window.clearTimeout(completeTimer);
@@ -47,23 +54,46 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
 
   return (
     <div className={styles.overlay} style={{ opacity }}>
-      <svg className={styles.svg} width="64" height="64" viewBox="0 0 64 64" aria-hidden>
-        <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(0,212,255,0.15)" strokeWidth="2" />
+      <svg className={styles.svg} width="80" height="80" viewBox="0 0 80 80" aria-hidden>
+        <circle cx="40" cy="40" r="36" fill="none" stroke="#00d4ff" strokeWidth="1" opacity="0.3" />
         <circle
           className={styles.spin}
-          cx="32"
-          cy="32"
-          r="28"
+          cx="40"
+          cy="40"
+          r="26"
           fill="none"
           stroke="#00d4ff"
-          strokeWidth="2"
-          strokeDasharray="40 136"
+          strokeWidth="1"
+          opacity="0.5"
+          strokeDasharray="40 123"
+          strokeDashoffset={0}
         />
-        <circle cx="32" cy="32" r="6" fill="#00d4ff" opacity="0.9" />
+        <circle
+          className={styles.spinReverse}
+          cx="40"
+          cy="40"
+          r="16"
+          fill="none"
+          stroke="#00d4ff"
+          strokeWidth="0.5"
+          opacity="0.4"
+          strokeDasharray="20 81"
+          strokeDashoffset={0}
+        />
+        <circle cx="40" cy="40" r="5" fill="#00d4ff" />
       </svg>
-      <div className={styles.label}>INITIALIZING</div>
+      <div className={styles.label}>INITIALIZING JARVIS</div>
+      <div className={styles.bootSub}>
+        {BOOT_LINES.slice(0, lineIndex).map((line) => (
+          <div key={line}>
+            {line}
+          </div>
+        ))}
+      </div>
       <div className={styles.barWrap}>
-        <div className={styles.bar} style={{ width: `${progress}%` }} />
+        <div className={styles.bar} style={{ width: `${progress}%` }}>
+          <span className={styles.barHead} />
+        </div>
       </div>
     </div>
   );

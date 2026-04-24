@@ -10,6 +10,7 @@ import styles from "./profile-experience.module.css";
 type ProfileClientProps = { profile: UserProfile };
 
 export function ProfileClient({ profile }: ProfileClientProps) {
+  void profile;
   const [interests, setInterests] = useState([
     "AI Ethics",
     "Machine Learning",
@@ -24,15 +25,16 @@ export function ProfileClient({ profile }: ProfileClientProps) {
 
   return (
     <div className={`${styles.page} screenEnter`}>
-      <h2 className={styles.h2}>Profile</h2>
       <JarvisCard hover={false} className={styles.card}>
         <div className={styles.hero}>
-          <div className={styles.avatar} aria-hidden>
-            OP
+          <div className={styles.avatarWrap}>
+            <div className={styles.avatar} aria-hidden>
+              OP
+            </div>
           </div>
           <div>
-            <div className={styles.name}>{profile.displayName}</div>
-            <div className={styles.email}>{profile.email}</div>
+            <div className={styles.name}>OPERATOR</div>
+            <div className={styles.email}>JOINED APR 2026 · LEVEL 12</div>
             <div className={styles.tags}>
               <JarvisTag label="Advanced learner" />
               <JarvisTag label="AI focused" color="var(--accent)" />
@@ -89,7 +91,7 @@ export function ProfileClient({ profile }: ProfileClientProps) {
             max={5}
             value={depth}
             onChange={(e) => setDepth(Number(e.target.value))}
-            className={styles.range}
+            className={`${styles.range} ${styles.rangeDepth}`}
           />
           <div className={styles.rangeLabels}>
             <span>Overview</span>
@@ -106,7 +108,7 @@ export function ProfileClient({ profile }: ProfileClientProps) {
             step={15}
             value={sessionLen}
             onChange={(e) => setSessionLen(Number(e.target.value))}
-            className={styles.range}
+            className={`${styles.range} ${styles.rangeSession}`}
           />
           <div className={styles.rangeLabels}>
             <span>15 min</span>

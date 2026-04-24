@@ -37,7 +37,12 @@ export function AccessGateProvider({ children }: AccessGateProviderProps) {
       try {
         const authenticated = await getAccessSession();
         if (!active) return;
-        setStatus(authenticated ? "ready" : "locked");
+        if (authenticated) {
+          setBootRunId((current) => current + 1);
+          setStatus("booting");
+          return;
+        }
+        setStatus("locked");
       } catch (error) {
         if (!active) return;
         if (isApiError(error) && error.status === 401) {

@@ -1,19 +1,22 @@
 .primary {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
+  padding: 14px 0;
 }
 
 .bottom {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-bottom: 12px;
+  gap: 0;
+  margin: 0;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--accent-dim);
 }
 
 .spacer {
   flex: 1;
-  min-height: var(--space-4);
+  min-height: var(--space-3);
 }
 
 .navLink,
@@ -21,46 +24,57 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
+  gap: 12px;
+  padding: 12px 20px;
+  border-radius: 0;
   border: none;
+  border-left: 2px solid transparent;
   background: transparent;
   text-align: left;
   color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.18s ease;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 400;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
   text-decoration: none;
 }
 
 .navLink:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--color-text);
+  background: var(--accent-subtle);
+  color: var(--accent);
   text-decoration: none;
 }
 
 .navLinkActive {
-  background: rgba(255, 255, 255, 0.09);
-  color: var(--color-text);
-  font-weight: 600;
+  background: var(--accent-active);
+  color: var(--accent);
+  border-left-color: var(--accent);
   text-decoration: none;
 }
 
 .badge {
   margin-left: auto;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 9px;
-  background: #ef4444;
-  color: #fff;
-  font-size: 10px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ff9500;
+  color: #000;
+  font-size: 8px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 4px;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 8px rgba(255, 149, 0, 0.4);
+}
+
+.activeDot {
+  margin-left: auto;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
 }

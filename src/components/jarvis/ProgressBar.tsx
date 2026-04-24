@@ -31,7 +31,7 @@ export function ProgressBar({
           style={{
             width: `${Math.min(100, Math.max(0, value))}%`,
             background: `linear-gradient(90deg, color-mix(in srgb, ${color} 60%, #7c5cbf), ${color})`,
-            boxShadow: "0 0 8px color-mix(in srgb, var(--accent) 50%, transparent)",
+            boxShadow: `0 0 8px color-mix(in srgb, ${color} 50%, transparent)`,
           }}
         />
       </div>

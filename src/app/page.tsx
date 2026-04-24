@@ -1,5 +1,5 @@
-import { DashboardScreen } from "@/modules/dashboard";
+import { StartScreen } from "@/modules/start";
 
 export default function HomePage() {
-  return <DashboardScreen />;
+  return <StartScreen />;
 }

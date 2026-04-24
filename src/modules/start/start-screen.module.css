@@ -1,0 +1,140 @@
+.root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  min-height: 100%;
+}
+
+.top {
+  position: relative;
+  z-index: 2;
+  min-height: 280px;
+}
+
+.heroRow {
+  display: flex;
+  padding: 48px 40px 40px;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.heroText {
+  flex: 1;
+}
+
+.greet {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+.headline {
+  font-family: var(--font-sans);
+  font-size: clamp(28px, 4vw, 56px);
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.05;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.sub {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 16px 0 24px;
+  line-height: 1.5;
+}
+
+.sub strong {
+  color: var(--color-text);
+}
+
+.sessionCol {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.sessionLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.sessionCard {
+  background: rgba(10, 14, 26, 0.7);
+  border: 1px solid var(--accent-dim);
+  border-radius: 18px;
+  padding: 24px;
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.sessionCenter {
+  text-align: center;
+}
+
+.sessionTitle {
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+.sessionMeta {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.sessionMeta strong {
+  color: var(--color-text);
+}
+
+.resume {
+  width: 100%;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.bottom {
+  position: relative;
+  z-index: 2;
+  padding: 20px 40px calc(20px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 960px) {
+  .heroRow {
+    flex-direction: column;
+    padding: 28px 24px 24px;
+  }
+
+  .sessionCol {
+    width: 100%;
+  }
+
+  .bottom {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}

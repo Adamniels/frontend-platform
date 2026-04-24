@@ -17,9 +17,10 @@ const ALL: Hit[] = [
 type SearchOverlayProps = {
   open: boolean;
   onClose: () => void;
+  onSelect?: (type: string, title: string) => void;
 };
 
-export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
+export function SearchOverlay({ open, onClose, onSelect }: SearchOverlayProps) {
   const [q, setQ] = useState("");
 
   const results = useMemo(
@@ -55,10 +56,18 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
         />
         <div className={styles.results}>
           {results.map((r, i) => (
-            <div key={`${r.title}-${i}`} className={styles.row}>
+            <button
+              type="button"
+              key={`${r.title}-${i}`}
+              className={styles.row}
+              onClick={() => {
+                onSelect?.(r.type, r.title);
+                close();
+              }}
+            >
               <JarvisTag label={r.type} />
               <span className={styles.title}>{r.title}</span>
-            </div>
+            </button>
           ))}
         </div>
         {q.length > 1 && results.length === 0 ? (

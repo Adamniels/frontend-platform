@@ -37,6 +37,7 @@ export function MainNav({ onSearchClick }: MainNavProps) {
                 color={active ? "var(--accent)" : "currentColor"}
               />
               {item.label}
+              {active ? <span className={styles.activeDot} aria-hidden /> : null}
             </Link>
           );
         })}
@@ -53,6 +54,7 @@ export function MainNav({ onSearchClick }: MainNavProps) {
                 type="button"
                 className={styles.navLink}
                 onClick={onSearchClick}
+              aria-label="Open search"
               >
                 <JarvisIcon name={item.icon} size={17} color="currentColor" />
                 {item.label}

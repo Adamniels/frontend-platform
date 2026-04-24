@@ -1,8 +1,16 @@
 /* JARVIS-style design tokens — CSS Modules + variables only (no Tailwind). */
 :root {
   --accent: #00d4ff;
-  --color-bg: #070c14;
-  --color-sidebar: #0a0f1a;
+  --accent-dim: color-mix(in srgb, var(--accent) 25%, transparent);
+  --accent-hover: color-mix(in srgb, var(--accent) 10%, transparent);
+  --accent-active: color-mix(in srgb, var(--accent) 8%, transparent);
+  --accent-subtle: color-mix(in srgb, var(--accent) 5%, transparent);
+  --accent-track: color-mix(in srgb, var(--accent) 15%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 15%, transparent);
+  --accent-card: color-mix(in srgb, var(--accent) 4%, transparent);
+  --accent-scanline: color-mix(in srgb, var(--accent) 5%, transparent);
+  --color-bg: #04080e;
+  --color-sidebar: rgba(4, 8, 14, 0.95);
   --color-surface: rgba(255, 255, 255, 0.045);
   --color-surface-hover: rgba(255, 255, 255, 0.065);
   --color-border: rgba(255, 255, 255, 0.08);
@@ -27,11 +35,14 @@
   --space-6: 32px;
   --space-8: 40px;
   --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
-  --font-mono: ui-monospace, monospace;
-  --sidebar-width: 200px;
-  --topbar-height: 56px;
+  --font-display: var(--font-orbitron), "Orbitron", var(--font-sans);
+  --font-mono: var(--font-space-mono), "Space Mono", ui-monospace, monospace;
+  --sidebar-width: 220px;
+  --topbar-height: 52px;
   /* 1 = baseline (matches settings slider at 60). */
   --shell-brightness: 1;
+  --scanlines-opacity: 1;
+  --hexgrid-opacity: 0.08;
 }
 
 *,
@@ -158,6 +169,57 @@ textarea {
   }
   to {
     stroke-dashoffset: -251;
+  }
+}
+
+@keyframes pulseDot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 6px var(--accent);
+  }
+  50% {
+    opacity: 0.3;
+    box-shadow: 0 0 2px var(--accent);
+  }
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes barPulse {
+  from {
+    opacity: 0.3;
+    transform: scaleY(0.5);
+  }
+  to {
+    opacity: 0.9;
+    transform: scaleY(1.5);
+  }
+}
+
+@keyframes glitchIn {
+  0% {
+    opacity: 0;
+    clip-path: inset(50% 0 50% 0);
+  }
+  30% {
+    clip-path: inset(20% 0 20% 0);
+    opacity: 0.7;
+  }
+  60% {
+    clip-path: inset(5% 0 5% 0);
+    opacity: 0.9;
+  }
+  100% {
+    clip-path: inset(0% 0 0% 0);
+    opacity: 1;
   }
 }
 

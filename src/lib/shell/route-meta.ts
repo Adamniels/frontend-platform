@@ -4,11 +4,13 @@ export type RouteMeta = {
 };
 
 const metaByPrefix: { prefix: string; meta: RouteMeta }[] = [
-  { prefix: "/", meta: { title: "Dashboard", subtitle: "personalized overview" } },
+  { prefix: "/", meta: { title: "Start", subtitle: "mission control" } },
+  { prefix: "/dashboard", meta: { title: "Dashboard", subtitle: "personalized overview" } },
+  { prefix: "/jarvis", meta: { title: "Jarvis", subtitle: "classic dashboard" } },
   { prefix: "/stats", meta: { title: "Stats", subtitle: "your activity" } },
   { prefix: "/news", meta: { title: "News", subtitle: "recommended articles" } },
-  { prefix: "/side-learning", meta: { title: "Side learning", subtitle: "learning paths" } },
-  { prefix: "/saved-items", meta: { title: "Saved items", subtitle: "your library" } },
+  { prefix: "/side-learning", meta: { title: "Learning", subtitle: "side learning module" } },
+  { prefix: "/saved-items", meta: { title: "Saved", subtitle: "your library" } },
   { prefix: "/insights", meta: { title: "Insights", subtitle: "memory and patterns" } },
   { prefix: "/profile", meta: { title: "Profile", subtitle: "preferences and focus" } },
   { prefix: "/settings", meta: { title: "Settings", subtitle: "customization" } },

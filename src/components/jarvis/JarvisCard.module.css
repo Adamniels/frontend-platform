@@ -1,17 +1,43 @@
 .card {
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  padding: 20px 22px;
-  backdrop-filter: blur(12px);
+  position: relative;
+  background: var(--accent-card);
+  border: 1px solid var(--accent-dim);
+  border-radius: 0;
+  padding: 16px 18px;
+  backdrop-filter: blur(10px);
   transition:
     background 0.22s ease,
-    border-color 0.22s ease;
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+
+.card::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1px solid var(--accent);
+  border-left: 1px solid var(--accent);
+}
+
+.card::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 1px solid var(--accent);
+  border-bottom: 1px solid var(--accent);
 }
 
 .cardHoverable:hover {
-  background: rgba(255, 255, 255, 0.065);
-  border-color: var(--color-border-strong);
+  background: var(--accent-hover);
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
 }
 
 .clickable {

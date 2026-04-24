@@ -5,30 +5,43 @@ import { usePathname } from "next/navigation";
 import { JarvisIcon } from "@/components/jarvis/JarvisIcon";
 import { getRouteMeta } from "@/lib/shell/route-meta";
 import styles from "./TopBar.module.css";
-import { useAccessGate } from "./AccessGateProvider";
 
-export function TopBar() {
+type TopBarProps = {
+  onNotificationsClick: () => void;
+  onLockClick: () => void;
+  lockDisabled?: boolean;
+};
+
+export function TopBar({ onNotificationsClick, onLockClick, lockDisabled = false }: TopBarProps) {
   const pathname = usePathname();
   const { title, subtitle } = getRouteMeta(pathname);
-  const [time, setTime] = useState(() => new Date());
-  const { lock, status } = useAccessGate();
+  const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    const bootstrap = window.setTimeout(() => setTime(new Date()), 0);
     const t = window.setInterval(() => setTime(new Date()), 1000);
-    return () => window.clearInterval(t);
+    return () => {
+      window.clearTimeout(bootstrap);
+      window.clearInterval(t);
+    };
   }, []);
 
-  const fmtDate = time.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-  const fmtTime = time.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
+  const fmtDate = time
+    ? time.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "LOADING DATE";
+  const fmtTime = time
+    ? time.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+    : "--:--:--";
 
   return (
     <header className={styles.bar}>
@@ -44,16 +57,27 @@ export function TopBar() {
         ) : null}
       </div>
       <div className={styles.right}>
-        <span className={styles.date}>{fmtDate}</span>
-        <span className={styles.clock}>{fmtTime}</span>
-        <button type="button" className={styles.bellBtn} aria-label="Notifications">
+        <span className={styles.date}>{fmtDate.toUpperCase()}</span>
+        <span className={styles.clock} suppressHydrationWarning>
+          {fmtTime}
+        </span>
+        <div className={styles.telemetry} aria-hidden>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className={styles.telemetryBar} style={{ animationDuration: `${0.8 + i * 0.15}s` }} />
+          ))}
+        </div>
+        <button type="button" className={styles.operatorBtn} aria-label="Operator status">
+          <span className={styles.operatorDot} />
+          OPERATOR
+        </button>
+        <button type="button" className={styles.bellBtn} aria-label="Notifications" onClick={onNotificationsClick}>
           <JarvisIcon name="bell" size={15} color="rgba(232,237,248,0.45)" />
         </button>
         <button
           type="button"
           className={styles.lockBtn}
-          onClick={() => void lock()}
-          disabled={status === "checking" || status === "unlocking"}
+          onClick={onLockClick}
+          disabled={lockDisabled}
           aria-label="Lock application"
         >
           Lock

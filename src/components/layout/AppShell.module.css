@@ -5,31 +5,33 @@
   max-height: 100vh;
   background: var(--color-bg);
   overflow: hidden;
+  position: relative;
 }
 
 .sidebar {
   width: var(--sidebar-width);
   flex-shrink: 0;
   background: var(--color-sidebar);
-  border-right: 1px solid var(--color-border);
+  border-right: 1px solid var(--accent-dim);
   display: flex;
   flex-direction: column;
-  padding: 20px 12px;
+  padding: 0;
   gap: var(--space-2);
+  backdrop-filter: blur(10px);
+  z-index: 6;
 }
 
 .logoRow {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 4px 8px 24px;
+  padding: 28px 20px 24px;
+  border-bottom: 1px solid var(--accent-dim);
 }
 
 .logoOrb {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #7c5cbf);
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,18 +39,18 @@
 }
 
 .logoTitle {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--color-text);
-  letter-spacing: 0.3px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
 }
 
 .logoSub {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 9px;
-  color: var(--color-text-dim);
-  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  letter-spacing: 1.8px;
   text-transform: uppercase;
 }
 
@@ -65,6 +67,8 @@
   min-height: 0;
   overflow: auto;
   filter: brightness(var(--shell-brightness, 1));
+  z-index: 5;
+  position: relative;
 }
 
 .userRow {
@@ -73,23 +77,25 @@
   gap: 10px;
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.045);
-  margin-top: var(--space-2);
+  border: 1px solid var(--accent-dim);
+  background: var(--accent-card);
+  margin: 8px 20px 16px;
+  position: relative;
+  z-index: 2;
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #7c5cbf, var(--accent));
+  border: 1px solid var(--accent-dim);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
   font-weight: 700;
-  color: #fff;
+  color: var(--accent);
+  font-family: var(--font-display);
 }
 
 .userMeta {
@@ -98,8 +104,9 @@
 }
 
 .userName {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-family: var(--font-mono);
   color: var(--color-text);
   font-family: var(--font-sans);
   white-space: nowrap;
@@ -108,7 +115,118 @@
 }
 
 .userPlan {
-  font-size: 10px;
+  font-size: 8px;
   color: var(--accent);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+.hexGrid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--hexgrid-opacity, 0.08);
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--accent) 30%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--accent) 30%, transparent) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--accent-scanline) 2px,
+    var(--accent-scanline) 4px
+  );
+  opacity: var(--scanlines-opacity, 1);
+}
+
+.notifications {
+  position: fixed;
+  right: 0;
+  top: var(--topbar-height);
+  bottom: 0;
+  width: 320px;
+  background: rgba(4, 8, 14, 0.97);
+  border-left: 1px solid var(--accent-dim);
+  backdrop-filter: blur(12px);
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  animation: glitchIn 0.25s ease;
+}
+
+.notificationsHead {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--accent-dim);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notificationsHead span {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.notificationsHead button {
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.notificationsBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notificationCard {
+  text-align: left;
+  border: 1px solid var(--accent-dim);
+  background: var(--accent-card);
+  padding: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.notificationCard:hover {
+  border-color: var(--accent);
+}
+
+.notificationMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.notificationMeta span {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+}
+
+.notificationCard p {
   font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.6;
 }

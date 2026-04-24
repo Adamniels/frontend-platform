@@ -10,6 +10,14 @@ import {
   readStoredBrightness,
   writeStoredBrightness,
 } from "@/lib/theme/brightness";
+import {
+  applyHexGridToDocument,
+  applyScanlinesToDocument,
+  readStoredHexGrid,
+  readStoredScanlines,
+  writeStoredHexGrid,
+  writeStoredScanlines,
+} from "@/lib/theme/display";
 import { SettingsToggle } from "./SettingsToggle";
 import styles from "./settings-experience.module.css";
 
@@ -27,6 +35,8 @@ type SettingsClientProps = { settings: UserSettings };
 export function SettingsClient({ settings }: SettingsClientProps) {
   const [curAccent, setCurAccent] = useState(() => readStoredAccent() ?? "#00d4ff");
   const [brightness, setBrightness] = useState(() => readStoredBrightness() ?? 60);
+  const [scanLines, setScanLines] = useState(() => readStoredScanlines());
+  const [hexGrid, setHexGrid] = useState(() => readStoredHexGrid());
   const [notifs, setNotifs] = useState({
     brief: true,
     sessions: true,
@@ -37,7 +47,9 @@ export function SettingsClient({ settings }: SettingsClientProps) {
   useLayoutEffect(() => {
     applyAccentToDocument(curAccent);
     applyBrightnessToDocument(brightness);
-  }, [curAccent, brightness]);
+    applyScanlinesToDocument(scanLines);
+    applyHexGridToDocument(hexGrid);
+  }, [curAccent, brightness, scanLines, hexGrid]);
 
   const applyAccent = (color: string) => {
     setCurAccent(color);
@@ -49,6 +61,18 @@ export function SettingsClient({ settings }: SettingsClientProps) {
     setBrightness(v);
     applyBrightnessToDocument(v);
     writeStoredBrightness(v);
+  };
+
+  const applyScanLines = (enabled: boolean) => {
+    setScanLines(enabled);
+    applyScanlinesToDocument(enabled);
+    writeStoredScanlines(enabled);
+  };
+
+  const applyHexGrid = (enabled: boolean) => {
+    setHexGrid(enabled);
+    applyHexGridToDocument(enabled);
+    writeStoredHexGrid(enabled);
   };
 
   return (
@@ -81,6 +105,14 @@ export function SettingsClient({ settings }: SettingsClientProps) {
         </JarvisCard>
         <JarvisCard hover={false} className={styles.card}>
           <div className={styles.sectionTitle}>Display</div>
+          <div className={styles.row}>
+            <span>Scan lines</span>
+            <SettingsToggle on={scanLines} onChange={applyScanLines} />
+          </div>
+          <div className={styles.row}>
+            <span>Hex grid background</span>
+            <SettingsToggle on={hexGrid} onChange={applyHexGrid} />
+          </div>
           <div className={styles.row}>
             <span>HUD brightness</span>
             <div className={styles.brightness}>
