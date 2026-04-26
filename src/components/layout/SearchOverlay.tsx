@@ -7,6 +7,7 @@ import styles from "./SearchOverlay.module.css";
 type Hit = { type: string; title: string };
 
 const ALL: Hit[] = [
+  { type: "Memory", title: "Open Memory center" },
   { type: "Article", title: "EU AI Act Implementation" },
   { type: "Session", title: "AI Ethics in Practice" },
   { type: "Note", title: "Consequentialism vs Deontology" },

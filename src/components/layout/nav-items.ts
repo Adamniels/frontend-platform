@@ -30,6 +30,7 @@ export const sidebarPrimaryNav: SidebarNavLink[] = [
   { kind: "link", href: "/side-learning", label: "Learn", icon: "learn" },
   { kind: "link", href: "/saved-items", label: "Saved", icon: "saved" },
   { kind: "link", href: "/insights", label: "Insights", icon: "insights" },
+  { kind: "link", href: "/memory", label: "Memory", icon: "brain" },
   { kind: "link", href: "/profile", label: "Profile", icon: "profile" },
   { kind: "link", href: "/stats", label: "Stats", icon: "stats", indent: true },
   { kind: "link", href: "/workflow-runs", label: "Workflow runs", icon: "workflow" },

@@ -174,6 +174,7 @@ function AppShellFrame({ children }: AppShellProps) {
           if (type === "Session") router.push("/side-learning");
           else if (type === "Article") router.push("/news");
           else if (type === "Topic") router.push("/insights");
+          else if (type === "Memory") router.push("/memory");
           else router.push("/saved-items");
         }}
       />

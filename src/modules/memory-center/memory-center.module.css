@@ -1,0 +1,223 @@
+.page {
+  padding: 28px 36px 48px;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lead {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  max-width: 56ch;
+  margin: 0;
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+
+.h3 {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0 0 8px;
+}
+
+.subNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.subNavLink {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border: 1px solid var(--accent-dim);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-md, 4px);
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.subNavLink:hover {
+  color: var(--color-text);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--accent-dim));
+}
+
+.subNavLinkActive {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.muted {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.listItem {
+  padding: 2px 0;
+}
+
+.claim {
+  font-size: 14px;
+  color: var(--color-text);
+  line-height: 1.45;
+  margin: 0 0 6px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.textarea,
+.input {
+  width: 100%;
+  min-height: 88px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius-md, 4px);
+  color: var(--color-text);
+  font-family: var(--font-inter, sans-serif);
+  font-size: 13px;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.input {
+  min-height: auto;
+}
+
+.scoreBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 12px;
+}
+
+.scoreLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.barTrack {
+  height: 6px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 50%, #234), var(--accent));
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+.pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--accent-dim);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pillEmph {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--accent);
+}
+
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.evidence {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.evidence li {
+  padding: 8px 10px;
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius-md, 4px);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+.aside {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  padding: 12px 14px;
+  border: 1px dashed var(--accent-dim);
+  border-radius: var(--radius-md, 4px);
+  margin-top: 8px;
+}

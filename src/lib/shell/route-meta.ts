@@ -12,6 +12,7 @@ const metaByPrefix: { prefix: string; meta: RouteMeta }[] = [
   { prefix: "/side-learning", meta: { title: "Learning", subtitle: "side learning module" } },
   { prefix: "/saved-items", meta: { title: "Saved", subtitle: "your library" } },
   { prefix: "/insights", meta: { title: "Insights", subtitle: "memory and patterns" } },
+  { prefix: "/memory", meta: { title: "Memory", subtitle: "center" } },
   { prefix: "/profile", meta: { title: "Profile", subtitle: "preferences and focus" } },
   { prefix: "/settings", meta: { title: "Settings", subtitle: "customization" } },
   { prefix: "/input-needed", meta: { title: "Input needed", subtitle: "pending actions" } },
