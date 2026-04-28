@@ -6,13 +6,13 @@ import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import {
+  CURRENT_USER_ID,
   fetchReviewQueue,
   approveReviewItem,
   rejectReviewItem,
   type ReviewQueueItemV1,
   type ReviewProposalType,
 } from "@/lib/api/adapters/memory-center";
-import { MOCK_REVIEW_QUEUE, type MockReviewItem } from "./memory-mock";
 import styles from "./memory-center.module.css";
 
 // ── Proposal metadata ─────────────────────────────────────────────────────────
@@ -194,28 +194,6 @@ function toReviewCard(item: ReviewQueueItemV1): ReviewCard {
   };
 }
 
-function mockToReviewCard(item: MockReviewItem): ReviewCard {
-  return {
-    id:               item.id,
-    proposalType:     item.proposalType,
-    status:           item.status,
-    createdAt:        item.createdAt,
-    domain:           item.domain,
-    reason:           item.reason,
-    key:              item.key,
-    claim:            item.claim,
-    confidence:       item.confidence,
-    authorityWeight:  item.authorityWeight,
-    targetKey:        item.targetKey,
-    currentConfidence: item.currentConfidence,
-    proposedConfidence: item.proposedConfidence,
-    mergeTargets:     item.mergeTargets,
-    ruleName:         item.ruleName,
-    workflowType:     item.workflowType,
-    ruleContent:      item.ruleContent,
-  };
-}
-
 // ── Single review card component ──────────────────────────────────────────────
 
 type ReviewCardProps = {
@@ -234,7 +212,7 @@ function ReviewCardRow({ item, onChanged }: ReviewCardProps) {
   async function doApprove() {
     setBusy(true); setErr(null);
     try {
-      await approveReviewItem(item.id, 0);
+      await approveReviewItem(item.id, CURRENT_USER_ID);
       onChanged(item.id, "Approved");
     } catch (e) { setErr(formatLoadError(e)); }
     finally { setBusy(false); }
@@ -243,7 +221,7 @@ function ReviewCardRow({ item, onChanged }: ReviewCardProps) {
   async function doReject() {
     setBusy(true); setErr(null);
     try {
-      await rejectReviewItem(item.id, 0, "User declined in Memory Center");
+      await rejectReviewItem(item.id, CURRENT_USER_ID, "User declined in Memory Center");
       onChanged(item.id, "Rejected");
     } catch (e) { setErr(formatLoadError(e)); }
     finally { setBusy(false); }
@@ -319,7 +297,7 @@ export function ReviewQueuePanel() {
   const [filter,   setFilter]   = useState<"Pending" | "All">("Pending");
   const [statuses, setStatuses] = useState<Record<number, string>>({});
 
-  const load = useCallback(() => fetchReviewQueue(0), []);
+  const load = useCallback(() => fetchReviewQueue(CURRENT_USER_ID), []);
   const res  = useAsyncResource(load, "review-queue");
 
   function handleChanged(id: number, nextStatus: string) {
@@ -333,10 +311,7 @@ export function ReviewQueuePanel() {
     return <div className={styles.errorWrap}><JarvisInlineError title="Review queue" message={formatLoadError(res.error)} /></div>;
   }
 
-  // Use backend data if present, otherwise fall back to mock
-  const cards: ReviewCard[] = res.data.length > 0
-    ? res.data.map(toReviewCard)
-    : MOCK_REVIEW_QUEUE.map(mockToReviewCard);
+  const cards: ReviewCard[] = res.data.map(toReviewCard);
 
   // Merge local status overrides (for optimistic UI)
   const withOverrides = cards.map((c) => statuses[c.id] ? { ...c, status: statuses[c.id] } : c);

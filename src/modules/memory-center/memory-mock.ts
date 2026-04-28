@@ -1,13 +1,17 @@
 /**
- * Mock data for Memory Center features that don't yet have backend support.
+ * Mock data for Memory Center and app-wide features that don't yet have backend support.
  *
- * Used by:
- *  - MemoryGraphPanel: relationships between semantic nodes (no backend API)
- *  - MemoryGraphPanel: profile fact nodes augmenting explicit profile
- *  - Any panel falling back when backend returns empty/error
+ * Live exports (still used by production code):
+ *  - MOCK_RELATIONSHIPS  → MemoryGraphPanel (no /api/v1/memory/relationships endpoint yet)
+ *  - MOCK_NOTIFICATIONS  → AppShell (no /api/v1/notifications endpoint yet)
  *
- * All IDs here match the semantic ID space from the real backend.
- * When the backend exposes these, delete the corresponding export and wire the adapter.
+ * Dormant exports (types/data kept for reference; no longer used in production code paths):
+ *  - MOCK_SEMANTICS, MOCK_EVENTS, MOCK_RULES, MOCK_PROFILE_FACTS, MOCK_REVIEW_QUEUE
+ *    These were previously used as silent fallbacks — that pattern has been removed.
+ *    Delete these exports once you are confident the backend data is stable.
+ *
+ * All IDs match the semantic ID space from the real backend.
+ * When the backend exposes an endpoint, delete the corresponding export and wire the adapter.
  */
 
 // ── Types ────────────────────────────────────────────────────────────────────

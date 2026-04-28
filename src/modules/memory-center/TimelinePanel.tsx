@@ -5,8 +5,7 @@ import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
-import { fetchMemoryEvents, type MemoryEventV1 } from "@/lib/api/adapters/memory-center";
-import { MOCK_EVENTS } from "./memory-mock";
+import { CURRENT_USER_ID, fetchMemoryEvents, type MemoryEventV1 } from "@/lib/api/adapters/memory-center";
 import styles from "./memory-center.module.css";
 
 // ── Lane config ───────────────────────────────────────────────────────────────
@@ -451,18 +450,15 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
 
 // ── Panel ─────────────────────────────────────────────────────────────────────
 
-function mergeEvents(backendEvents: MemoryEventV1[]): TlEvent[] {
-  if (backendEvents.length > 0) {
-    return backendEvents.map((e) => ({
-      ...e,
-      payload: e.payloadPreview ? { preview: e.payloadPreview } : undefined,
-    }));
-  }
-  return MOCK_EVENTS as TlEvent[];
+function toTlEvents(backendEvents: MemoryEventV1[]): TlEvent[] {
+  return backendEvents.map((e) => ({
+    ...e,
+    payload: e.payloadPreview ? { preview: e.payloadPreview } : undefined,
+  }));
 }
 
 export function TimelinePanel() {
-  const load    = useCallback(() => fetchMemoryEvents(0, 100), []);
+  const load    = useCallback(() => fetchMemoryEvents(CURRENT_USER_ID, 100), []);
   const res     = useAsyncResource(load, "timeline");
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -473,7 +469,7 @@ export function TimelinePanel() {
     return <div className={styles.errorWrap}><JarvisInlineError title="Timeline" message={formatLoadError(res.error)} /></div>;
   }
 
-  const events = mergeEvents(res.data);
+  const events = toTlEvents(res.data);
 
   if (events.length === 0) {
     return <p className={styles.loadingText}>No events recorded yet.</p>;

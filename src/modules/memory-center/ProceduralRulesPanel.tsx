@@ -6,6 +6,7 @@ import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import {
+  CURRENT_USER_ID,
   fetchProceduralRules,
   fetchProceduralRuleDetail,
   activateProceduralRule,
@@ -13,7 +14,6 @@ import {
   type ProceduralRuleSummaryV1,
   type ProceduralRuleDetailV1,
 } from "@/lib/api/adapters/memory-center";
-import { MOCK_RULES } from "./memory-mock";
 import styles from "./memory-center.module.css";
 
 // ── Colour maps ───────────────────────────────────────────────────────────────
@@ -76,19 +76,10 @@ function RuleCard({ rule, onMutated }: RuleCardProps) {
     if (next && !detail) {
       setLoadingDetail(true);
       try {
-        const d = await fetchProceduralRuleDetail(rule.id, 0);
+        const d = await fetchProceduralRuleDetail(rule.id, CURRENT_USER_ID);
         setDetail(d);
-      } catch {
-        // Fall back to mock data matching this rule
-        const mock = MOCK_RULES.find((r) => r.id === rule.id);
-        if (mock) {
-          setDetail({
-            id: mock.id, workflowType: mock.workflowType, ruleName: mock.ruleName,
-            ruleContent: mock.ruleContent, version: mock.version, priority: mock.priority,
-            status: mock.status, authorityWeight: mock.authorityWeight, source: mock.source,
-            createdAt: mock.createdAt, updatedAt: mock.updatedAt,
-          });
-        }
+      } catch (e) {
+        setErr(formatLoadError(e));
       } finally {
         setLoadingDetail(false);
       }
@@ -189,17 +180,17 @@ function RuleCard({ rule, onMutated }: RuleCardProps) {
 
           <div className={styles.rowActions}>
             {status !== "Active" && !deprecated && (
-              <button className={styles.btnSuccess} disabled={busy} onClick={() => void doAction(() => activateProceduralRule(rule.id, 0), "Active")}>
+              <button className={styles.btnSuccess} disabled={busy} onClick={() => void doAction(() => activateProceduralRule(rule.id, CURRENT_USER_ID), "Active")}>
                 {busy ? "…" : "Activate"}
               </button>
             )}
             {status === "Active" && (
-              <button className={styles.btnWarn} disabled={busy} onClick={() => void doAction(() => deprecateProceduralRule(rule.id, 0), "Inactive")}>
+              <button className={styles.btnWarn} disabled={busy} onClick={() => void doAction(() => deprecateProceduralRule(rule.id, CURRENT_USER_ID), "Inactive")}>
                 {busy ? "…" : "Deactivate"}
               </button>
             )}
             {!deprecated && (
-              <button className={styles.btnDanger} disabled={busy} onClick={() => void doAction(() => deprecateProceduralRule(rule.id, 0), "Deprecated")}>
+              <button className={styles.btnDanger} disabled={busy} onClick={() => void doAction(() => deprecateProceduralRule(rule.id, CURRENT_USER_ID), "Deprecated")}>
                 {busy ? "…" : "Deprecate"}
               </button>
             )}
@@ -221,7 +212,7 @@ export function ProceduralRulesPanel() {
 
   // refresh is intentionally in deps to trigger re-fetch on mutation
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const load = useCallback(() => fetchProceduralRules(0), [refresh]);
+  const load = useCallback(() => fetchProceduralRules(CURRENT_USER_ID), [refresh]);
   const res  = useAsyncResource(load, `procedural-${refresh}`);
 
   if (res.status === "loading") {
@@ -231,15 +222,7 @@ export function ProceduralRulesPanel() {
     return <div className={styles.errorWrap}><JarvisInlineError title="Procedural rules" message={formatLoadError(res.error)} /></div>;
   }
 
-  // Fall back to mock if backend returns empty
-  const all: ProceduralRuleSummaryV1[] = res.data.length > 0
-    ? res.data
-    : MOCK_RULES.map((r) => ({
-        id: r.id, workflowType: r.workflowType, ruleName: r.ruleName,
-        version: r.version, priority: r.priority, status: r.status,
-        authorityWeight: r.authorityWeight, source: r.source,
-        updatedAt: r.updatedAt, createdAt: r.createdAt, ruleContent: r.ruleContent,
-      }));
+  const all: ProceduralRuleSummaryV1[] = res.data;
 
   const workflows = ["All", ...Array.from(new Set(all.map((r) => r.workflowType)))];
 

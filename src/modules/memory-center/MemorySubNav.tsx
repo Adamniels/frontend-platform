@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import {
+  CURRENT_USER_ID,
   fetchMemoryEvents,
   fetchProceduralRules,
   fetchReviewQueue,
@@ -42,10 +43,10 @@ export function MemorySubNav() {
     (async () => {
       try {
         const [ev, sem, rules, review] = await Promise.all([
-          fetchMemoryEvents(0, 120),
-          fetchSemantics(0, true),
-          fetchProceduralRules(0),
-          fetchReviewQueue(0),
+          fetchMemoryEvents(CURRENT_USER_ID, 120),
+          fetchSemantics(CURRENT_USER_ID, true),
+          fetchProceduralRules(CURRENT_USER_ID),
+          fetchReviewQueue(CURRENT_USER_ID),
         ]);
         if (!live) return;
         const pending = review.filter(

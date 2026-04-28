@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { DashboardSummary } from "@/types/dashboard";
+import { MOCK_INPUT_ITEMS, MOCK_PROGRESS_METRICS, MOCK_QUICK_ACTIONS, MOCK_SESSION_CARD } from "./dashboard-mock";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
@@ -79,11 +80,12 @@ export function DashboardClient(props: DashboardClientProps) {
             <JarvisTag label="Agents" color="#ff9500" />
           </div>
         </JarvisCard>
+        {/* TODO: wire to active session from GET /api/v1/side-learning/topics */}
         <JarvisCard onClick={() => router.push("/side-learning")} className={styles.click}>
-          <div className={styles.meta}>PAUSED · 62% COMPLETE</div>
-          <h3 className={styles.cardTitleAmber}>AI Ethics in Practice</h3>
-          <p className={styles.cardBody}>You left off at the exercise section. Estimated 12 min to complete.</p>
-          <ProgressBar value={62} color="#ff9500" />
+          <div className={styles.meta}>PAUSED · {MOCK_SESSION_CARD.progress}% COMPLETE</div>
+          <h3 className={styles.cardTitleAmber}>{MOCK_SESSION_CARD.title}</h3>
+          <p className={styles.cardBody}>You left off at the exercise section. Estimated {MOCK_SESSION_CARD.estimatedMinutes} min to complete.</p>
+          <ProgressBar value={MOCK_SESSION_CARD.progress} color="#ff9500" />
         </JarvisCard>
       </div>
 
@@ -108,29 +110,25 @@ export function DashboardClient(props: DashboardClientProps) {
         <JarvisCard>
           <div className={styles.meta}>PROGRESS</div>
           <div className={styles.stack}>
-            <ProgressBar label="Weekly Learning" value={68} />
-            <ProgressBar label="Topic Mastery: AI Ethics" value={82} />
-            <ProgressBar label="Reading Streak" value={45} />
+            {MOCK_PROGRESS_METRICS.map((metric) => (
+              <ProgressBar key={metric.label} label={metric.label} value={metric.value} />
+            ))}
           </div>
         </JarvisCard>
         <JarvisCard>
           <div className={styles.meta}>QUICK ACTIONS</div>
           <div className={styles.quickGrid}>
-            {[
-              ["Daily Brief", "/news"],
-              ["Start Session", "/side-learning"],
-              ["View Saved", "/saved-items"],
-              ["My Insights", "/insights"],
-            ].map(([label, href]) => (
-              <button key={label} type="button" className={styles.quickBtn} onClick={() => router.push(href)}>
-                {label}
+            {MOCK_QUICK_ACTIONS.map((action) => (
+              <button key={action.label} type="button" className={styles.quickBtn} onClick={() => router.push(action.href)}>
+                {action.label}
               </button>
             ))}
           </div>
         </JarvisCard>
       </div>
 
-      {[{ id: 1, text: "Rate your last AI Ethics session", type: "RATING", urgent: true }].map((item) =>
+      {/* TODO: replace with live items from GET /api/v1/human-input/items */}
+      {MOCK_INPUT_ITEMS.map((item) =>
         dismissed.includes(item.id) ? null : (
           <JarvisCard key={item.id}>
             <div className={styles.inputRow}>

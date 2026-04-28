@@ -2,18 +2,8 @@
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
+import { MOCK_SEARCH_HITS } from "./search-mock";
 import styles from "./SearchOverlay.module.css";
-
-type Hit = { type: string; title: string };
-
-const ALL: Hit[] = [
-  { type: "Memory", title: "Open Memory center" },
-  { type: "Article", title: "EU AI Act Implementation" },
-  { type: "Session", title: "AI Ethics in Practice" },
-  { type: "Note", title: "Consequentialism vs Deontology" },
-  { type: "Topic", title: "Quantum Computing Fundamentals" },
-  { type: "Article", title: "Memory-Augmented LLMs" },
-];
 
 type SearchOverlayProps = {
   open: boolean;
@@ -26,8 +16,9 @@ export function SearchOverlay({ open, onClose, onSelect }: SearchOverlayProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // TODO: replace with GET /api/v1/search when endpoint is available
   const results = useMemo(
-    () => (q.length > 1 ? ALL.filter((r) => r.title.toLowerCase().includes(q.toLowerCase())) : []),
+    () => (q.length > 1 ? MOCK_SEARCH_HITS.filter((r) => r.title.toLowerCase().includes(q.toLowerCase())) : []),
     [q],
   );
 

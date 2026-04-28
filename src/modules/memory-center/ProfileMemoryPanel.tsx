@@ -7,6 +7,7 @@ import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import {
+  CURRENT_USER_ID,
   type ProfileMemoryV1,
   type UpdateProfileMemoryV1,
   fetchExplicitProfile,
@@ -37,11 +38,13 @@ function toUpdate(from: ProfileMemoryV1): UpdateProfileMemoryV1 {
 }
 
 export function ProfileMemoryPanel() {
-  const load = useCallback(() => fetchExplicitProfile(0), []);
+  const load = useCallback(() => fetchExplicitProfile(CURRENT_USER_ID), []);
   const res = useAsyncResource(load, "profile-memory");
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [draft, setDraft] = useState<UpdateProfileMemoryV1 | null>(null);
+  const [committed, setCommitted] = useState<UpdateProfileMemoryV1 | null>(null);
 
   const gId = useId();
   const cId = useId();
@@ -53,20 +56,24 @@ export function ProfileMemoryPanel() {
   if (res.status === "error") {
     return <JarvisInlineError title="Profile memory" message={formatLoadError(res.error)} />;
   }
-  const base = toUpdate(res.data);
+
+  // Use the last committed save if available, otherwise fall back to the initial fetch
+  const base = committed ?? toUpdate(res.data);
   const d = draft ?? base;
 
   const update = (next: UpdateProfileMemoryV1) => {
     setDraft(next);
+    setSaved(false);
   };
 
   const onSave = async () => {
     setErr(null);
     setSaving(true);
     try {
-      await putExplicitProfile(0, d);
+      const updated = await putExplicitProfile(CURRENT_USER_ID, d);
+      setCommitted(toUpdate(updated));
       setDraft(null);
-      window.location.reload();
+      setSaved(true);
     } catch (e: unknown) {
       setErr(formatLoadError(e));
     } finally {
@@ -122,7 +129,7 @@ export function ProfileMemoryPanel() {
         <JarvisButton
           type="button"
           variant="primary"
-          label={saving ? "Saving…" : "Save profile"}
+          label={saving ? "Saving…" : saved ? "Saved ✓" : "Save profile"}
           onClick={() => void onSave()}
         />
       </JarvisCard>

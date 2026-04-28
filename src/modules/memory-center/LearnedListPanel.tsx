@@ -6,7 +6,7 @@ import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
-import { fetchSemantics, type SemanticMemoryV1 } from "@/lib/api/adapters/memory-center";
+import { CURRENT_USER_ID, fetchSemantics, type SemanticMemoryV1 } from "@/lib/api/adapters/memory-center";
 import { ScoreBar } from "./ScoreBar";
 import styles from "./memory-center.module.css";
 
@@ -48,7 +48,7 @@ function LearnedCard({ m }: { m: SemanticMemoryV1 }) {
 }
 
 export function LearnedListPanel() {
-  const load = useCallback(() => fetchSemantics(0, true), []);
+  const load = useCallback(() => fetchSemantics(CURRENT_USER_ID, true), []);
   const res = useAsyncResource(load, "semantics");
   if (res.status === "loading") {
     return <p className={styles.muted}>Loading learned memory…</p>;

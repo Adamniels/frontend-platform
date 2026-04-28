@@ -4,25 +4,8 @@ import { useMemo, useState } from "react";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
+import { MOCK_SAVED_ITEMS, MOCK_SAVED_ITEM_TYPES } from "./saved-items-mock";
 import styles from "./saved-experience.module.css";
-
-type Item = {
-  id: number;
-  type: string;
-  title: string;
-  date: string;
-  tags: string[];
-};
-
-const ITEMS: Item[] = [
-  { id: 1, type: "Article", title: "EU AI Act Implementation: What Changes in Q3 2026", date: "Apr 23", tags: ["Policy"] },
-  { id: 2, type: "Session", title: "The Alignment Problem — Learning Session", date: "Apr 15", tags: ["AI", "Ethics"] },
-  { id: 3, type: "Note", title: "Key frameworks: Consequentialism vs Deontology", date: "Apr 18", tags: ["Philosophy"] },
-  { id: 4, type: "Topic", title: "Quantum Computing Fundamentals", date: "Apr 20", tags: ["Quantum"] },
-  { id: 5, type: "Resource", title: "Russell: Human Compatible (Annotations)", date: "Apr 12", tags: ["Books"] },
-];
-
-const TYPES = ["All", "Article", "Session", "Note", "Topic", "Resource"];
 
 export function SavedItemsExperience() {
   const [filter, setFilter] = useState("All");
@@ -31,7 +14,7 @@ export function SavedItemsExperience() {
 
   const visible = useMemo(
     () =>
-      ITEMS.filter(
+      MOCK_SAVED_ITEMS.filter(
         (i) =>
           !removed.includes(i.id) &&
           (filter === "All" || i.type === filter) &&
@@ -51,7 +34,7 @@ export function SavedItemsExperience() {
           placeholder="Search…"
           aria-label="Search saved"
         />
-        {TYPES.map((t) => (
+        {MOCK_SAVED_ITEM_TYPES.map((t) => (
           <button
             key={t}
             type="button"

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { MOCK_ACTIVE_SESSION, MOCK_QUICK_ACTIONS } from "./jarvis-mock";
 import { ProgressRing } from "@/components/jarvis/ProgressRing";
 import { JarvisIcon } from "@/components/jarvis/JarvisIcon";
 import styles from "./jarvis-screen.module.css";
@@ -11,15 +12,8 @@ export function JarvisScreen() {
   const [prompt, setPrompt] = useState("");
   const [ringValue, setRingValue] = useState(0);
 
-  const quickActions = [
-    { label: "Summarize latest AI news", href: "/news", icon: "news" as const },
-    { label: "Explain quantum computing", href: "/side-learning", icon: "brain" as const },
-    { label: "Plan my learning path", href: "/side-learning", icon: "dashboard" as const },
-    { label: "Analyze a document", href: "/saved-items", icon: "saved" as const },
-  ];
-
   useEffect(() => {
-    const timer = window.setTimeout(() => setRingValue(82), 500);
+    const timer = window.setTimeout(() => setRingValue(MOCK_ACTIVE_SESSION.progress), 500);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -61,11 +55,11 @@ export function JarvisScreen() {
               <div className={styles.sessionContent}>
                 <ProgressRing value={ringValue} size={110} stroke={8} />
                 <div className={styles.sessionCenter}>
-                  <div className={styles.sessionTitle}>AI Ethics in Practice</div>
+                  <div className={styles.sessionTitle}>{MOCK_ACTIVE_SESSION.title}</div>
                   <p className={styles.sessionMeta}>
                     You left off at the exercise section.
                     <br />
-                    Estimated <strong>12 min</strong> to complete.
+                    Estimated <strong>{MOCK_ACTIVE_SESSION.estimatedMinutes} min</strong> to complete.
                   </p>
                 </div>
                 <button type="button" className={styles.resumeBtn} onClick={() => router.push("/side-learning")}>
@@ -107,7 +101,7 @@ export function JarvisScreen() {
           </div>
 
           <div className={styles.quick}>
-            {quickActions.map((action) => (
+            {MOCK_QUICK_ACTIONS.map((action) => (
               <button key={action.label} type="button" className={styles.quickBtn} onClick={() => router.push(action.href)}>
                 <span className={styles.quickLeft}>
                   <JarvisIcon name={action.icon} size={12} color="var(--accent)" />

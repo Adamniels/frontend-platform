@@ -6,6 +6,7 @@ import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import {
+  CURRENT_USER_ID,
   fetchSemantics,
   archiveSemantic,
   rejectSemantic,
@@ -64,7 +65,7 @@ function ConfBar({ value, color }: { value: number; color: string }) {
 // ── Evidence sub-panel ────────────────────────────────────────────────────────
 
 function EvidencePanel({ semanticId }: { semanticId: number }) {
-  const load = useCallback(() => fetchSemanticEvidence(semanticId, 0), [semanticId]);
+  const load = useCallback(() => fetchSemanticEvidence(semanticId, CURRENT_USER_ID), [semanticId]);
   const res  = useAsyncResource(load, `evidence-${semanticId}`);
 
   if (res.status === "loading") {
@@ -122,14 +123,14 @@ function SemanticCard({ sem, onMutated }: SemanticCardProps) {
 
   const doArchive = async () => {
     setBusy(true); setErr(null);
-    try { await archiveSemantic(sem.id, 0); onMutated(); }
+    try { await archiveSemantic(sem.id, CURRENT_USER_ID); onMutated(); }
     catch (e) { setErr(formatLoadError(e)); }
     finally { setBusy(false); }
   };
 
   const doReject = async () => {
     setBusy(true); setErr(null);
-    try { await rejectSemantic(sem.id, 0); onMutated(); }
+    try { await rejectSemantic(sem.id, CURRENT_USER_ID); onMutated(); }
     catch (e) { setErr(formatLoadError(e)); }
     finally { setBusy(false); }
   };
@@ -231,7 +232,7 @@ export function MemorySemanticsPanel() {
 
   // refresh is intentionally in deps to trigger re-fetch on mutation
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const load = useCallback(() => fetchSemantics(0, true), [refresh]);
+  const load = useCallback(() => fetchSemantics(CURRENT_USER_ID, true), [refresh]);
   const res  = useAsyncResource(load, `semantics-${refresh}`);
 
   if (res.status === "loading") {

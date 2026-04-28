@@ -6,6 +6,7 @@ import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import {
+  CURRENT_USER_ID,
   fetchSemantics,
   fetchProceduralRules,
   fetchExplicitProfile,
@@ -17,13 +18,6 @@ import {
 } from "@/lib/api/adapters/memory-center";
 import {
   MOCK_RELATIONSHIPS,
-  MOCK_PROFILE_FACTS,
-  MOCK_SEMANTICS,
-  MOCK_RULES,
-  type MockRelationship,
-  type MockProfileFact,
-  type MockSemanticMemory,
-  type MockProceduralRule,
 } from "./memory-mock";
 import styles from "./memory-center.module.css";
 
@@ -194,8 +188,24 @@ function vogelOffset3d(i: number, n: number, scale: number): { ox: number; oy: n
 type GraphInputData = {
   semantics: SemanticMemoryV1[];
   rules: ProceduralRuleSummaryV1[];
-  profileFacts: MockProfileFact[];
-  relationships: MockRelationship[];
+  profileFacts: GraphProfileFact[];
+  relationships: GraphRelationship[];
+};
+
+type GraphProfileFact = {
+  id: number;
+  key: string;
+  value: string;
+  confidence: number;
+  status: string;
+};
+
+type GraphRelationship = {
+  id: number;
+  sourceId: number;
+  targetId: number;
+  type: string;
+  label: string;
 };
 
 const SEMANTIC_CLUSTERS: Record<string, { cx: number; cy: number; cz: number }> = {
@@ -249,7 +259,7 @@ function semanticIndexById(semantics: SemanticMemoryV1[]): Map<number, number> {
 /** Undirected unique edges between semantic indices from relationship rows. */
 function relationshipSemanticEdges(
   semantics: SemanticMemoryV1[],
-  relationships: MockRelationship[],
+  relationships: GraphRelationship[],
 ): [number, number][] {
   const idToIdx = semanticIndexById(semantics);
   const seen = new Set<string>();
@@ -422,7 +432,7 @@ function unflattenNoodleLayout(semNodes: GraphNode[], semantics: SemanticMemoryV
  * 2) **Fruchterman–Reingold 2D** on edges in that component (avoids 3D “noodle” line collapse).
  * 3) **Secondary**: domain centroids (soft), then unflatten if the cloud is still too 1D.
  */
-function layoutSemanticSubgraph(semNodes: GraphNode[], semantics: SemanticMemoryV1[], rels: MockRelationship[]) {
+function layoutSemanticSubgraph(semNodes: GraphNode[], semantics: SemanticMemoryV1[], rels: GraphRelationship[]) {
   const n = semNodes.length;
   if (n === 0) return;
   const edgeIdx = relationshipSemanticEdges(semantics, rels);
@@ -1089,7 +1099,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
 }
 
 function rejectSemantic(id: number) {
-  return import("@/lib/api/adapters/memory-center").then((m) => m.rejectSemantic(id, 0));
+  return import("@/lib/api/adapters/memory-center").then((m) => m.rejectSemantic(id, CURRENT_USER_ID));
 }
 
 type NodeActionProps = {
@@ -1123,55 +1133,6 @@ function NodeAction({ label, variant, nodeId, action, onDone }: NodeActionProps)
 }
 
 // ── Data loader wrapper ───────────────────────────────────────────────────────
-// Design reference: platform memory-2-design/memory/memory-graph.jsx + MEMORY_MOCK
-// (full graph needs many semantics/rules/edges; API may return only a few rows).
-
-function mockSemanticToV1(m: MockSemanticMemory): SemanticMemoryV1 {
-  return {
-    id: m.id,
-    key: m.key,
-    claim: m.claim,
-    domain: m.domain,
-    confidence: m.confidence,
-    authorityWeight: m.authorityWeight,
-    status: m.status,
-    createdAt: m.createdAt,
-    updatedAt: m.lastSupportedAt,
-    lastSupportedAt: m.lastSupportedAt,
-    evidenceCount: m.evidenceCount,
-  };
-}
-
-function mockRuleToSummary(m: MockProceduralRule): ProceduralRuleSummaryV1 {
-  return {
-    id: m.id,
-    workflowType: m.workflowType,
-    ruleName: m.ruleName,
-    version: m.version,
-    priority: m.priority,
-    status: m.status,
-    authorityWeight: m.authorityWeight,
-    source: m.source,
-    updatedAt: m.updatedAt,
-    createdAt: m.createdAt,
-    ruleContent: m.ruleContent,
-  };
-}
-
-/** Merge static mock with API by id; API row wins (same idea as profileToFacts + MOCK_PROFILE_FACTS). */
-function mergeSemanticsWithMock(api: SemanticMemoryV1[]): SemanticMemoryV1[] {
-  const byId = new Map<number, SemanticMemoryV1>();
-  for (const m of MOCK_SEMANTICS) byId.set(m.id, mockSemanticToV1(m));
-  for (const s of api) byId.set(s.id, s);
-  return [...byId.values()].sort((a, b) => a.id - b.id);
-}
-
-function mergeRulesWithMock(api: ProceduralRuleSummaryV1[]): ProceduralRuleSummaryV1[] {
-  const byId = new Map<number, ProceduralRuleSummaryV1>();
-  for (const m of MOCK_RULES) byId.set(m.id, mockRuleToSummary(m));
-  for (const r of api) byId.set(r.id, r);
-  return [...byId.values()].sort((a, b) => a.id - b.id);
-}
 
 type GraphDataBundle = {
   semantics: SemanticMemoryV1[];
@@ -1180,28 +1141,23 @@ type GraphDataBundle = {
 };
 
 async function loadGraphData(): Promise<GraphDataBundle> {
-  const [apiSemantics, apiRules, profile] = await Promise.all([
-    fetchSemantics(0, true),
-    fetchProceduralRules(0),
-    fetchExplicitProfile(0),
+  const [semantics, rules, profile] = await Promise.all([
+    fetchSemantics(CURRENT_USER_ID, true),
+    fetchProceduralRules(CURRENT_USER_ID),
+    fetchExplicitProfile(CURRENT_USER_ID),
   ]);
-  return {
-    semantics: mergeSemanticsWithMock(apiSemantics),
-    rules: mergeRulesWithMock(apiRules),
-    profile,
-  };
+  return { semantics, rules, profile };
 }
 
-function profileToFacts(profile: ProfileMemoryV1): MockProfileFact[] {
-  const facts: MockProfileFact[] = [];
+function profileToFacts(profile: ProfileMemoryV1): GraphProfileFact[] {
+  const facts: GraphProfileFact[] = [];
   if (profile.coreInterests?.length) {
     facts.push({ id: 100, key: "core_interests", value: profile.coreInterests.join(", "), confidence: 1.0, status: "Active" });
   }
   if (profile.goals?.length) {
     facts.push({ id: 101, key: "goals", value: profile.goals.slice(0, 2).join(", "), confidence: 1.0, status: "Active" });
   }
-  // Merge with static mock profile facts as supplementary nodes
-  return [...MOCK_PROFILE_FACTS, ...facts];
+  return facts;
 }
 
 export function MemoryGraphPanel() {
@@ -1219,6 +1175,7 @@ export function MemoryGraphPanel() {
     );
   }
 
+  // TODO: replace MOCK_RELATIONSHIPS with GET /api/v1/memory/relationships when endpoint is available
   const graphData: GraphInputData = {
     semantics: res.data.semantics,
     rules: res.data.rules,

@@ -6,7 +6,7 @@ import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
-import { fetchSemantic, fetchSemanticEvidence, type SemanticMemoryV1 } from "@/lib/api/adapters/memory-center";
+import { CURRENT_USER_ID, fetchSemantic, fetchSemanticEvidence, type SemanticMemoryV1 } from "@/lib/api/adapters/memory-center";
 import { ScoreBar } from "./ScoreBar";
 import styles from "./memory-center.module.css";
 
@@ -43,7 +43,7 @@ export function LearnedDetailPanel({ id }: Props) {
     if (Number.isNaN(n) || n <= 0) {
       return Promise.reject(new Error("Invalid memory id"));
     }
-    return fetchSemantic(n, 0);
+    return fetchSemantic(n, CURRENT_USER_ID);
   }, [id]);
   const res = useAsyncResource(load, `semantic-${id}`);
 
@@ -52,7 +52,7 @@ export function LearnedDetailPanel({ id }: Props) {
     if (Number.isNaN(n) || n <= 0) {
       return Promise.resolve([]);
     }
-    return fetchSemanticEvidence(n, 0);
+    return fetchSemanticEvidence(n, CURRENT_USER_ID);
   }, [id]);
   const ev = useAsyncResource(evLoad, `evidence-${id}`);
 

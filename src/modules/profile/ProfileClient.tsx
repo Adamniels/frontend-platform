@@ -5,6 +5,13 @@ import type { UserProfile } from "@/lib/api/adapters/profile";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
+import {
+  MOCK_PROFILE_DEPTH,
+  MOCK_PROFILE_DEPTH_LABELS,
+  MOCK_PROFILE_INTERESTS,
+  MOCK_PROFILE_SESSION_LENGTH,
+  MOCK_PROFILE_TAGS,
+} from "./profile-mock";
 import styles from "./profile-experience.module.css";
 
 type ProfileClientProps = { profile: UserProfile };
@@ -20,17 +27,13 @@ export function ProfileClient({ profile }: ProfileClientProps) {
     .slice(0, 2)
     .toUpperCase() || "OP";
 
-  const [interests, setInterests] = useState([
-    "AI Ethics",
-    "Machine Learning",
-    "AI Policy",
-    "Agentic Systems",
-  ]);
-  const [depth, setDepth] = useState(3);
-  const [sessionLen, setSessionLen] = useState(45);
+  // TODO: initialize from GET /api/v1/settings or profile API when available
+  const [interests, setInterests] = useState(MOCK_PROFILE_INTERESTS);
+  const [depth, setDepth] = useState(MOCK_PROFILE_DEPTH);
+  const [sessionLen, setSessionLen] = useState(MOCK_PROFILE_SESSION_LENGTH);
   const [newInterest, setNewInterest] = useState("");
 
-  const depthLabel = ["", "Overview", "Introductory", "Intermediate", "Advanced", "Expert"][depth] ?? "";
+  const depthLabel = MOCK_PROFILE_DEPTH_LABELS[depth] ?? "";
 
   return (
     <div className={`${styles.page} screenEnter`}>
@@ -46,8 +49,8 @@ export function ProfileClient({ profile }: ProfileClientProps) {
             <div className={styles.name}>{profile.displayName.toUpperCase()}</div>
             <div className={styles.email}>{profile.email}</div>
             <div className={styles.tags}>
-              <JarvisTag label="Advanced learner" />
-              <JarvisTag label="AI focused" color="var(--accent)" />
+              <JarvisTag label={MOCK_PROFILE_TAGS[0]} />
+              <JarvisTag label={MOCK_PROFILE_TAGS[1]} color="var(--accent)" />
             </div>
           </div>
         </div>

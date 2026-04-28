@@ -5,32 +5,8 @@ import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { ProgressBar } from "@/components/jarvis/ProgressBar";
+import { MOCK_HISTORY, MOCK_SECTIONS, MOCK_TOPICS } from "./side-learning-mock";
 import styles from "./side-learning-experience.module.css";
-
-type Topic = {
-  id: number;
-  title: string;
-  difficulty: string;
-  time: string;
-  progress: number;
-  tags: string[];
-};
-
-const TOPICS: Topic[] = [
-  { id: 1, title: "AI Ethics in Practice", difficulty: "Intermediate", time: "45 min", progress: 82, tags: ["Ethics", "AI"] },
-  { id: 2, title: "Quantum Computing Fundamentals", difficulty: "Beginner", time: "30 min", progress: 0, tags: ["Quantum", "Physics"] },
-  { id: 3, title: "Agentic System Design", difficulty: "Advanced", time: "60 min", progress: 0, tags: ["Agents", "Architecture"] },
-  { id: 4, title: "Transformer Architecture Deep Dive", difficulty: "Advanced", time: "90 min", progress: 15, tags: ["ML", "Transformers"] },
-];
-
-const SECTIONS = [
-  { id: "goal", label: "Objective", content: "Understand key frameworks for evaluating ethical decisions in AI deployment, and apply them to real-world cases." },
-  { id: "context", label: "Context", content: "AI Ethics draws from moral philosophy, law, social science and computer science." },
-  { id: "material", label: "Learning Material", content: "The three dominant frameworks: Consequentialism, Deontology, and Virtue Ethics." },
-  { id: "resources", label: "Resources", content: "Bostrom: Superintelligence · Russell: Human Compatible · EU AI Act (Annex III)" },
-  { id: "exercise", label: "Exercise", content: "Write one paragraph justifying either deployment or delay for an LLM hiring assistant scenario." },
-  { id: "reflection", label: "Reflection", content: "Rate the difficulty of this session and identify which framework felt most natural." },
-];
 
 function diffColor(d: string) {
   if (d === "Beginner") return "#34d399";
@@ -46,12 +22,12 @@ export function SideLearningExperience() {
   const [completed, setCompleted] = useState<string[]>([]);
 
   if (activeTopic && session) {
-    const topic = TOPICS.find((t) => t.id === activeTopic)!;
-    const sec = SECTIONS[sectionIdx]!;
+    const topic = MOCK_TOPICS.find((t) => t.id === activeTopic)!;
+    const sec = MOCK_SECTIONS[sectionIdx]!;
     return (
       <div className={`${styles.page} ${styles.split} screenEnter`}>
         <div className={styles.navCol}>
-          {SECTIONS.map((s, i) => (
+          {MOCK_SECTIONS.map((s, i) => (
             <button
               key={s.id}
               type="button"
@@ -67,11 +43,11 @@ export function SideLearningExperience() {
         <div className={styles.mainCol}>
           <div>
             <div className={styles.breadcrumb}>
-              {topic.title} · {sectionIdx + 1}/{SECTIONS.length}
+              {topic.title} · {sectionIdx + 1}/{MOCK_SECTIONS.length}
             </div>
             <h2 className={styles.h2}>{sec.label}</h2>
           </div>
-          <ProgressBar value={Math.round((sectionIdx / SECTIONS.length) * 100)} showVal={false} />
+          <ProgressBar value={Math.round((sectionIdx / MOCK_SECTIONS.length) * 100)} showVal={false} />
           <JarvisCard hover={false}>
             <p className={styles.body}>{sec.content}</p>
           </JarvisCard>
@@ -82,11 +58,11 @@ export function SideLearningExperience() {
               <span />
             )}
             <JarvisButton
-              label={sectionIdx === SECTIONS.length - 1 ? "Complete ✓" : "Mark done →"}
+              label={sectionIdx === MOCK_SECTIONS.length - 1 ? "Complete ✓" : "Mark done →"}
               variant="primary"
               onClick={() => {
                 setCompleted((c) => [...c, sec.id]);
-                if (sectionIdx < SECTIONS.length - 1) setSectionIdx((i) => i + 1);
+                if (sectionIdx < MOCK_SECTIONS.length - 1) setSectionIdx((i) => i + 1);
               }}
             />
           </div>
@@ -114,11 +90,7 @@ export function SideLearningExperience() {
           </div>
         </div>
         <JarvisCard hover={false}>
-          {[
-            { title: "Introduction to LLMs", date: "Apr 20", score: "94%" },
-            { title: "Bias in Machine Learning", date: "Apr 18", score: "88%" },
-            { title: "The Alignment Problem", date: "Apr 15", score: "91%" },
-          ].map((s, i) => (
+          {MOCK_HISTORY.map((s, i) => (
             <div
               key={s.title}
               className={styles.historyRow}
@@ -153,7 +125,7 @@ export function SideLearningExperience() {
           ))}
         </div>
       </div>
-      {TOPICS.map((topic) => (
+      {MOCK_TOPICS.map((topic) => (
         <JarvisCard
           key={topic.id}
           onClick={() => {

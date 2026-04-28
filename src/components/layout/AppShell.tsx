@@ -12,6 +12,7 @@ import { TopBar } from "./TopBar";
 import { UnlockOverlay } from "./UnlockOverlay";
 import { BrandLogo } from "./BrandLogo";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
+import { MOCK_NOTIFICATIONS } from "./layout-mock";
 import { applyAccentToDocument, readStoredAccent } from "@/lib/theme/accent";
 import { applyBrightnessToDocument, readStoredBrightness } from "@/lib/theme/brightness";
 import {
@@ -110,26 +111,8 @@ function AppShellFrame({ children }: AppShellProps) {
               </button>
             </div>
             <div className={styles.notificationsBody}>
-              {[
-                {
-                  id: 1,
-                  type: "Brief",
-                  text: "Your daily brief is ready — 3 new articles in AI Policy.",
-                  time: "now",
-                },
-                {
-                  id: 2,
-                  type: "Session",
-                  text: "New session available: Agentic System Design.",
-                  time: "1h ago",
-                },
-                {
-                  id: 3,
-                  type: "Input",
-                  text: "Workflow needs your confirmation on latest run.",
-                  time: "2h ago",
-                },
-              ].map((item) => (
+              {/* TODO: replace with GET /api/v1/notifications — using mock data until endpoint exists */}
+              {MOCK_NOTIFICATIONS.map((item) => (
                 <button
                   key={item.id}
                   type="button"

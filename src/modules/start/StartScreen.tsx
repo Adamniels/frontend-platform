@@ -7,6 +7,7 @@ import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisIcon } from "@/components/jarvis/JarvisIcon";
 import { ProgressRing } from "@/components/jarvis/ProgressRing";
 import { QuickActions } from "@/components/jarvis/QuickActions";
+import { MOCK_ACTIVE_SESSION } from "./start-mock";
 import styles from "./start-screen.module.css";
 
 export function StartScreen() {
@@ -41,14 +42,15 @@ export function StartScreen() {
           </div>
           <div className={styles.sessionCol}>
             <div className={styles.sessionLabel}>Continue Session</div>
+            {/* TODO: wire to active session from GET /api/v1/side-learning/topics */}
             <div className={styles.sessionCard}>
-              <ProgressRing value={82} size={110} stroke={8} />
+              <ProgressRing value={MOCK_ACTIVE_SESSION.progress} size={110} stroke={8} />
               <div className={styles.sessionCenter}>
-                <div className={styles.sessionTitle}>AI Ethics in Practice</div>
+                <div className={styles.sessionTitle}>{MOCK_ACTIVE_SESSION.title}</div>
                 <p className={styles.sessionMeta}>
                   You left off at the exercise section.
                   <br />
-                  Estimated <strong>12 min</strong> to complete.
+                  Estimated <strong>{MOCK_ACTIVE_SESSION.estimatedMinutes} min</strong> to complete.
                 </p>
               </div>
               <JarvisButton
