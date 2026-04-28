@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function MemoryIndexPage() {
-  redirect("/memory/profile");
+  redirect("/memory/graph");
 }

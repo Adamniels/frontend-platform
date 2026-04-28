@@ -2,6 +2,8 @@ import { apiRequest } from "@/lib/api/client";
 
 const q = (userId: number) => (userId ? `?userId=${userId}` : "?userId=0");
 
+// ── Explicit profile ─────────────────────────────────────────────────────────
+
 export type ProfileMemoryV1 = {
   id?: number;
   coreInterests: string[];
@@ -35,6 +37,8 @@ export async function putExplicitProfile(userId: number, body: UpdateProfileMemo
   });
 }
 
+// ── Semantic memory ──────────────────────────────────────────────────────────
+
 export type SemanticMemoryV1 = {
   id: number;
   key: string;
@@ -46,6 +50,7 @@ export type SemanticMemoryV1 = {
   createdAt: string;
   updatedAt: string;
   lastSupportedAt?: string | null;
+  evidenceCount?: number | null;
 };
 
 export async function fetchSemantics(userId = 0, includePending = true): Promise<SemanticMemoryV1[]> {
@@ -63,18 +68,49 @@ export type SemanticEvidenceV1 = {
   strength: number;
   note?: string | null;
   occurredAt: string;
+  // Governance fields added in schema v2
+  polarity?: string | null;
+  sourceKind?: string | null;
+  reliabilityWeight?: number | null;
+  sourceId?: string | null;
+  schemaVersion?: number | null;
+  provenanceJson?: string | null;
 };
 
 export async function fetchSemanticEvidence(id: number, userId = 0): Promise<SemanticEvidenceV1[]> {
   return apiRequest<SemanticEvidenceV1[]>(`/api/v1/memory/semantics/${id}/evidence${q(userId)}`);
 }
 
+export async function archiveSemantic(id: number, userId = 0): Promise<void> {
+  await apiRequest<unknown>(`/api/v1/memory/semantics/${id}/archive${q(userId)}`, { method: "POST" });
+}
+
+export async function rejectSemantic(id: number, userId = 0): Promise<void> {
+  await apiRequest<unknown>(`/api/v1/memory/semantics/${id}/reject${q(userId)}`, { method: "POST" });
+}
+
+// ── Review queue ─────────────────────────────────────────────────────────────
+
+export type ReviewProposalType =
+  | "NewSemantic"
+  | "AdjustConfidence"
+  | "MergeDuplicate"
+  | "NewProceduralRule"
+  | "ContradictionDetected"
+  | "ArchiveStaleSemantic"
+  | "MergeSemanticCandidates"
+  | "SupersedeSemantic"
+  | "ConflictWithExplicitProfile"
+  | "ReviseSemanticClaim"
+  | "ReviseProceduralRule"
+  | string;
+
 export type ReviewQueueItemV1 = {
   id: number;
   title: string;
   summary: string;
   status: string;
-  proposalType: string;
+  proposalType: ReviewProposalType;
   priority: number;
   createdAtIso: string;
   updatedAtIso: string;
@@ -85,6 +121,16 @@ export type ReviewQueueItemV1 = {
   proposedChangeJson?: string | null;
   evidenceJson?: string | null;
   approvedProceduralRuleId?: number | null;
+};
+
+export type MemoryContextConflict = {
+  kind?: string | null;
+  summary?: string | null;
+  relatedEntityIds?: string[] | null;
+  severity?: string | null;
+  againstExplicitProfile?: boolean | null;
+  confidence?: number | null;
+  authorityWeight?: number | null;
 };
 
 export async function fetchReviewQueue(userId = 0): Promise<ReviewQueueItemV1[]> {
@@ -109,6 +155,8 @@ export async function rejectReviewItem(id: number, userId = 0, reason?: string):
   });
 }
 
+// ── Memory events ────────────────────────────────────────────────────────────
+
 export type MemoryEventV1 = {
   id: number;
   eventType: string;
@@ -123,6 +171,8 @@ export async function fetchMemoryEvents(userId = 0, take = 80): Promise<MemoryEv
   return apiRequest<MemoryEventV1[]>(`/api/v1/memory/events${q(userId)}&take=${take}`);
 }
 
+// ── Procedural rules ─────────────────────────────────────────────────────────
+
 export type ProceduralRuleSummaryV1 = {
   id: number;
   workflowType: string;
@@ -133,8 +183,43 @@ export type ProceduralRuleSummaryV1 = {
   authorityWeight: number;
   source: string;
   updatedAt: string;
+  createdAt?: string;
+  ruleContent?: string | null;
+};
+
+export type ProceduralRuleDetailV1 = {
+  id: number;
+  workflowType: string;
+  ruleName: string;
+  ruleContent: string;
+  version: number;
+  priority: number;
+  status: string;
+  authorityWeight: number;
+  source: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export async function fetchProceduralRules(userId = 0): Promise<ProceduralRuleSummaryV1[]> {
   return apiRequest<ProceduralRuleSummaryV1[]>(`/api/v1/memory/procedural-rules${q(userId)}`);
+}
+
+export async function fetchProceduralRuleDetail(id: number, userId = 0): Promise<ProceduralRuleDetailV1> {
+  return apiRequest<ProceduralRuleDetailV1>(`/api/v1/memory/procedural-rules/${id}${q(userId)}`);
+}
+
+export async function activateProceduralRule(id: number, userId = 0): Promise<void> {
+  await apiRequest<unknown>(`/api/v1/memory/procedural-rules/${id}/activate${q(userId)}`, { method: "POST" });
+}
+
+export async function deprecateProceduralRule(id: number, userId = 0): Promise<void> {
+  await apiRequest<unknown>(`/api/v1/memory/procedural-rules/${id}/deprecate${q(userId)}`, { method: "POST" });
+}
+
+export async function updateProceduralRulePriority(id: number, priority: number, userId = 0): Promise<void> {
+  await apiRequest<unknown>(`/api/v1/memory/procedural-rules/${id}/priority${q(userId)}`, {
+    method: "PUT",
+    body: { priority },
+  });
 }
