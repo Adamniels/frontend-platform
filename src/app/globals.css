@@ -37,7 +37,7 @@
   --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
   --font-display: var(--font-orbitron), "Orbitron", var(--font-sans);
   --font-mono: var(--font-space-mono), "Space Mono", ui-monospace, monospace;
-  --sidebar-width: 220px;
+  --sidebar-width: 312px;
   --topbar-height: 52px;
   /* 1 = baseline (matches settings slider at 60). */
   --shell-brightness: 1;

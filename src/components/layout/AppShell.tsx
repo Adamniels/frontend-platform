@@ -10,6 +10,7 @@ import { PendingInputProvider } from "./PendingInputContext";
 import { SearchOverlay } from "./SearchOverlay";
 import { TopBar } from "./TopBar";
 import { UnlockOverlay } from "./UnlockOverlay";
+import { BrandLogo } from "./BrandLogo";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { applyAccentToDocument, readStoredAccent } from "@/lib/theme/accent";
 import { applyBrightnessToDocument, readStoredBrightness } from "@/lib/theme/brightness";
@@ -74,16 +75,7 @@ function AppShellFrame({ children }: AppShellProps) {
         <div className={styles.scanlines} aria-hidden />
         <aside className={styles.sidebar} aria-label="Primary">
           <div className={styles.logoRow}>
-            <div className={styles.logoOrb} aria-hidden>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" />
-              </svg>
-            </div>
-            <div>
-              <div className={styles.logoTitle}>Platform</div>
-              <div className={styles.logoSub}>AI shell</div>
-            </div>
+            <BrandLogo />
           </div>
           <MainNav onSearchClick={() => setSearchOpen(true)} />
           <div className={styles.userRow}>
