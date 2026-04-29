@@ -20,17 +20,17 @@ import styles from "./memory-center.module.css";
 type ProposalMeta = { label: string; color: string; border: string; bgRgb: string; icon: string };
 
 const PROPOSAL_META: Record<string, ProposalMeta> = {
-  NewSemantic:              { label: "New Semantic",       color: "#00d4ff", border: "rgba(0,212,255,0.45)",   bgRgb: "0,212,255",    icon: "◈" },
-  AdjustConfidence:         { label: "Adjust Confidence",  color: "#a78bfa", border: "rgba(167,139,250,0.45)", bgRgb: "167,139,250",  icon: "↕" },
-  MergeDuplicate:           { label: "Merge Duplicate",    color: "#ff9500", border: "rgba(255,149,0,0.45)",   bgRgb: "255,149,0",    icon: "⊕" },
-  MergeSemanticCandidates:  { label: "Merge Candidates",   color: "#ff9500", border: "rgba(255,149,0,0.45)",   bgRgb: "255,149,0",    icon: "⊕" },
-  NewProceduralRule:        { label: "New Rule",           color: "#34d399", border: "rgba(52,211,153,0.45)",  bgRgb: "52,211,153",   icon: "⟡" },
-  ReviseProceduralRule:     { label: "Revise Rule",        color: "#34d399", border: "rgba(52,211,153,0.45)",  bgRgb: "52,211,153",   icon: "⟡" },
-  ContradictionDetected:    { label: "Contradiction",      color: "#ef4444", border: "rgba(239,68,68,0.45)",   bgRgb: "239,68,68",    icon: "⚠" },
-  ConflictWithExplicitProfile: { label: "Profile Conflict", color: "#ef4444", border: "rgba(239,68,68,0.45)", bgRgb: "239,68,68",    icon: "⚠" },
-  ArchiveStaleSemantic:     { label: "Archive Stale",      color: "rgba(232,237,248,0.35)", border: "rgba(255,255,255,0.15)", bgRgb: "232,237,248", icon: "◻" },
-  SupersedeSemantic:        { label: "Supersede",          color: "#a78bfa", border: "rgba(167,139,250,0.45)", bgRgb: "167,139,250",  icon: "↑" },
-  ReviseSemanticClaim:      { label: "Revise Claim",       color: "#a78bfa", border: "rgba(167,139,250,0.45)", bgRgb: "167,139,250",  icon: "✎" },
+  NewSemantic:              { label: "New Semantic",       color: "#6b8fc3", border: "rgba(107,143,195,0.32)", bgRgb: "107,143,195", icon: "◈" },
+  AdjustConfidence:         { label: "Adjust Confidence",  color: "#8f7aa8", border: "rgba(143,122,168,0.32)", bgRgb: "143,122,168", icon: "↕" },
+  MergeDuplicate:           { label: "Merge Duplicate",    color: "#b58a49", border: "rgba(181,138,73,0.32)",  bgRgb: "181,138,73",  icon: "⊕" },
+  MergeSemanticCandidates:  { label: "Merge Candidates",   color: "#b58a49", border: "rgba(181,138,73,0.32)",  bgRgb: "181,138,73",  icon: "⊕" },
+  NewProceduralRule:        { label: "New Rule",           color: "#79a88b", border: "rgba(121,168,139,0.32)", bgRgb: "121,168,139", icon: "⟡" },
+  ReviseProceduralRule:     { label: "Revise Rule",        color: "#79a88b", border: "rgba(121,168,139,0.32)", bgRgb: "121,168,139", icon: "⟡" },
+  ContradictionDetected:    { label: "Contradiction",      color: "#b56f6f", border: "rgba(181,111,111,0.3)",  bgRgb: "181,111,111", icon: "⚠" },
+  ConflictWithExplicitProfile: { label: "Profile Conflict", color: "#b56f6f", border: "rgba(181,111,111,0.3)", bgRgb: "181,111,111", icon: "⚠" },
+  ArchiveStaleSemantic:     { label: "Archive Stale",      color: "#a09c8e", border: "rgba(160,156,142,0.24)", bgRgb: "160,156,142", icon: "◻" },
+  SupersedeSemantic:        { label: "Supersede",          color: "#8f7aa8", border: "rgba(143,122,168,0.32)", bgRgb: "143,122,168", icon: "↑" },
+  ReviseSemanticClaim:      { label: "Revise Claim",       color: "#8f7aa8", border: "rgba(143,122,168,0.32)", bgRgb: "143,122,168", icon: "✎" },
 };
 
 function metaFor(proposalType: ReviewProposalType): ProposalMeta {
@@ -48,16 +48,16 @@ function ConfDiff({ current, proposed }: { current: number; proposed: number }) 
   const pos   = delta >= 0;
   return (
     <div className={styles.confDiff}>
-      {([["Current", current, "rgba(232,237,248,0.25)"] as const, ["Proposed", proposed, pos ? "#34d399" : "#ef4444"] as const]).map(([lbl, val, col]) => (
+      {([["Current", current, "rgba(160,156,142,0.45)"] as const, ["Proposed", proposed, pos ? "#79a88b" : "#b56f6f"] as const]).map(([lbl, val, col]) => (
         <div key={lbl} className={styles.confDiffRow}>
           <span className={styles.confDiffLabel}>{lbl}</span>
           <div className={styles.barTrackSlim}>
-            <div style={{ height: "100%", width: `${val * 100}%`, background: col, boxShadow: `0 0 6px ${col}` }} />
+            <div style={{ height: "100%", width: `${val * 100}%`, background: col }} />
           </div>
           <span className={styles.confDiffValue} style={{ color: col }}>{Math.round(val * 100)}%</span>
         </div>
       ))}
-      <div className={styles.confDiffDelta} style={{ color: pos ? "#34d399" : "#ef4444" }}>
+      <div className={styles.confDiffDelta} style={{ color: pos ? "#79a88b" : "#b56f6f" }}>
         {pos ? "+" : ""}{Math.round(delta * 100)}% DELTA
       </div>
     </div>
@@ -123,8 +123,7 @@ function ProposalBody({ item, meta }: { item: ReviewCard; meta: ProposalMeta }) 
             {item.authorityWeight != null && <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, color: meta.color }}>auth:{Math.round(item.authorityWeight * 100)}%</span>}
           </div>
           {item.ruleContent && (
-            <div style={{ padding: "8px 10px", background: `rgba(${meta.bgRgb},0.04)`, border: `1px solid rgba(${meta.bgRgb},0.15)`, fontFamily: "var(--font-sans)", fontSize: 12, color: "rgba(232,237,248,0.7)", lineHeight: 1.6, position: "relative" }}>
-              <div style={{ position: "absolute", top: -1, left: -1, width: 6, height: 6, borderTop: `1px solid ${meta.color}`, borderLeft: `1px solid ${meta.color}` }} />
+            <div style={{ padding: "8px 10px", background: `rgba(${meta.bgRgb},0.04)`, border: `1px solid rgba(${meta.bgRgb},0.15)`, fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--color-text-muted)", lineHeight: 1.7, position: "relative", fontWeight: 500 }}>
               {item.ruleContent}
             </div>
           )}
@@ -207,7 +206,7 @@ function ReviewCardRow({ item, onChanged }: ReviewCardProps) {
   const meta    = metaFor(item.proposalType);
   const pending = item.status === "Pending";
 
-  const statusColor = item.status === "Approved" ? "#34d399" : item.status === "Rejected" ? "#ef4444" : "#ff9500";
+  const statusColor = item.status === "Approved" ? "#79a88b" : item.status === "Rejected" ? "#b56f6f" : "#b58a49";
 
   async function doApprove() {
     setBusy(true); setErr(null);
@@ -230,7 +229,7 @@ function ReviewCardRow({ item, onChanged }: ReviewCardProps) {
   return (
     <div className={`${styles.reviewCard} ${!pending ? styles.reviewCardResolved : ""}`}>
       {/* Left accent stripe */}
-      <div className={styles.reviewCardStripe} style={{ background: pending ? meta.color : "rgba(255,255,255,0.06)" }} />
+      <div className={styles.reviewCardStripe} style={{ background: pending ? meta.color : "rgba(160,156,142,0.16)" }} />
 
       {/* Header */}
       <div className={styles.reviewCardHeader}>
@@ -269,7 +268,7 @@ function ReviewCardRow({ item, onChanged }: ReviewCardProps) {
       )}
 
       {/* Error */}
-      {err && <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "#ef4444", margin: "0 0 8px" }}>{err}</p>}
+      {err && <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--color-danger)", margin: "0 0 8px" }}>{err}</p>}
 
       {/* Actions */}
       {pending && (
@@ -283,7 +282,7 @@ function ReviewCardRow({ item, onChanged }: ReviewCardProps) {
         </div>
       )}
       {!pending && (
-        <div className={styles.reviewResolved} style={{ color: item.status === "Approved" ? "#34d399" : "#ef4444" }}>
+        <div className={styles.reviewResolved} style={{ color: item.status === "Approved" ? "#79a88b" : "#b56f6f" }}>
           {item.status === "Approved" ? "✓ APPROVED" : "✕ REJECTED"}
         </div>
       )}

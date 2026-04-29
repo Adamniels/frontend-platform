@@ -1,7 +1,9 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: #070c14;
+  background:
+    radial-gradient(circle at top, rgba(143, 171, 212, 0.14), transparent 38%),
+    var(--color-bg);
   z-index: 9998;
   display: flex;
   flex-direction: column;
@@ -35,7 +37,7 @@
 .bootSub {
   font-family: var(--font-mono);
   font-size: 9px;
-  color: rgba(0, 212, 255, 0.5);
+  color: var(--color-text-muted);
   letter-spacing: 1.5px;
   display: flex;
   flex-direction: column;
@@ -51,7 +53,7 @@
 .barWrap {
   width: 200px;
   height: 2px;
-  background: rgba(0, 212, 255, 0.12);
+  background: var(--accent-dim);
   border-radius: 1px;
   overflow: hidden;
 }
@@ -61,7 +63,7 @@
   background: var(--accent);
   border-radius: 1px;
   transition: width 0.25s ease;
-  box-shadow: 0 0 10px var(--accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 22%, transparent);
   position: relative;
 }
 
@@ -73,7 +75,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 26%, transparent);
 }
 
 @keyframes fadeIn {

@@ -95,7 +95,7 @@ export function JarvisScreen() {
                 Voice
               </button>
               <button type="button" className={`${styles.chatSend} ${prompt.trim() ? styles.chatSendOn : ""}`}>
-                <JarvisIcon name="send" size={12} color={prompt.trim() ? "#000" : "rgba(232,237,248,0.4)"} />
+                <JarvisIcon name="send" size={12} color={prompt.trim() ? "#f7f5ef" : "var(--color-text-dim)"} />
               </button>
             </div>
           </div>

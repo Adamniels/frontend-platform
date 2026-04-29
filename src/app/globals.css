@@ -1,31 +1,37 @@
-/* JARVIS-style design tokens — CSS Modules + variables only (no Tailwind). */
+/* Platform design tokens — CSS Modules + variables only (no Tailwind). */
 :root {
-  --accent: #00d4ff;
-  --accent-dim: color-mix(in srgb, var(--accent) 25%, transparent);
-  --accent-hover: color-mix(in srgb, var(--accent) 10%, transparent);
-  --accent-active: color-mix(in srgb, var(--accent) 8%, transparent);
-  --accent-subtle: color-mix(in srgb, var(--accent) 5%, transparent);
-  --accent-track: color-mix(in srgb, var(--accent) 15%, transparent);
-  --accent-glow: color-mix(in srgb, var(--accent) 15%, transparent);
-  --accent-card: color-mix(in srgb, var(--accent) 4%, transparent);
-  --accent-scanline: color-mix(in srgb, var(--accent) 5%, transparent);
-  --color-bg: #04080e;
-  --color-sidebar: rgba(4, 8, 14, 0.95);
-  --color-surface: rgba(255, 255, 255, 0.045);
-  --color-surface-hover: rgba(255, 255, 255, 0.065);
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-strong: rgba(255, 255, 255, 0.12);
-  --color-text: #e8edf8;
-  --color-text-muted: rgba(232, 237, 248, 0.45);
-  --color-text-dim: rgba(232, 237, 248, 0.25);
-  --color-purple: #7c5cbf;
-  --color-green: #34d399;
-  --color-danger: #ef4444;
-  --color-warning: #ff9500;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 16px;
+  --accent: #4a70a9;
+  --accent-mid: #8fabd4;
+  --accent-dim: rgba(74, 112, 169, 0.16);
+  --accent-hover: rgba(74, 112, 169, 0.08);
+  --accent-active: rgba(74, 112, 169, 0.12);
+  --accent-subtle: rgba(74, 112, 169, 0.05);
+  --accent-track: rgba(74, 112, 169, 0.14);
+  --accent-glow: rgba(74, 112, 169, 0.15);
+  --accent-card: rgba(74, 112, 169, 0.05);
+  --accent-scanline: rgba(74, 112, 169, 0.05);
+  --accent-hex: #4a70a9;
+  --color-bg: #efece3;
+  --color-sidebar: #e7e3d9;
+  --color-card: #f7f5ef;
+  --color-card-hover: #faf8f3;
+  --color-surface: #e2dfd5;
+  --color-surface-hover: #ece8de;
+  --color-border: rgba(40, 35, 20, 0.08);
+  --color-border-strong: rgba(40, 35, 20, 0.14);
+  --color-shadow: rgba(30, 25, 10, 0.06);
+  --color-shadow-md: rgba(30, 25, 10, 0.1);
+  --color-text: #1c1a14;
+  --color-text-muted: #7a7669;
+  --color-text-dim: #a09c8e;
+  --color-purple: #8d7ec9;
+  --color-green: #1a9e72;
+  --color-danger: #c94040;
+  --color-warning: #b87200;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
   --radius-pill: 999px;
   --space-1: 4px;
   --space-2: 8px;
@@ -38,11 +44,11 @@
   --font-display: var(--font-orbitron), "Orbitron", var(--font-sans);
   --font-mono: var(--font-space-mono), "Space Mono", ui-monospace, monospace;
   --sidebar-width: 312px;
-  --topbar-height: 52px;
+  --topbar-height: 40px;
   /* 1 = baseline (matches settings slider at 60). */
   --shell-brightness: 1;
-  --scanlines-opacity: 1;
-  --hexgrid-opacity: 0.08;
+  --scanlines-opacity: 0;
+  --hexgrid-opacity: 0.025;
 }
 
 *,
@@ -63,8 +69,10 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.5;
+  font-weight: 500;
+  text-rendering: optimizeLegibility;
 }
 
 /* Legacy token aliases for gradual migration */
@@ -88,12 +96,13 @@ a:hover {
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(232, 237, 248, 0.35);
+  color: color-mix(in srgb, var(--color-text-muted) 72%, transparent);
 }
 
 input,
 textarea {
   color: var(--color-text);
+  font-weight: 500;
 }
 
 ::-webkit-scrollbar {
@@ -103,11 +112,11 @@ textarea {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-border-strong);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: color-mix(in srgb, var(--color-text-muted) 30%, transparent);
 }
 
 @keyframes auroraFloat1 {
@@ -176,11 +185,11 @@ textarea {
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 6px var(--accent);
+    box-shadow: 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent);
   }
   50% {
     opacity: 0.3;
-    box-shadow: 0 0 2px var(--accent);
+    box-shadow: 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
   }
 }
 
@@ -221,6 +230,10 @@ textarea {
     clip-path: inset(0% 0 0% 0);
     opacity: 1;
   }
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 .screenEnter {

@@ -162,7 +162,7 @@ function JarvisChevron() {
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M9 18l6-6-6-6"
-        stroke="rgba(232,237,248,0.25)"
+        stroke="var(--color-text-dim)"
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"

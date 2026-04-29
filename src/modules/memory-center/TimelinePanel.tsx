@@ -11,10 +11,10 @@ import styles from "./memory-center.module.css";
 // ── Lane config ───────────────────────────────────────────────────────────────
 
 const DOMAIN_LANES: Record<string, { y: number; color: string; rgb: string; label: string }> = {
-  Learning:       { y: 0.18, color: "#00d4ff", rgb: "0,212,255",    label: "LEARNING"       },
-  Workflow:       { y: 0.38, color: "#ff9500", rgb: "255,149,0",    label: "WORKFLOW"       },
-  Recommendation: { y: 0.62, color: "#e879f9", rgb: "232,121,249",  label: "RECOMMENDATION" },
-  Profile:        { y: 0.80, color: "#34d399", rgb: "52,211,153",   label: "PROFILE"        },
+  Learning:       { y: 0.18, color: "#6b8fc3", rgb: "107,143,195", label: "LEARNING" },
+  Workflow:       { y: 0.38, color: "#b58a49", rgb: "181,138,73",  label: "WORKFLOW" },
+  Recommendation: { y: 0.62, color: "#b68bbd", rgb: "182,139,189", label: "RECOMMENDATION" },
+  Profile:        { y: 0.80, color: "#79a88b", rgb: "121,168,139", label: "PROFILE" },
 };
 
 const AXIS_Y_FRAC = 0.50;
@@ -150,8 +150,8 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
 
       ctx.save(); ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#04080e"; ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(0,212,255,0.04)"; ctx.lineWidth = 0.5;
+      ctx.fillStyle = "#f7f5ef"; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "rgba(40,35,20,0.04)"; ctx.lineWidth = 0.5;
       for (let gx = 0; gx < W; gx += 42) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
       for (let gy = 0; gy < H; gy += 42) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
 
@@ -166,32 +166,32 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
       while (d.getTime() < visEnd) {
         const x = timeToX(d.getTime());
         const isMonday = d.getDay() === 1;
-        ctx.strokeStyle = isMonday ? "rgba(0,212,255,0.15)" : "rgba(0,212,255,0.06)";
+        ctx.strokeStyle = isMonday ? "rgba(74,112,169,0.14)" : "rgba(40,35,20,0.05)";
         ctx.lineWidth   = isMonday ? 1 : 0.5;
         ctx.setLineDash(isMonday ? [] : [4, 6]);
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
         ctx.setLineDash([]);
         if (tl.scale > 30) {
           const label = d.toLocaleDateString("en-SE", { month: "short", day: "numeric" }).toUpperCase();
-          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(0,212,255,0.4)"; ctx.textAlign = "left";
+          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.82)"; ctx.textAlign = "left";
           ctx.fillText(label, x + 4, axisY + 12);
         }
         d.setDate(d.getDate() + 1);
       }
 
-      ctx.shadowColor = "#00d4ff"; ctx.shadowBlur = 8;
-      ctx.strokeStyle = "rgba(0,212,255,0.6)"; ctx.lineWidth = 1;
+      ctx.shadowColor = "rgba(74,112,169,0.18)"; ctx.shadowBlur = 4;
+      ctx.strokeStyle = "rgba(74,112,169,0.42)"; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(LABEL_W, axisY); ctx.lineTo(W, axisY); ctx.stroke();
       ctx.shadowBlur = 0;
 
       const nowX = timeToX(new Date().getTime());
       if (nowX >= LABEL_W && nowX <= W) {
-        ctx.strokeStyle = "#ff9500"; ctx.lineWidth = 1.5;
-        ctx.shadowColor = "#ff9500"; ctx.shadowBlur = 12;
+        ctx.strokeStyle = "rgba(181,138,73,0.6)"; ctx.lineWidth = 1.5;
+        ctx.shadowColor = "rgba(181,138,73,0.22)"; ctx.shadowBlur = 6;
         ctx.setLineDash([4, 4]);
         ctx.beginPath(); ctx.moveTo(nowX, 20); ctx.lineTo(nowX, H - 20); ctx.stroke();
         ctx.setLineDash([]); ctx.shadowBlur = 0;
-        ctx.font = "7px 'Space Mono',monospace"; ctx.fillStyle = "#ff9500"; ctx.textAlign = "center";
+        ctx.font = "7px 'Space Mono',monospace"; ctx.fillStyle = "#b58a49"; ctx.textAlign = "center";
         ctx.fillText("NOW", nowX, 14);
       }
 
@@ -242,7 +242,7 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
         ctx.strokeStyle = `rgba(${lane.rgb},${(isHov||isSel?1:0.8)*entryAlpha})`;
         ctx.lineWidth = isHov||isSel ? 2 : 1.2;
         ctx.globalAlpha = entryAlpha;
-        if (isSel) { ctx.shadowColor = lane.color; ctx.shadowBlur = 16; }
+        if (isSel) { ctx.shadowColor = lane.color; ctx.shadowBlur = 8; }
         ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
 
         const icon = EV_ICONS[ev.eventType] ?? "·";
@@ -255,7 +255,7 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
           const lbl = ev.eventType.replace(/_/g, " ").toUpperCase();
           const fs  = Math.min(9, Math.max(7, tl.scale * 0.04));
           ctx.font = `${isHov||isSel?"bold ":""}${fs}px 'Space Mono',monospace`;
-          ctx.fillStyle = isHov||isSel ? lane.color : `rgba(${lane.rgb},0.6)`;
+          ctx.fillStyle = isHov||isSel ? lane.color : "rgba(122,118,105,0.82)";
           ctx.textAlign = "center"; ctx.globalAlpha = entryAlpha * (isHov||isSel ? 1 : 0.7);
           const labelY = laneY < axisY ? laneY - r - 8 : laneY + r + 14;
           ctx.fillText(lbl.length > 20 ? lbl.slice(0,18)+"…" : lbl, x, labelY);
@@ -267,21 +267,21 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
 
       ctx.restore();
 
-      ctx.fillStyle = "rgba(4,8,14,0.92)"; ctx.fillRect(0, 0, LABEL_W, H);
-      ctx.strokeStyle = "rgba(0,212,255,0.2)"; ctx.lineWidth = 1;
+      ctx.fillStyle = "rgba(247,245,239,0.98)"; ctx.fillRect(0, 0, LABEL_W, H);
+      ctx.strokeStyle = "rgba(40,35,20,0.12)"; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(LABEL_W, 0); ctx.lineTo(LABEL_W, H); ctx.stroke();
 
       Object.values(DOMAIN_LANES).forEach((lane) => {
         const laneY = H * lane.y;
         ctx.beginPath(); ctx.arc(LABEL_W - 12, laneY, 4, 0, Math.PI*2);
-        ctx.fillStyle = lane.color; ctx.shadowColor = lane.color; ctx.shadowBlur = 8;
+        ctx.fillStyle = lane.color; ctx.shadowColor = lane.color; ctx.shadowBlur = 4;
         ctx.fill(); ctx.shadowBlur = 0;
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = `rgba(${lane.rgb},0.7)`;
+        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = `rgba(${lane.rgb},0.85)`;
         ctx.textAlign = "right"; ctx.textBaseline = "middle";
         ctx.fillText(lane.label, LABEL_W - 22, laneY);
         ctx.textBaseline = "alphabetic";
       });
-      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(0,212,255,0.5)";
+      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.78)";
       ctx.textAlign = "right"; ctx.textBaseline = "middle";
       ctx.fillText("TIMELINE", LABEL_W - 22, H * AXIS_Y_FRAC);
       ctx.textBaseline = "alphabetic";
@@ -292,27 +292,23 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
         if (lane) {
           const tx = Math.min(ev._x! + 14, W - 200);
           const ty = Math.max(ev._y! - 58, 8);
-          ctx.fillStyle = "rgba(4,8,14,0.97)";
-          ctx.strokeStyle = `rgba(${lane.rgb},0.7)`; ctx.lineWidth = 1;
+          ctx.fillStyle = "rgba(247,245,239,0.98)";
+          ctx.strokeStyle = "rgba(40,35,20,0.14)"; ctx.lineWidth = 1;
           ctx.beginPath(); ctx.rect(tx, ty, 192, 50); ctx.fill(); ctx.stroke();
-          [[tx,ty,1,1],[tx+192,ty+50,-1,-1]].forEach(([bx,by,sx,sy]) => {
-            ctx.strokeStyle = lane.color; ctx.lineWidth = 1.2;
-            ctx.beginPath(); ctx.moveTo(bx+sx*7, by); ctx.lineTo(bx, by); ctx.lineTo(bx, by+sy*7); ctx.stroke();
-          });
           const evDate = new Date(ev.occurredAt);
           ctx.font = "bold 9px 'Space Mono',monospace"; ctx.fillStyle = lane.color; ctx.textAlign = "left";
           ctx.fillText(ev.eventType.replace(/_/g," ").toUpperCase(), tx+10, ty+16);
-          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(232,237,248,0.5)";
+          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.82)";
           ctx.fillText(evDate.toLocaleDateString("en-SE",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).toUpperCase(), tx+10, ty+30);
-          if (ev.workflowId) { ctx.fillStyle="rgba(232,237,248,0.25)"; ctx.fillText(ev.workflowId, tx+10, ty+44); }
+          if (ev.workflowId) { ctx.fillStyle="rgba(160,156,142,0.82)"; ctx.fillText(ev.workflowId, tx+10, ty+44); }
         }
       }
 
       if (tickRef.current < 90) {
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(0,212,255,0.3)"; ctx.textAlign = "center";
+        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "center";
         ctx.fillText("SCROLL: ZOOM  ·  DRAG: PAN  ·  CLICK: SELECT", W/2, H-12);
       }
-      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(0,212,255,0.3)"; ctx.textAlign = "right";
+      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "right";
       ctx.fillText(`${tl.scale.toFixed(0)}PX/DAY`, W-12, H-12);
 
       ctx.restore();

@@ -71,7 +71,7 @@ export function TopBar({ onNotificationsClick, onLockClick, lockDisabled = false
           OPERATOR
         </button>
         <button type="button" className={styles.bellBtn} aria-label="Notifications" onClick={onNotificationsClick}>
-          <JarvisIcon name="bell" size={15} color="rgba(232,237,248,0.45)" />
+          <JarvisIcon name="bell" size={15} color="var(--color-text-muted)" />
         </button>
         <button
           type="button"

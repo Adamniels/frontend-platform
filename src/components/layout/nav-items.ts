@@ -25,7 +25,7 @@ export type SidebarNavBottomLink = {
 
 export const sidebarPrimaryNav: SidebarNavLink[] = [
   { kind: "link", href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { kind: "link", href: "/jarvis", label: "Jarvis", icon: "dashboard", indent: true },
+  { kind: "link", href: "/jarvis", label: "Jarvis", icon: "jarvis", indent: true },
   { kind: "link", href: "/news", label: "News", icon: "news" },
   { kind: "link", href: "/side-learning", label: "Learn", icon: "learn" },
   { kind: "link", href: "/saved-items", label: "Saved", icon: "saved" },

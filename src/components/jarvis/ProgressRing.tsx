@@ -14,7 +14,7 @@ export function ProgressRing({
   size = 100,
   stroke = 7,
   color = "var(--accent)",
-  bg = "rgba(255,255,255,0.07)",
+  bg = "rgba(74,112,169,0.14)",
   label,
 }: ProgressRingProps) {
   const r = (size - stroke) / 2;
@@ -42,7 +42,7 @@ export function ProgressRing({
           strokeDasharray={circ}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          style={{ filter: `drop-shadow(0 0 6px ${color})` }}
+          style={{ filter: `drop-shadow(0 0 4px ${color})` }}
         />
       </svg>
       <div className={styles.center}>

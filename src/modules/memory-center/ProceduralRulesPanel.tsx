@@ -19,17 +19,17 @@ import styles from "./memory-center.module.css";
 // ── Colour maps ───────────────────────────────────────────────────────────────
 
 const WF_COL: Record<string, { color: string; border: string }> = {
-  "news":           { color: "#00d4ff", border: "rgba(0,212,255,0.45)"   },
-  "side-learning":  { color: "#a78bfa", border: "rgba(167,139,250,0.45)" },
-  "workflow":       { color: "#ff9500", border: "rgba(255,149,0,0.45)"   },
-  "recommendation": { color: "#e879f9", border: "rgba(232,121,249,0.45)" },
-  "insights":       { color: "#34d399", border: "rgba(52,211,153,0.45)"  },
+  "news":           { color: "#6b8fc3", border: "rgba(107,143,195,0.32)" },
+  "side-learning":  { color: "#8f7aa8", border: "rgba(143,122,168,0.32)" },
+  "workflow":       { color: "#b58a49", border: "rgba(181,138,73,0.32)"  },
+  "recommendation": { color: "#b68bbd", border: "rgba(182,139,189,0.32)" },
+  "insights":       { color: "#79a88b", border: "rgba(121,168,139,0.32)" },
 };
 
 const ST_COL: Record<string, { color: string; border: string }> = {
-  Active:     { color: "#34d399", border: "rgba(52,211,153,0.45)"   },
-  Inactive:   { color: "#ff9500", border: "rgba(255,149,0,0.45)"    },
-  Deprecated: { color: "rgba(232,237,248,0.25)", border: "rgba(255,255,255,0.1)" },
+  Active:     { color: "#79a88b", border: "rgba(121,168,139,0.32)" },
+  Inactive:   { color: "#b58a49", border: "rgba(181,138,73,0.32)"  },
+  Deprecated: { color: "#a09c8e", border: "rgba(160,156,142,0.24)" },
 };
 
 function wfColor(wfType: string) { return WF_COL[wfType] ?? WF_COL.workflow; }
@@ -135,10 +135,10 @@ function RuleCard({ rule, onMutated }: RuleCardProps) {
           </div>
           <div style={{ flex: 1 }}>
             <div className={styles.ruleStatLabel}>
-              Authority <span style={{ color: "#00d4ff" }}>{Math.round(rule.authorityWeight * 100)}%</span>
+              Authority <span style={{ color: "var(--accent)" }}>{Math.round(rule.authorityWeight * 100)}%</span>
             </div>
             <div className={styles.barTrackSlim}>
-              <div style={{ height: "100%", width: `${rule.authorityWeight * 100}%`, background: "#00d4ff", boxShadow: "0 0 6px rgba(0,212,255,0.5)" }} />
+              <div style={{ height: "100%", width: `${rule.authorityWeight * 100}%`, background: "var(--accent)" }} />
             </div>
           </div>
           <div className={styles.ruleStatSource}>{(rule.source ?? "—").replace(/_/g, " ")}</div>
@@ -147,7 +147,7 @@ function RuleCard({ rule, onMutated }: RuleCardProps) {
 
       {expanded && (
         <div className={styles.semanticCardExpanded}>
-          {err && <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "#ef4444", margin: 0 }}>{err}</p>}
+          {err && <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--color-danger)", margin: 0 }}>{err}</p>}
 
           {loadingDetail ? (
             <p className={styles.muted} style={{ fontSize: 11 }}>Loading rule detail…</p>

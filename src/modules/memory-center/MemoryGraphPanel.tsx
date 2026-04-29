@@ -24,9 +24,9 @@ import styles from "./memory-center.module.css";
 // ── Colours ──────────────────────────────────────────────────────────────────
 
 const NODE_COLORS = {
-  semantic:   { fill: "#00d4ff", glow: "rgba(0,212,255,0.7)",  bg: "rgba(0,212,255,0.08)",  rgb: "0,212,255"   },
-  procedural: { fill: "#7c5cbf", glow: "rgba(124,92,191,0.7)", bg: "rgba(124,92,191,0.08)", rgb: "124,92,191"  },
-  profile:    { fill: "#34d399", glow: "rgba(52,211,153,0.7)", bg: "rgba(52,211,153,0.08)", rgb: "52,211,153"  },
+  semantic:   { fill: "#6b8fc3", glow: "rgba(107,143,195,0.24)", bg: "rgba(107,143,195,0.08)", rgb: "107,143,195" },
+  procedural: { fill: "#8f7aa8", glow: "rgba(143,122,168,0.22)", bg: "rgba(143,122,168,0.08)", rgb: "143,122,168" },
+  profile:    { fill: "#79a88b", glow: "rgba(121,168,139,0.22)", bg: "rgba(121,168,139,0.08)", rgb: "121,168,139" },
 } as const;
 
 const TYPE_LABELS = { semantic: "Semantic", procedural: "Procedural", profile: "Profile Fact" } as const;
@@ -761,8 +761,8 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
       const gs   = stateRef.current!;
       ctx.save(); ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#04080e"; ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(0,212,255,0.04)"; ctx.lineWidth = 0.5;
+      ctx.fillStyle = "#f7f5ef"; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "rgba(40,35,20,0.04)"; ctx.lineWidth = 0.5;
       for (let gx = 0; gx < W; gx += 42) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
       for (let gy = 0; gy < H; gy += 42) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
 
@@ -787,12 +787,12 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
         const cpy  = (pa.py + pb.py) / 2 - (pb.px - pa.px) * 0.2;
         const midSc = Math.max(0.1, (pa.sc + pb.sc) * 0.5);
         ctx.beginPath(); ctx.moveTo(pa.px, pa.py); ctx.quadraticCurveTo(cpx, cpy, pb.px, pb.py);
-        ctx.strokeStyle = isHi ? `rgba(${col.rgb},0.6)` : `rgba(${col.rgb},0.18)`;
+        ctx.strokeStyle = isHi ? `rgba(${col.rgb},0.42)` : `rgba(${col.rgb},0.16)`;
         ctx.lineWidth = (isHi ? 1.8 : 0.8) * midSc; ctx.stroke();
         e.particles.forEach((p) => {
           const pt = bezierPoint(p.t, pa.px, pa.py, cpx, cpy, pb.px, pb.py);
           ctx.beginPath(); ctx.arc(pt.x, pt.y, (isHi ? 2.8 : 2) * midSc, 0, Math.PI*2);
-          ctx.fillStyle = col.fill; ctx.shadowColor = col.fill; ctx.shadowBlur = isHi ? 14 : 7;
+          ctx.fillStyle = col.fill; ctx.shadowColor = col.fill; ctx.shadowBlur = isHi ? 8 : 4;
           ctx.fill(); ctx.shadowBlur = 0;
         });
       });
@@ -809,17 +809,17 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
         const r     = Math.max(0.5, n.r * p.sc * (isSel ? 1.3 : isHov ? 1.18 : 1));
         const alpha = Math.max(0.25, Math.min(1, 0.35 + Math.min(p.sc, 4)));
 
-        const halo = ctx.createRadialGradient(p.px, p.py, r * 0.2, p.px, p.py, r + 20);
-        halo.addColorStop(0, `rgba(${col.rgb},${(isSel?0.5:isHov?0.38:0.2)*alpha})`);
+        const halo = ctx.createRadialGradient(p.px, p.py, r * 0.2, p.px, p.py, r + 18);
+        halo.addColorStop(0, `rgba(${col.rgb},${(isSel?0.24:isHov?0.18:0.1)*alpha})`);
         halo.addColorStop(1, "transparent");
-        ctx.beginPath(); ctx.arc(p.px, p.py, r+20, 0, Math.PI*2);
+        ctx.beginPath(); ctx.arc(p.px, p.py, r+18, 0, Math.PI*2);
         ctx.fillStyle = halo; ctx.fill();
 
         ctx.beginPath(); ctx.arc(p.px, p.py, r, 0, Math.PI*2);
         ctx.fillStyle = col.bg; ctx.strokeStyle = col.fill;
         ctx.lineWidth = (isSel ? 2.5 : isHov ? 2 : 1.5) * p.sc;
         ctx.globalAlpha = alpha; ctx.fill();
-        if (isSel) { ctx.shadowColor = col.fill; ctx.shadowBlur = 20; }
+        if (isSel) { ctx.shadowColor = col.fill; ctx.shadowBlur = 10; }
         ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
 
         if (r > 10) {
@@ -841,7 +841,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
         if ((isHov || isSel || r > labelThreshold) && p.sc > 0.45) {
           const fs = Math.max(8, Math.round(9 * Math.min(p.sc, 1.2)));
           ctx.font = `${isHov||isSel ? 700 : 400} ${fs}px 'Space Mono',monospace`;
-          ctx.fillStyle = isHov||isSel ? col.fill : "rgba(232,237,248,0.5)";
+          ctx.fillStyle = isHov||isSel ? col.fill : "rgba(122,118,105,0.82)";
           ctx.globalAlpha = alpha * (isHov||isSel ? 1 : 0.75);
           const lbl = n.label.length > 22 ? n.label.slice(0, 20) + "…" : n.label;
           ctx.fillText(lbl.toUpperCase(), p.px, p.py + r + 12 * p.sc);
@@ -858,25 +858,21 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
         } else {
         const tx = Math.min((n._px ?? 0) + 16, W - 180);
         const ty = Math.max((n._py ?? 0) - 48, 8);
-        ctx.fillStyle = "rgba(4,8,14,0.96)"; ctx.strokeStyle = `rgba(${col.rgb},0.7)`; ctx.lineWidth = 1;
+        ctx.fillStyle = "rgba(247,245,239,0.98)"; ctx.strokeStyle = "rgba(40,35,20,0.14)"; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.rect(tx, ty, 172, 40); ctx.fill(); ctx.stroke();
-        [[tx,ty,1,1],[tx+172,ty+40,-1,-1]].forEach(([bx,by,sx,sy]) => {
-          ctx.strokeStyle = col.fill; ctx.lineWidth = 1.2;
-          ctx.beginPath(); ctx.moveTo(bx+sx*7, by); ctx.lineTo(bx, by); ctx.lineTo(bx, by+sy*7); ctx.stroke();
-        });
         ctx.font = "bold 9px 'Orbitron',sans-serif"; ctx.fillStyle = col.fill; ctx.textAlign = "left";
         ctx.fillText(TYPE_LABELS[n.type].toUpperCase(), tx+10, ty+16);
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(232,237,248,0.6)";
+        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.9)";
         const lbl = n.label.length > 26 ? n.label.slice(0, 24) + "…" : n.label;
         ctx.fillText(lbl, tx+10, ty+30);
         }
       }
 
       if (tickRef.current < 80) {
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(0,212,255,0.35)"; ctx.textAlign = "center";
+        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "center";
         ctx.fillText("DRAG: ORBIT  ·  SHIFT / RMB: PAN  ·  SCROLL: DOLLY (MOVE IN/OUT)", W/2, H-14);
       }
-      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(0,212,255,0.3)"; ctx.textAlign = "right";
+      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "right";
       ctx.fillText(`DOLLY ${Math.round(cam.distance)}u`, W-16, H-14);
 
       ctx.restore();
@@ -1053,12 +1049,12 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
             <div>
               <div className={styles.nodeDetailBarMeta}>
                 <span className={styles.nodeDetailBarLabel}>Authority</span>
-                <span className={styles.nodeDetailBarValue} style={{ color: "rgba(232,237,248,0.6)" }}>
+                <span className={styles.nodeDetailBarValue} style={{ color: "var(--color-text-muted)" }}>
                   {Math.round(selected.data.authorityWeight * 100)}%
                 </span>
               </div>
               <div className={styles.barTrackSlim} style={{ height: 2 }}>
-                <div style={{ height: "100%", width: `${selected.data.authorityWeight * 100}%`, background: "rgba(232,237,248,0.25)" }} />
+                <div style={{ height: "100%", width: `${selected.data.authorityWeight * 100}%`, background: "rgba(160,156,142,0.5)" }} />
               </div>
             </div>
           )}
@@ -1070,7 +1066,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
             {selected.data.status && (
               <JarvisTag
                 label={selected.data.status}
-                color={selected.data.status === "Active" ? "#34d399" : "#ff9500"}
+                color={selected.data.status === "Active" ? "#79a88b" : "#b58a49"}
               />
             )}
             {selected.data.evidenceCount != null && (

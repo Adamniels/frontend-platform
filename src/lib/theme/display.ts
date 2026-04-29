@@ -22,7 +22,7 @@ function writeBool(key: string, value: boolean): void {
 }
 
 export function readStoredScanlines(): boolean {
-  return readBool(SCANLINES_STORAGE_KEY, true);
+  return readBool(SCANLINES_STORAGE_KEY, false);
 }
 
 export function writeStoredScanlines(enabled: boolean): void {
@@ -44,5 +44,5 @@ export function applyScanlinesToDocument(enabled: boolean): void {
 
 export function applyHexGridToDocument(enabled: boolean): void {
   if (typeof document === "undefined") return;
-  document.documentElement.style.setProperty("--hexgrid-opacity", enabled ? "0.08" : "0");
+  document.documentElement.style.setProperty("--hexgrid-opacity", enabled ? "0.025" : "0");
 }

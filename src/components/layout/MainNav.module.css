@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 14px 0;
+  padding: 10px 0;
 }
 
 .bottom {
@@ -10,8 +10,8 @@
   flex-direction: column;
   gap: 0;
   margin: 0;
-  padding: 12px 20px 16px;
-  border-top: 1px solid var(--accent-dim);
+  padding: 8px 16px 12px;
+  border-top: 1px solid var(--color-border);
 }
 
 .spacer {
@@ -24,8 +24,8 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
+  gap: 10px;
+  padding: 8px 18px;
   border-radius: 0;
   border: none;
   border-left: 2px solid transparent;
@@ -33,10 +33,11 @@
   text-align: left;
   color: var(--color-text-muted);
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.13s ease;
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 1.5px;
+  font-weight: 700;
+  letter-spacing: 1.15px;
   text-transform: uppercase;
   text-decoration: none;
 }
@@ -56,18 +57,17 @@
 
 .badge {
   margin-left: auto;
-  min-width: 16px;
-  height: 16px;
+  min-width: 15px;
+  height: 15px;
   border-radius: 50%;
-  background: #ff9500;
-  color: #000;
+  background: var(--color-warning);
+  color: #fff;
   font-size: 8px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
-  box-shadow: 0 0 8px rgba(255, 149, 0, 0.4);
+  padding: 0 3px;
 }
 
 .activeDot {
@@ -76,5 +76,4 @@
   height: 4px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 6px var(--accent);
 }

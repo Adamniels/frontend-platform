@@ -4,7 +4,7 @@ import { useId, useLayoutEffect, useState } from "react";
 import type { UserSettings } from "@/lib/api/adapters/settings";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
-import { applyAccentToDocument, readStoredAccent, writeStoredAccent } from "@/lib/theme/accent";
+import { PLATFORM_LIGHT_ACCENT, applyAccentToDocument, readStoredAccent, writeStoredAccent } from "@/lib/theme/accent";
 import {
   applyBrightnessToDocument,
   readStoredBrightness,
@@ -21,20 +21,13 @@ import {
 import { SettingsToggle } from "./SettingsToggle";
 import styles from "./settings-experience.module.css";
 
-const ACCENTS = [
-  { label: "Cyan", value: "#00d4ff" },
-  { label: "Violet", value: "#a78bfa" },
-  { label: "Green", value: "#34d399" },
-  { label: "Red", value: "#ff6b6b" },
-  { label: "Amber", value: "#fbbf24" },
-  { label: "Pink", value: "#f472b6" },
-];
+const ACCENTS = [{ label: "Platform Light", value: PLATFORM_LIGHT_ACCENT }];
 
 type SettingsClientProps = { settings: UserSettings };
 
 export function SettingsClient({ settings }: SettingsClientProps) {
   const brightnessRangeId = useId();
-  const [curAccent, setCurAccent] = useState(() => readStoredAccent() ?? "#00d4ff");
+  const [curAccent, setCurAccent] = useState(() => readStoredAccent() ?? PLATFORM_LIGHT_ACCENT);
   const [brightness, setBrightness] = useState(() => readStoredBrightness() ?? 60);
   const [scanLines, setScanLines] = useState(() => readStoredScanlines());
   const [hexGrid, setHexGrid] = useState(() => readStoredHexGrid());
@@ -95,8 +88,8 @@ export function SettingsClient({ settings }: SettingsClientProps) {
                   className={styles.swatch}
                   style={{
                     background: a.value,
-                    outline: curAccent === a.value ? "2px solid #fff" : "2px solid transparent",
-                    boxShadow: curAccent === a.value ? `0 0 16px ${a.value}` : "none",
+                    outline: curAccent === a.value ? "2px solid var(--color-text)" : "2px solid transparent",
+                    boxShadow: curAccent === a.value ? `0 8px 18px color-mix(in srgb, ${a.value} 30%, transparent)` : "none",
                   }}
                 />
                 <span className={styles.accentLabel}>{a.label}</span>

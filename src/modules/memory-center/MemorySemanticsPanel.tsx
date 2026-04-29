@@ -19,18 +19,18 @@ import styles from "./memory-center.module.css";
 // ── Colour maps ───────────────────────────────────────────────────────────────
 
 const DOM_COL: Record<string, { color: string; border: string }> = {
-  learning:       { color: "#00d4ff", border: "rgba(0,212,255,0.45)"   },
-  workflow:       { color: "#ff9500", border: "rgba(255,149,0,0.45)"   },
-  recommendation: { color: "#e879f9", border: "rgba(232,121,249,0.45)" },
-  profile:        { color: "#34d399", border: "rgba(52,211,153,0.45)"  },
+  learning:       { color: "#6b8fc3", border: "rgba(107,143,195,0.32)" },
+  workflow:       { color: "#b58a49", border: "rgba(181,138,73,0.32)"  },
+  recommendation: { color: "#b68bbd", border: "rgba(182,139,189,0.32)" },
+  profile:        { color: "#79a88b", border: "rgba(121,168,139,0.32)" },
 };
 
 const STAT_COL: Record<string, { color: string; border: string }> = {
-  Active:        { color: "#34d399", border: "rgba(52,211,153,0.45)"   },
-  PendingReview: { color: "#ff9500", border: "rgba(255,149,0,0.45)"    },
-  Archived:      { color: "rgba(232,237,248,0.3)", border: "rgba(255,255,255,0.15)" },
-  Superseded:    { color: "rgba(232,237,248,0.3)", border: "rgba(255,255,255,0.15)" },
-  Rejected:      { color: "#ef4444", border: "rgba(239,68,68,0.45)"    },
+  Active:        { color: "#79a88b", border: "rgba(121,168,139,0.32)" },
+  PendingReview: { color: "#b58a49", border: "rgba(181,138,73,0.32)"  },
+  Archived:      { color: "#a09c8e", border: "rgba(160,156,142,0.24)" },
+  Superseded:    { color: "#a09c8e", border: "rgba(160,156,142,0.24)" },
+  Rejected:      { color: "#b56f6f", border: "rgba(181,111,111,0.3)"  },
 };
 
 function domainColor(domain: string | null | undefined) {
@@ -95,7 +95,7 @@ function EvidencePanel({ semanticId }: { semanticId: number }) {
             {ev.sourceKind ? ` · ${ev.sourceKind}` : ""}
             {ev.polarity ? ` · ${ev.polarity}` : ""}
           </div>
-          {ev.note && <div style={{ marginTop: 4, fontSize: 11, fontStyle: "italic", color: "rgba(232,237,248,0.4)" }}>{ev.note}</div>}
+          {ev.note && <div style={{ marginTop: 4, fontSize: 12, color: "var(--color-text-muted)", fontWeight: 500 }}>{ev.note}</div>}
         </li>
       ))}
     </ul>
@@ -160,13 +160,13 @@ function SemanticCard({ sem, onMutated }: SemanticCardProps) {
           <div className={styles.semanticCardBarRow}>
             <span className={styles.semanticCardBarLabel}>Confidence</span>
             <div style={{ flex: 1 }}>
-              <ConfBar value={sem.confidence} color="#00d4ff" />
+              <ConfBar value={sem.confidence} color="#6b8fc3" />
             </div>
           </div>
           <div className={styles.semanticCardBarRow}>
             <span className={styles.semanticCardBarLabel}>Authority</span>
             <div style={{ flex: 1 }}>
-              <ConfBar value={sem.authorityWeight} color="rgba(232,237,248,0.3)" />
+              <ConfBar value={sem.authorityWeight} color="rgba(160,156,142,0.55)" />
             </div>
           </div>
         </div>
@@ -175,7 +175,7 @@ function SemanticCard({ sem, onMutated }: SemanticCardProps) {
       {expanded && (
         <div className={styles.semanticCardExpanded}>
           {err && (
-            <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "#ef4444", margin: 0 }}>{err}</p>
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--color-danger)", margin: 0 }}>{err}</p>
           )}
 
           <div className={styles.dateMeta}>

@@ -55,14 +55,14 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
   return (
     <div className={styles.overlay} style={{ opacity }}>
       <svg className={styles.svg} width="80" height="80" viewBox="0 0 80 80" aria-hidden>
-        <circle cx="40" cy="40" r="36" fill="none" stroke="#00d4ff" strokeWidth="1" opacity="0.3" />
+        <circle cx="40" cy="40" r="36" fill="none" stroke="var(--accent)" strokeWidth="1" opacity="0.3" />
         <circle
           className={styles.spin}
           cx="40"
           cy="40"
           r="26"
           fill="none"
-          stroke="#00d4ff"
+          stroke="var(--accent)"
           strokeWidth="1"
           opacity="0.5"
           strokeDasharray="40 123"
@@ -74,13 +74,13 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
           cy="40"
           r="16"
           fill="none"
-          stroke="#00d4ff"
+          stroke="var(--accent)"
           strokeWidth="0.5"
           opacity="0.4"
           strokeDasharray="20 81"
           strokeDashoffset={0}
         />
-        <circle cx="40" cy="40" r="5" fill="#00d4ff" />
+        <circle cx="40" cy="40" r="5" fill="var(--accent)" />
       </svg>
       <div className={styles.label}>INITIALIZING JARVIS</div>
       <div className={styles.bootSub}>

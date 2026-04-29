@@ -35,10 +35,10 @@
   animation: bIn 0.3s ease forwards;
 }
 
-.bracketTl { top: 0; left: 0; border-top: 1.5px solid #00d4ff; border-left: 1.5px solid #00d4ff; animation-delay: 0.05s; }
-.bracketTr { top: 0; right: 0; border-top: 1.5px solid #00d4ff; border-right: 1.5px solid #00d4ff; animation-delay: 0.15s; }
-.bracketBl { bottom: 0; left: 0; border-bottom: 1.5px solid #00d4ff; border-left: 1.5px solid #00d4ff; animation-delay: 0.25s; }
-.bracketBr { bottom: 0; right: 0; border-bottom: 1.5px solid #00d4ff; border-right: 1.5px solid #00d4ff; animation-delay: 0.35s; }
+.bracketTl { top: 0; left: 0; border-top: 1.5px solid var(--accent); border-left: 1.5px solid var(--accent); animation-delay: 0.05s; }
+.bracketTr { top: 0; right: 0; border-top: 1.5px solid var(--accent); border-right: 1.5px solid var(--accent); animation-delay: 0.15s; }
+.bracketBl { bottom: 0; left: 0; border-bottom: 1.5px solid var(--accent); border-left: 1.5px solid var(--accent); animation-delay: 0.25s; }
+.bracketBr { bottom: 0; right: 0; border-bottom: 1.5px solid var(--accent); border-right: 1.5px solid var(--accent); animation-delay: 0.35s; }
 
 @keyframes bIn {
   from { opacity: 0; transform: scale(1.4); }
@@ -50,8 +50,7 @@
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: #00d4ff;
-  box-shadow: 0 0 5px #00d4ff;
+  background: var(--accent);
   opacity: 0;
   animation: pipIn 0.2s ease forwards;
 }
@@ -81,7 +80,7 @@
 
 .pulseOct {
   fill: none;
-  stroke: #00d4ff;
+  stroke: var(--accent);
   stroke-width: 0.8;
   opacity: 0;
   animation: pulseOct 3s ease-in-out 2s infinite;
@@ -97,18 +96,18 @@
 
 .octOuter {
   fill: none;
-  stroke: #00d4ff;
+  stroke: var(--accent);
   stroke-width: 1.2;
   stroke-dasharray: 260;
   stroke-dashoffset: 260;
-  filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.6));
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 32%, transparent));
   animation:
     draw 1s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards,
     outerPulse 3.6s ease-in-out 2.3s infinite;
 }
 
 .tick {
-  stroke: #00d4ff;
+  stroke: var(--accent);
   stroke-width: 1;
   opacity: 0;
   animation: fadeEl 0.2s ease forwards;
@@ -116,7 +115,7 @@
 
 .arcRing {
   fill: none;
-  stroke: #00d4ff;
+  stroke: var(--accent);
   stroke-width: 1;
   stroke-dasharray: 6 10;
   opacity: 0.5;
@@ -130,7 +129,7 @@
 
 .arcRing2 {
   fill: none;
-  stroke: rgba(0, 212, 255, 0.3);
+  stroke: color-mix(in srgb, var(--accent) 30%, transparent);
   stroke-width: 0.8;
   stroke-dasharray: 3 14;
   opacity: 0;
@@ -140,7 +139,7 @@
 
 .arcRing3 {
   fill: none;
-  stroke: rgba(0, 212, 255, 0.45);
+  stroke: color-mix(in srgb, var(--accent) 45%, transparent);
   stroke-width: 0.7;
   stroke-dasharray: 2 7;
   opacity: 0;
@@ -153,17 +152,17 @@
 }
 
 .innerDiamond {
-  fill: rgba(0, 212, 255, 0.05);
-  stroke: #00d4ff;
+  fill: color-mix(in srgb, var(--accent) 5%, transparent);
+  stroke: var(--accent);
   stroke-width: 1.2;
   stroke-dasharray: 120;
   stroke-dashoffset: 120;
-  filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.5));
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 26%, transparent));
   animation: draw 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.7s forwards;
 }
 
 .crosshair {
-  stroke: rgba(0, 212, 255, 0.35);
+  stroke: color-mix(in srgb, var(--accent) 35%, transparent);
   stroke-width: 0.8;
   stroke-dasharray: 3 4;
   opacity: 0;
@@ -171,36 +170,36 @@
 }
 
 .centerDot {
-  fill: #00d4ff;
-  filter: drop-shadow(0 0 6px #00d4ff);
+  fill: var(--accent);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 32%, transparent));
   opacity: 0;
   animation: fadeEl 0.4s ease 1.1s forwards, centerPulse 1.9s ease-in-out 2s infinite;
 }
 
 @keyframes centerPulse {
-  0%, 100% { opacity: 0.8; r: 3; filter: drop-shadow(0 0 5px #00d4ff); }
-  50% { opacity: 1; r: 4; filter: drop-shadow(0 0 10px #00d4ff); }
+  0%, 100% { opacity: 0.8; r: 3; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 30%, transparent)); }
+  50% { opacity: 1; r: 4; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 40%, transparent)); }
 }
 
 .orbitDot {
-  fill: #00d4ff;
-  filter: drop-shadow(0 0 4px #00d4ff);
+  fill: var(--accent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 30%, transparent));
   opacity: 0;
   animation: fadeEl 0.3s ease 1.3s forwards, orbitDot 4s linear 1.5s infinite;
   transform-origin: 40px 40px;
 }
 
 .orbitDot2 {
-  fill: rgba(0, 212, 255, 0.95);
-  filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.9));
+  fill: color-mix(in srgb, var(--accent) 95%, white 5%);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 34%, transparent));
   opacity: 0;
   animation: fadeEl 0.25s ease 1.45s forwards, orbitDotCCW 3.2s linear 1.7s infinite;
   transform-origin: 40px 40px;
 }
 
 .orbitDot3 {
-  fill: rgba(0, 212, 255, 0.75);
-  filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.8));
+  fill: color-mix(in srgb, var(--accent) 75%, white 25%);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 30%, transparent));
   opacity: 0;
   animation: fadeEl 0.25s ease 1.6s forwards, orbitDotOval 5.1s linear 1.9s infinite;
   transform-origin: 40px 40px;
@@ -208,7 +207,7 @@
 
 .sparkDot1,
 .sparkDot2 {
-  fill: #00d4ff;
+  fill: var(--accent);
   opacity: 0;
 }
 
@@ -262,7 +261,7 @@
   font-size: 60px;
   font-weight: 800;
   letter-spacing: 0.21em;
-  color: #fff;
+  color: var(--color-text);
   text-transform: uppercase;
   line-height: 1;
   position: relative;
@@ -272,7 +271,7 @@
 
 @keyframes nameGlow {
   0%, 100% { filter: drop-shadow(0 0 0 transparent); }
-  50% { filter: drop-shadow(0 0 24px rgba(0, 212, 255, 0.26)); }
+  50% { filter: drop-shadow(0 0 16px color-mix(in srgb, var(--accent) 18%, transparent)); }
 }
 
 .glitchWrap {
@@ -292,7 +291,7 @@
 }
 
 .glitchWrap::before {
-  color: #00d4ff;
+  color: var(--accent);
   clip-path: polygon(0 25%, 100% 25%, 100% 45%, 0 45%);
   animation-delay: 3s;
 }
@@ -316,7 +315,7 @@
   opacity: 0;
   transform: translateY(-12px);
   animation: cDrop 0.4s cubic-bezier(0.2, 0, 0, 1) forwards;
-  text-shadow: 0 0 24px rgba(0, 212, 255, 0.25);
+  text-shadow: none;
 }
 
 @keyframes cDrop {
@@ -335,7 +334,7 @@
 .subLine {
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #00d4ff, transparent);
+  background: linear-gradient(90deg, var(--accent), transparent);
   animation: lineGrow 0.8s ease 1.9s forwards;
 }
 
@@ -347,10 +346,10 @@
   font-family: "Courier New", monospace;
   font-size: 16px;
   letter-spacing: 0.22em;
-  color: #00d4ff;
+  color: var(--accent);
   text-transform: uppercase;
   opacity: 0.95;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.35);
+  text-shadow: none;
   white-space: nowrap;
 }
 
@@ -358,8 +357,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: rgba(0, 212, 255, 0.7);
-  box-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+  background: color-mix(in srgb, var(--accent) 70%, white 30%);
 }
 
 @keyframes fadeUp {
@@ -373,9 +371,8 @@
   left: 14px;
   right: 14px;
   height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.26) 18%, rgba(0, 212, 255, 0.26) 82%, transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 26%, transparent) 18%, color-mix(in srgb, var(--accent) 26%, transparent) 82%, transparent);
   opacity: 1;
-  box-shadow: 0 0 8px rgba(0, 212, 255, 0.22);
 }
 
 .dataDot {
@@ -384,8 +381,7 @@
   width: 20px;
   height: 8px;
   border-radius: 0;
-  background: linear-gradient(90deg, rgba(0, 212, 255, 0), rgba(0, 212, 255, 0.75), rgba(0, 212, 255, 0));
-  box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 75%, transparent), transparent);
   animation: dataDot 2.2s linear 1.7s infinite;
 }
 
@@ -395,8 +391,8 @@
 }
 
 @keyframes outerPulse {
-  0%, 100% { filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.6)); }
-  50% { filter: drop-shadow(0 0 9px rgba(0, 212, 255, 0.9)); }
+  0%, 100% { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 22%, transparent)); }
+  50% { filter: drop-shadow(0 0 9px color-mix(in srgb, var(--accent) 34%, transparent)); }
 }
 
 @keyframes dataDot {
