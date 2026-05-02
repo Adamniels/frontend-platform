@@ -761,8 +761,8 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
       const gs   = stateRef.current!;
       ctx.save(); ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#f7f5ef"; ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(40,35,20,0.04)"; ctx.lineWidth = 0.5;
+      ctx.fillStyle = "#080c10"; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "rgba(0,212,255,0.05)"; ctx.lineWidth = 0.5;
       for (let gx = 0; gx < W; gx += 42) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
       for (let gy = 0; gy < H; gy += 42) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
 
@@ -841,7 +841,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
         if ((isHov || isSel || r > labelThreshold) && p.sc > 0.45) {
           const fs = Math.max(8, Math.round(9 * Math.min(p.sc, 1.2)));
           ctx.font = `${isHov||isSel ? 700 : 400} ${fs}px 'Space Mono',monospace`;
-          ctx.fillStyle = isHov||isSel ? col.fill : "rgba(122,118,105,0.82)";
+          ctx.fillStyle = isHov||isSel ? col.fill : "rgba(90,122,138,0.82)";
           ctx.globalAlpha = alpha * (isHov||isSel ? 1 : 0.75);
           const lbl = n.label.length > 22 ? n.label.slice(0, 20) + "…" : n.label;
           ctx.fillText(lbl.toUpperCase(), p.px, p.py + r + 12 * p.sc);
@@ -858,21 +858,21 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
         } else {
         const tx = Math.min((n._px ?? 0) + 16, W - 180);
         const ty = Math.max((n._py ?? 0) - 48, 8);
-        ctx.fillStyle = "rgba(247,245,239,0.98)"; ctx.strokeStyle = "rgba(40,35,20,0.14)"; ctx.lineWidth = 1;
+        ctx.fillStyle = "rgba(14,21,32,0.98)"; ctx.strokeStyle = "rgba(0,212,255,0.18)"; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.rect(tx, ty, 172, 40); ctx.fill(); ctx.stroke();
         ctx.font = "bold 9px 'Orbitron',sans-serif"; ctx.fillStyle = col.fill; ctx.textAlign = "left";
         ctx.fillText(TYPE_LABELS[n.type].toUpperCase(), tx+10, ty+16);
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.9)";
+        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.9)";
         const lbl = n.label.length > 26 ? n.label.slice(0, 24) + "…" : n.label;
         ctx.fillText(lbl, tx+10, ty+30);
         }
       }
 
       if (tickRef.current < 80) {
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "center";
+        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.75)"; ctx.textAlign = "center";
         ctx.fillText("DRAG: ORBIT  ·  SHIFT / RMB: PAN  ·  SCROLL: DOLLY (MOVE IN/OUT)", W/2, H-14);
       }
-      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "right";
+      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.75)"; ctx.textAlign = "right";
       ctx.fillText(`DOLLY ${Math.round(cam.distance)}u`, W-16, H-14);
 
       ctx.restore();

@@ -6,7 +6,7 @@
   justify-content: space-between;
   padding: 0 22px;
   border-bottom: 1px solid var(--color-border-strong);
-  background: rgba(239, 236, 227, 0.92);
+  background: rgba(8, 12, 16, 0.92);
   backdrop-filter: blur(8px);
 }
 
@@ -72,7 +72,7 @@
   width: 2px;
   height: 10px;
   background: var(--accent);
-  opacity: 0.4;
+  opacity: 0.5;
   animation: barPulse 1s ease-in-out infinite alternate;
 }
 

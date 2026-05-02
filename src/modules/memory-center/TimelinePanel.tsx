@@ -150,8 +150,8 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
 
       ctx.save(); ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#f7f5ef"; ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(40,35,20,0.04)"; ctx.lineWidth = 0.5;
+      ctx.fillStyle = "#080c10"; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "rgba(0,212,255,0.06)"; ctx.lineWidth = 0.5;
       for (let gx = 0; gx < W; gx += 42) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
       for (let gy = 0; gy < H; gy += 42) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
 
@@ -166,21 +166,21 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
       while (d.getTime() < visEnd) {
         const x = timeToX(d.getTime());
         const isMonday = d.getDay() === 1;
-        ctx.strokeStyle = isMonday ? "rgba(74,112,169,0.14)" : "rgba(40,35,20,0.05)";
+        ctx.strokeStyle = isMonday ? "rgba(0,212,255,0.18)" : "rgba(0,212,255,0.05)";
         ctx.lineWidth   = isMonday ? 1 : 0.5;
         ctx.setLineDash(isMonday ? [] : [4, 6]);
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
         ctx.setLineDash([]);
         if (tl.scale > 30) {
           const label = d.toLocaleDateString("en-SE", { month: "short", day: "numeric" }).toUpperCase();
-          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.82)"; ctx.textAlign = "left";
+          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.82)"; ctx.textAlign = "left";
           ctx.fillText(label, x + 4, axisY + 12);
         }
         d.setDate(d.getDate() + 1);
       }
 
-      ctx.shadowColor = "rgba(74,112,169,0.18)"; ctx.shadowBlur = 4;
-      ctx.strokeStyle = "rgba(74,112,169,0.42)"; ctx.lineWidth = 1;
+      ctx.shadowColor = "rgba(0,212,255,0.25)"; ctx.shadowBlur = 4;
+      ctx.strokeStyle = "rgba(0,212,255,0.35)"; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(LABEL_W, axisY); ctx.lineTo(W, axisY); ctx.stroke();
       ctx.shadowBlur = 0;
 
@@ -267,8 +267,8 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
 
       ctx.restore();
 
-      ctx.fillStyle = "rgba(247,245,239,0.98)"; ctx.fillRect(0, 0, LABEL_W, H);
-      ctx.strokeStyle = "rgba(40,35,20,0.12)"; ctx.lineWidth = 1;
+      ctx.fillStyle = "rgba(11,16,24,0.98)"; ctx.fillRect(0, 0, LABEL_W, H);
+      ctx.strokeStyle = "rgba(0,212,255,0.15)"; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(LABEL_W, 0); ctx.lineTo(LABEL_W, H); ctx.stroke();
 
       Object.values(DOMAIN_LANES).forEach((lane) => {
@@ -281,7 +281,7 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
         ctx.fillText(lane.label, LABEL_W - 22, laneY);
         ctx.textBaseline = "alphabetic";
       });
-      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.78)";
+      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.78)";
       ctx.textAlign = "right"; ctx.textBaseline = "middle";
       ctx.fillText("TIMELINE", LABEL_W - 22, H * AXIS_Y_FRAC);
       ctx.textBaseline = "alphabetic";
@@ -292,13 +292,13 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
         if (lane) {
           const tx = Math.min(ev._x! + 14, W - 200);
           const ty = Math.max(ev._y! - 58, 8);
-          ctx.fillStyle = "rgba(247,245,239,0.98)";
-          ctx.strokeStyle = "rgba(40,35,20,0.14)"; ctx.lineWidth = 1;
+          ctx.fillStyle = "rgba(14,21,32,0.98)";
+          ctx.strokeStyle = "rgba(0,212,255,0.18)"; ctx.lineWidth = 1;
           ctx.beginPath(); ctx.rect(tx, ty, 192, 50); ctx.fill(); ctx.stroke();
           const evDate = new Date(ev.occurredAt);
           ctx.font = "bold 9px 'Space Mono',monospace"; ctx.fillStyle = lane.color; ctx.textAlign = "left";
           ctx.fillText(ev.eventType.replace(/_/g," ").toUpperCase(), tx+10, ty+16);
-          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.82)";
+          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.82)";
           ctx.fillText(evDate.toLocaleDateString("en-SE",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).toUpperCase(), tx+10, ty+30);
           if (ev.workflowId) { ctx.fillStyle="rgba(160,156,142,0.82)"; ctx.fillText(ev.workflowId, tx+10, ty+44); }
         }

@@ -15,10 +15,10 @@
   z-index: 0;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 70% 60% at 75% 10%, rgba(143, 171, 212, 0.22) 0%, transparent 72%),
-    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(74, 112, 169, 0.12) 0%, transparent 65%),
-    radial-gradient(ellipse 40% 30% at 30% 80%, rgba(74, 112, 169, 0.06) 0%, transparent 60%),
-    linear-gradient(155deg, #f7f5ef 0%, #efece3 58%, #e7e3d9 100%);
+    radial-gradient(ellipse 70% 60% at 75% 10%, rgba(0, 212, 255, 0.10) 0%, transparent 72%),
+    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(0, 212, 255, 0.06) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 30% 80%, rgba(232, 160, 32, 0.04) 0%, transparent 60%),
+    linear-gradient(155deg, #0a1220 0%, #080c10 58%, #060a0e 100%);
   animation: bgBreath 16s ease-in-out infinite alternate;
 }
 

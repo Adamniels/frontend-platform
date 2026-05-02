@@ -25,6 +25,7 @@ export function JarvisCard({
       tabIndex={onClick ? 0 : undefined}
       className={cn(styles.card, hover && styles.cardHoverable, onClick && styles.clickable, className)}
       style={style}
+      data-card
       onClick={onClick}
       onKeyDown={
         onClick
@@ -37,6 +38,10 @@ export function JarvisCard({
           : undefined
       }
     >
+      <span className={styles.cornerTL} data-corner aria-hidden />
+      <span className={styles.cornerTR} data-corner aria-hidden />
+      <span className={styles.cornerBL} data-corner aria-hidden />
+      <span className={styles.cornerBR} data-corner aria-hidden />
       {children}
     </div>
   );

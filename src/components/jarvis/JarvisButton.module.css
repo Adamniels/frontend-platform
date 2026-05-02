@@ -8,6 +8,8 @@
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
+  position: relative;
+  overflow: hidden;
   transition:
     background 0.18s ease,
     border-color 0.18s ease,
@@ -20,15 +22,40 @@
 .icon {
   display: inline-flex;
   align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hover pulse ring */
+.ring {
+  position: absolute;
+  inset: -2px;
+  border: 1px solid var(--accent);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+}
+
+/* Click ripple */
+.ripple {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
 }
 
 .variant_primary {
   background: var(--accent);
-  color: #f7f5ef;
+  color: #070c14;
 }
 
 .variant_primary:hover {
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 20%, transparent);
+  box-shadow: var(--glow-accent-strong);
   transform: translateY(-1px);
 }
 
@@ -40,6 +67,7 @@
 
 .variant_ghost:hover {
   background: var(--color-card-hover);
+  border-color: var(--accent-dim);
 }
 
 .variant_outline {

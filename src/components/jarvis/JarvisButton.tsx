@@ -1,6 +1,9 @@
 "use client";
 
-import type { ReactNode, CSSProperties, MouseEventHandler } from "react";
+import type { ReactNode, CSSProperties, MouseEvent } from "react";
+import { useRef } from "react";
+import { animate } from "animejs";
+import { prefersReducedMotion } from "@/lib/anime/motion";
 import { cn } from "@/lib/utils/cn";
 import styles from "./JarvisButton.module.css";
 
@@ -8,7 +11,7 @@ export type JarvisButtonVariant = "primary" | "ghost" | "outline";
 
 type JarvisButtonProps = {
   label: string;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   variant?: JarvisButtonVariant;
   icon?: ReactNode;
   type?: "button" | "submit";
@@ -25,13 +28,46 @@ export function JarvisButton({
   className,
   style,
 }: JarvisButtonProps) {
+  const ringRef = useRef<HTMLSpanElement>(null);
+  const rippleRef = useRef<HTMLSpanElement>(null);
+
+  function handleMouseEnter() {
+    if (prefersReducedMotion() || !ringRef.current) return;
+    animate(ringRef.current, {
+      scale: [1, 1.7],
+      opacity: [0.55, 0],
+      duration: 520,
+      ease: "outExpo",
+    });
+  }
+
+  function handleClick(e: MouseEvent<HTMLButtonElement>) {
+    if (!prefersReducedMotion() && rippleRef.current) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      rippleRef.current.style.left = `${x}px`;
+      rippleRef.current.style.top = `${y}px`;
+      animate(rippleRef.current, {
+        scale: [0, 3.5],
+        opacity: [0.4, 0],
+        duration: 420,
+        ease: "outExpo",
+      });
+    }
+    onClick?.(e);
+  }
+
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
       className={cn(styles.btn, styles[`variant_${variant}` as keyof typeof styles], className)}
       style={style}
     >
+      <span ref={ringRef} className={styles.ring} aria-hidden />
+      <span ref={rippleRef} className={styles.ripple} aria-hidden />
       {icon ? <span className={styles.icon}>{icon}</span> : null}
       {label}
     </button>

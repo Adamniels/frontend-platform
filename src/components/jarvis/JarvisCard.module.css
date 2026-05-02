@@ -20,12 +20,57 @@
 
 .cardHoverable:hover {
   background: var(--color-card-hover);
-  border-color: var(--color-border-strong);
+  border-color: var(--accent-dim);
   box-shadow:
     0 2px 8px var(--color-shadow-md),
-    0 8px 24px var(--color-shadow-md);
+    0 8px 24px var(--color-shadow-md),
+    var(--glow-accent);
 }
 
 .clickable {
   cursor: pointer;
+}
+
+/* HUD corner brackets — animated in by anime.js */
+.cornerTL,
+.cornerTR,
+.cornerBL,
+.cornerBR {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+  pointer-events: none;
+}
+.cornerTL {
+  top: -1px;
+  left: -1px;
+  border-top: 1px solid var(--accent);
+  border-left: 1px solid var(--accent);
+}
+.cornerTR {
+  top: -1px;
+  right: -1px;
+  border-top: 1px solid var(--accent);
+  border-right: 1px solid var(--accent);
+}
+.cornerBL {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 1px solid var(--accent);
+  border-left: 1px solid var(--accent);
+}
+.cornerBR {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 1px solid var(--accent);
+  border-right: 1px solid var(--accent);
+}
+
+/* Show corners on hover even without JS */
+.cardHoverable:hover .cornerTL,
+.cardHoverable:hover .cornerTR,
+.cardHoverable:hover .cornerBL,
+.cardHoverable:hover .cornerBR {
+  opacity: 0.5;
 }

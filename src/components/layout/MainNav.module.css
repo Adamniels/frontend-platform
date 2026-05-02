@@ -40,6 +40,7 @@
   letter-spacing: 1.15px;
   text-transform: uppercase;
   text-decoration: none;
+  position: relative;
 }
 
 .navLink:hover {
@@ -51,8 +52,20 @@
 .navLinkActive {
   background: var(--accent-active);
   color: var(--accent);
-  border-left-color: var(--accent);
+  border-left-color: transparent; /* indicator handled by .activeBorder span */
   text-decoration: none;
+}
+
+/* Animated left-border indicator driven by anime.js */
+.activeBorder {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  transform-origin: top center;
 }
 
 .badge {
@@ -61,7 +74,7 @@
   height: 15px;
   border-radius: 50%;
   background: var(--color-warning);
-  color: #fff;
+  color: #070c14;
   font-size: 8px;
   font-weight: 700;
   display: flex;
@@ -76,4 +89,5 @@
   height: 4px;
   border-radius: 50%;
   background: var(--accent);
+  box-shadow: 0 0 4px var(--accent);
 }

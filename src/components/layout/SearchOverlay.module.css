@@ -1,7 +1,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(28, 26, 20, 0.18);
+  background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(10px);
   z-index: 200;
   display: flex;
@@ -18,8 +18,8 @@
   border: 1px solid var(--color-border-strong);
   border-radius: 0;
   padding: var(--space-5);
-  animation: glitchIn 0.25s ease;
-  box-shadow: 0 24px 80px rgba(30, 25, 10, 0.18);
+  /* entrance driven by anime.js */
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), var(--glow-accent);
 }
 
 .input {

@@ -1,33 +1,41 @@
 export const ACCENT_STORAGE_KEY = "platform_accent";
-export const PLATFORM_LIGHT_ACCENT = "#4A70A9";
+export const PLATFORM_LIGHT_ACCENT = "#00D4FF";
 
 const PLATFORM_LIGHT_TOKENS = {
-  "--accent": "#4A70A9",
-  "--accent-mid": "#8FABD4",
-  "--accent-dim": "rgba(74,112,169,0.16)",
-  "--accent-hover": "rgba(74,112,169,0.08)",
-  "--accent-active": "rgba(74,112,169,0.12)",
-  "--accent-card": "rgba(74,112,169,0.05)",
-  "--accent-track": "rgba(74,112,169,0.14)",
-  "--accent-glow": "rgba(74,112,169,0.15)",
-  "--accent-scanline": "rgba(74,112,169,0.05)",
-  "--accent-hex": "#4A70A9",
-  "--color-bg": "#efece3",
-  "--color-sidebar": "#e7e3d9",
-  "--color-card": "#f7f5ef",
-  "--color-card-hover": "#faf8f3",
-  "--color-surface": "#e2dfd5",
-  "--color-surface-hover": "#ece8de",
-  "--color-border": "rgba(40,35,20,0.08)",
-  "--color-border-strong": "rgba(40,35,20,0.14)",
-  "--color-shadow": "rgba(30,25,10,0.06)",
-  "--color-shadow-md": "rgba(30,25,10,0.10)",
-  "--color-text": "#1c1a14",
-  "--color-text-muted": "#7a7669",
-  "--color-text-dim": "#a09c8e",
-  "--color-green": "#1a9e72",
-  "--color-danger": "#c94040",
-  "--color-warning": "#b87200",
+  "--accent": "#00d4ff",
+  "--accent-hex": "#00d4ff",
+  "--accent-mid": "#5de4ff",
+  "--accent-dim": "rgba(0,212,255,0.18)",
+  "--accent-hover": "rgba(0,212,255,0.08)",
+  "--accent-active": "rgba(0,212,255,0.14)",
+  "--accent-subtle": "rgba(0,212,255,0.05)",
+  "--accent-track": "rgba(0,212,255,0.12)",
+  "--accent-glow": "rgba(0,212,255,0.20)",
+  "--accent-card": "rgba(0,212,255,0.04)",
+  "--accent-scanline": "rgba(0,212,255,0.04)",
+  "--accent-alt": "#e8a020",
+  "--accent-alt-dim": "rgba(232,160,32,0.16)",
+  "--accent-alt-glow": "rgba(232,160,32,0.22)",
+  "--color-bg": "#080c10",
+  "--color-sidebar": "#0b1018",
+  "--color-card": "#0e1520",
+  "--color-card-hover": "#111a26",
+  "--color-surface": "#111c2a",
+  "--color-surface-hover": "#162234",
+  "--color-border": "rgba(0,212,255,0.08)",
+  "--color-border-strong": "rgba(0,212,255,0.16)",
+  "--color-shadow": "rgba(0,0,0,0.40)",
+  "--color-shadow-md": "rgba(0,0,0,0.60)",
+  "--color-text": "#cce8f0",
+  "--color-text-muted": "#5a7a8a",
+  "--color-text-dim": "#34505e",
+  "--color-green": "#00ff88",
+  "--color-purple": "#a855f7",
+  "--color-danger": "#ff3b3b",
+  "--color-warning": "#e8a020",
+  "--glow-accent": "0 0 12px rgba(0,212,255,0.25), 0 0 40px rgba(0,212,255,0.08)",
+  "--glow-accent-strong": "0 0 6px rgba(0,212,255,0.50), 0 0 20px rgba(0,212,255,0.20)",
+  "--glow-amber": "0 0 12px rgba(232,160,32,0.25), 0 0 40px rgba(232,160,32,0.08)",
 } as const;
 
 export function readStoredAccent(): string | null {
@@ -54,7 +62,7 @@ export function applyAccentToDocument(hex: string): void {
     return;
   }
 
-  root.style.setProperty("--accent", PLATFORM_LIGHT_ACCENT);
+  root.style.setProperty("--accent", hex);
   root.style.setProperty("--accent-mid", PLATFORM_LIGHT_TOKENS["--accent-mid"]);
   root.style.setProperty("--accent-dim", PLATFORM_LIGHT_TOKENS["--accent-dim"]);
   root.style.setProperty("--accent-hover", PLATFORM_LIGHT_TOKENS["--accent-hover"]);
@@ -63,5 +71,5 @@ export function applyAccentToDocument(hex: string): void {
   root.style.setProperty("--accent-track", PLATFORM_LIGHT_TOKENS["--accent-track"]);
   root.style.setProperty("--accent-glow", PLATFORM_LIGHT_TOKENS["--accent-glow"]);
   root.style.setProperty("--accent-scanline", PLATFORM_LIGHT_TOKENS["--accent-scanline"]);
-  root.style.setProperty("--accent-hex", PLATFORM_LIGHT_TOKENS["--accent-hex"]);
+  root.style.setProperty("--accent-hex", hex);
 }

@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { animate, stagger } from "animejs";
+import { prefersReducedMotion } from "@/lib/anime/motion";
 import type { DashboardSummary } from "@/types/dashboard";
 import { MOCK_INPUT_ITEMS, MOCK_PROGRESS_METRICS, MOCK_QUICK_ACTIONS, MOCK_SESSION_CARD } from "./dashboard-mock";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
@@ -14,6 +16,7 @@ type DashboardClientProps = { summary: DashboardSummary } | { loadError: string 
 
 export function DashboardClient(props: DashboardClientProps) {
   const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
   const [greeting] = useState(() => {
     const h = new Date().getHours();
     if (h < 12) return "Good morning";
@@ -22,6 +25,39 @@ export function DashboardClient(props: DashboardClientProps) {
   });
 
   const summary = "summary" in props ? props.summary : null;
+
+  // Page reveal + card stagger entrance
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || prefersReducedMotion()) return;
+
+    // Scan reveal — content sweeps in from top
+    animate(el, {
+      clipPath: ["inset(0 0 100% 0)", "inset(0 0 0% 0)"],
+      duration: 450,
+      ease: "outExpo",
+    });
+
+    // Cards stagger in
+    const cards = el.querySelectorAll<HTMLElement>("[data-card]");
+    animate(cards, {
+      opacity: [0, 1],
+      translateY: [24, 0],
+      duration: 520,
+      ease: "outExpo",
+      delay: stagger(75, { start: 120 }),
+    });
+
+    // Corner brackets lock on after cards appear
+    const corners = el.querySelectorAll<HTMLElement>("[data-corner]");
+    animate(corners, {
+      opacity: [0, 0.65],
+      scale: [1.5, 1],
+      duration: 220,
+      ease: "outExpo",
+      delay: stagger(30, { start: 200 }),
+    });
+  }, []);
 
   const streakNote = useMemo(() => {
     if (!summary) return null;
@@ -51,7 +87,7 @@ export function DashboardClient(props: DashboardClientProps) {
   }
 
   return (
-    <div className={`${styles.root} screenEnter`}>
+    <div ref={containerRef} className={styles.root}>
       <div className={styles.headerRow}>
         <div>
           <div className={styles.greet}>{greeting.toUpperCase()}, OPERATOR</div>

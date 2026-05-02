@@ -152,7 +152,7 @@
   z-index: 80;
   display: flex;
   flex-direction: column;
-  animation: glitchIn 0.25s ease;
+  /* entrance driven by anime.js */
 }
 
 .notificationsHead {
