@@ -31,7 +31,7 @@
   cursor: pointer;
 }
 
-/* HUD corner brackets — animated in by anime.js */
+/* HUD corner brackets — pop in on hover */
 .cornerTL,
 .cornerTR,
 .cornerBL,
@@ -41,6 +41,8 @@
   height: 10px;
   opacity: 0;
   pointer-events: none;
+  transform: scale(1.4);
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 .cornerTL {
   top: -1px;
@@ -67,10 +69,10 @@
   border-right: 1px solid var(--accent);
 }
 
-/* Show corners on hover even without JS */
 .cardHoverable:hover .cornerTL,
 .cardHoverable:hover .cornerTR,
 .cardHoverable:hover .cornerBL,
 .cardHoverable:hover .cornerBR {
-  opacity: 0.5;
+  opacity: 0.65;
+  transform: scale(1);
 }

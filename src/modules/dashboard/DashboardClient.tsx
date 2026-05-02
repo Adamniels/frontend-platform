@@ -48,15 +48,6 @@ export function DashboardClient(props: DashboardClientProps) {
       delay: stagger(75, { start: 120 }),
     });
 
-    // Corner brackets lock on after cards appear
-    const corners = el.querySelectorAll<HTMLElement>("[data-corner]");
-    animate(corners, {
-      opacity: [0, 0.65],
-      scale: [1.5, 1],
-      duration: 220,
-      ease: "outExpo",
-      delay: stagger(30, { start: 200 }),
-    });
   }, []);
 
   const streakNote = useMemo(() => {
