@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { animate, createTimeline, stagger } from "animejs";
+import { animate, createTimeline, stagger, steps } from "animejs";
 import { prefersReducedMotion } from "@/lib/anime/motion";
 import styles from "./BootOverlay.module.css";
 
@@ -61,7 +61,7 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
     tl.add(counterState, {
       value: 100,
       duration: totalDuration,
-      ease: "steps(20)",
+      ease: steps(20),
       onUpdate: () => {
         counter.textContent = `${String(Math.round(counterState.value)).padStart(3, "0")}%`;
       },
