@@ -24,9 +24,9 @@ import styles from "./memory-center.module.css";
 // ── Colours ──────────────────────────────────────────────────────────────────
 
 const NODE_COLORS = {
-  semantic:   { fill: "#6b8fc3", glow: "rgba(107,143,195,0.24)", bg: "rgba(107,143,195,0.08)", rgb: "107,143,195" },
-  procedural: { fill: "#8f7aa8", glow: "rgba(143,122,168,0.22)", bg: "rgba(143,122,168,0.08)", rgb: "143,122,168" },
-  profile:    { fill: "#79a88b", glow: "rgba(121,168,139,0.22)", bg: "rgba(121,168,139,0.08)", rgb: "121,168,139" },
+  semantic:   { fill: "#00d4ff", glow: "rgba(0,212,255,0.28)",  bg: "rgba(0,212,255,0.07)",  rgb: "0,212,255"  },
+  procedural: { fill: "#a855f7", glow: "rgba(168,85,247,0.26)", bg: "rgba(168,85,247,0.07)", rgb: "168,85,247" },
+  profile:    { fill: "#00ff88", glow: "rgba(0,255,136,0.24)",  bg: "rgba(0,255,136,0.06)",  rgb: "0,255,136"  },
 } as const;
 
 const TYPE_LABELS = { semantic: "Semantic", procedural: "Procedural", profile: "Profile Fact" } as const;
@@ -47,6 +47,7 @@ type GraphNode = {
   rx?: number; ry?: number; rz?: number;
   fx?: number; fy?: number; fz?: number;
   _px?: number; _py?: number; _pr?: number;
+  breathPhase: number;
 };
 
 type Particle = { t: number; speed: number };
@@ -509,7 +510,7 @@ function meanSemanticPositionByDomain(
 }
 
 function buildGraph(data: GraphInputData): GraphState {
-  const semNodes: GraphNode[] = data.semantics.map((s) => ({
+  const semNodes: GraphNode[] = data.semantics.map((s, i) => ({
     id: `s-${s.id}`,
     type: "semantic" as const,
     label: s.key.replace(/_/g, " "),
@@ -517,6 +518,7 @@ function buildGraph(data: GraphInputData): GraphState {
     data: s,
     x: 0, y: 0, z: 0,
     vx: 0, vy: 0, vz: 0,
+    breathPhase: i * 0.73,
   }));
   layoutSemanticSubgraph(semNodes, data.semantics, data.relationships);
   const domainCenter = meanSemanticPositionByDomain(data.semantics, semNodes);
@@ -543,6 +545,7 @@ function buildGraph(data: GraphInputData): GraphState {
       y: center.y + sp.oy * spread + jitter(0, 18),
       z: center.z + sp.oz * spread + jitter(0, 20),
       vx: 0, vy: 0, vz: 0,
+      breathPhase: idx * 0.91 + 1.1,
     });
   });
   const nP = data.profileFacts.length;
@@ -564,6 +567,7 @@ function buildGraph(data: GraphInputData): GraphState {
       y: profCenter.y + sp.oy * spread + jitter(0, 16),
       z: profCenter.z + sp.oz * spread + jitter(0, 18),
       vx: 0, vy: 0, vz: 0,
+      breathPhase: idx * 1.17 + 2.2,
     });
   });
   const idMap: Record<string, GraphNode> = Object.fromEntries(nodes.map((n) => [n.id, n]));
@@ -572,8 +576,8 @@ function buildGraph(data: GraphInputData): GraphState {
       src: `s-${rel.sourceId}`,
       tgt: `s-${rel.targetId}`,
       label: rel.type,
-      particles: Array.from({ length: 2 }, (_, i) => ({
-        t: i * 0.5 + Math.random() * 0.3,
+      particles: Array.from({ length: 4 }, (_, i) => ({
+        t: i * 0.25 + Math.random() * 0.18,
         speed: 0.0012 + Math.random() * 0.0018,
       })),
     }))
@@ -678,30 +682,23 @@ type MemoryGraphCanvasProps = {
 };
 
 function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
-  const canvasRef    = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const stateRef     = useRef<GraphState | null>(null);
-  const frameRef     = useRef<number>(0);
-  const tickRef      = useRef(0);
-  const dprRef       = useRef(1);
-  const camRef         = useRef<Camera>({
-    target: { x: 0, y: 0, z: 0 },
-    yaw: 0.42,
-    pitch: -0.28,
-    distance: 2200,
-  });
-  const dragRef      = useRef({ active: false, button: 0, lx: 0, ly: 0, moved: false });
-  const selectedRef  = useRef<GraphNode | null>(null);
-  const hoveredRef   = useRef<GraphNode | null>(null);
+  const canvasRef          = useRef<HTMLCanvasElement>(null);
+  const containerRef       = useRef<HTMLDivElement>(null);
+  const stateRef           = useRef<GraphState | null>(null);
+  const frameRef           = useRef<number>(0);
+  const tickRef            = useRef(0);
+  const dprRef             = useRef(1);
+  const camRef             = useRef<Camera>({ target: { x: 0, y: 0, z: 0 }, yaw: 0.42, pitch: -0.28, distance: 2200 });
+  const dragRef            = useRef({ active: false, button: 0, lx: 0, ly: 0, moved: false });
+  const selectedRef        = useRef<GraphNode | null>(null);
+  const hoveredRef         = useRef<GraphNode | null>(null);
+  const focusNodeRef       = useRef<string | null>(null);
+  const lastInteractionRef = useRef<number>(Date.now());
+  const lastClickRef       = useRef<{ time: number; nodeId: string } | null>(null);
+  const clickBurstsRef     = useRef<Array<{ px: number; py: number; radius: number; alpha: number; rgb: string }>>([]);
 
   const [selected, setSelected] = useState<SelectedNode | null>(null);
-
-  const DEFAULT_CAM: Camera = {
-    target: { x: 0, y: 0, z: 0 },
-    yaw: 0.42,
-    pitch: -0.28,
-    distance: 2200,
-  };
+  const [focusMode, setFocusMode] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current, container = containerRef.current;
@@ -741,11 +738,13 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
         });
         if (t === 359) {
           nodes.forEach((n) => { n.vx = 0; n.vy = 0; n.vz = 0; n.rx = n.x; n.ry = n.y; n.rz = n.z; });
-          /** Final pass: camera moves must not re-run physics; keep nodes strictly separated. */
           enforceMinNodeSeparation(nodes, 10);
         }
       } else {
         nodes.forEach((n) => { n.vx = 0; n.vy = 0; n.vz = 0; n.rx = n.x; n.ry = n.y; n.rz = n.z; });
+        if (Date.now() - lastInteractionRef.current > 4000) {
+          camRef.current.yaw += 0.0005;
+        }
       }
 
       edges.forEach((e) => { e.particles.forEach((p) => { p.t += p.speed; if (p.t > 1) p.t -= 1; }); });
@@ -753,127 +752,205 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
     }
 
     function draw() {
-      const ctx  = canvas!.getContext("2d")!;
-      const dpr  = dprRef.current;
-      const W    = canvas!.width  / dpr;
-      const H    = canvas!.height / dpr;
-      const cam  = camRef.current;
-      const gs   = stateRef.current!;
+      const ctx = canvas!.getContext("2d")!;
+      const dpr = dprRef.current;
+      const W   = canvas!.width  / dpr;
+      const H   = canvas!.height / dpr;
+      const cam = camRef.current;
+      const gs  = stateRef.current!;
+      const t   = tickRef.current;
       ctx.save(); ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, W, H);
+
+      // Background + grid
       ctx.fillStyle = "#080c10"; ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(0,212,255,0.05)"; ctx.lineWidth = 0.5;
+      ctx.strokeStyle = "rgba(0,212,255,0.035)"; ctx.lineWidth = 0.5;
       for (let gx = 0; gx < W; gx += 42) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
       for (let gy = 0; gy < H; gy += 42) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
 
+      // Central ambient glow
+      const cx = W / 2, cy = H / 2;
+      const amb = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.55);
+      amb.addColorStop(0, "rgba(0,212,255,0.05)");
+      amb.addColorStop(0.5, "rgba(0,212,255,0.016)");
+      amb.addColorStop(1, "transparent");
+      ctx.fillStyle = amb; ctx.fillRect(0, 0, W, H);
+
       const { nodes, edges, idMap } = gs;
-      const hovId = hoveredRef.current?.id ?? null;
-      const selId = selectedRef.current?.id ?? null;
+      const hovId   = hoveredRef.current?.id ?? null;
+      const selId   = selectedRef.current?.id ?? null;
+      const focusId = focusNodeRef.current;
+
+      // Focus-mode neighbour set
+      let focusNeighbors: Set<string> | null = null;
+      if (focusId) {
+        focusNeighbors = new Set<string>([focusId]);
+        edges.forEach((e) => {
+          if (e.src === focusId) focusNeighbors!.add(e.tgt);
+          if (e.tgt === focusId) focusNeighbors!.add(e.src);
+        });
+      }
 
       const proj: Record<string, ReturnType<typeof project3D>> = {};
       nodes.forEach((n) => { proj[n.id] = project3D(n.x, n.y, n.z, cam, W, H); });
-      // Larger depth = farther along view; draw far nodes first, near on top.
       const sorted = [...nodes].sort((a, b) => proj[b.id].depth - proj[a.id].depth);
 
-      // Edges
+      // ── Edges ──────────────────────────────────────────────────────
       edges.forEach((e) => {
         const a = idMap[e.src], b = idMap[e.tgt]; if (!a || !b) return;
         const pa = proj[a.id], pb = proj[b.id];
         if (pa.sc < 0.01 || pb.sc < 0.01) return;
         if (!Number.isFinite(pa.px) || !Number.isFinite(pb.px)) return;
         const isHi = a.id === hovId || b.id === hovId || a.id === selId || b.id === selId;
-        const col  = NODE_COLORS[a.type];
-        const cpx  = (pa.px + pb.px) / 2 + (pb.py - pa.py) * 0.2;
-        const cpy  = (pa.py + pb.py) / 2 - (pb.px - pa.px) * 0.2;
+        const isFocusDim = focusNeighbors != null && !focusNeighbors.has(a.id) && !focusNeighbors.has(b.id);
+        const col   = NODE_COLORS[a.type];
+        const cpx   = (pa.px + pb.px) / 2 + (pb.py - pa.py) * 0.2;
+        const cpy   = (pa.py + pb.py) / 2 - (pb.px - pa.px) * 0.2;
         const midSc = Math.max(0.1, (pa.sc + pb.sc) * 0.5);
         ctx.beginPath(); ctx.moveTo(pa.px, pa.py); ctx.quadraticCurveTo(cpx, cpy, pb.px, pb.py);
-        ctx.strokeStyle = isHi ? `rgba(${col.rgb},0.42)` : `rgba(${col.rgb},0.16)`;
-        ctx.lineWidth = (isHi ? 1.8 : 0.8) * midSc; ctx.stroke();
+        ctx.strokeStyle = `rgba(${col.rgb},${isFocusDim ? 0.04 : isHi ? 0.50 : 0.18})`;
+        ctx.lineWidth = (isHi ? 2 : 0.9) * midSc; ctx.stroke();
+        const pAlpha = isFocusDim ? 0.05 : 1;
         e.particles.forEach((p) => {
           const pt = bezierPoint(p.t, pa.px, pa.py, cpx, cpy, pb.px, pb.py);
-          ctx.beginPath(); ctx.arc(pt.x, pt.y, (isHi ? 2.8 : 2) * midSc, 0, Math.PI*2);
-          ctx.fillStyle = col.fill; ctx.shadowColor = col.fill; ctx.shadowBlur = isHi ? 8 : 4;
+          ctx.beginPath(); ctx.arc(pt.x, pt.y, (isHi ? 2.8 : 1.8) * midSc, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${col.rgb},${pAlpha})`;
+          ctx.shadowColor = col.fill; ctx.shadowBlur = isHi ? 10 : 5;
           ctx.fill(); ctx.shadowBlur = 0;
         });
       });
 
-      // Nodes
+      // ── Nodes ──────────────────────────────────────────────────────
       sorted.forEach((n) => {
         const p = proj[n.id];
         if (p.sc < 0.01 || !Number.isFinite(p.px) || !Number.isFinite(p.py)) {
-          n._px = -1; n._py = -1; n._pr = 0;
-          return;
+          n._px = -1; n._py = -1; n._pr = 0; return;
         }
         const col   = NODE_COLORS[n.type];
-        const isHov = n.id === hovId, isSel = n.id === selId;
-        const r     = Math.max(0.5, n.r * p.sc * (isSel ? 1.3 : isHov ? 1.18 : 1));
-        const alpha = Math.max(0.25, Math.min(1, 0.35 + Math.min(p.sc, 4)));
+        const isHov = n.id === hovId;
+        const isSel = n.id === selId;
+        const isFocusDimNode = focusNeighbors != null && !focusNeighbors.has(n.id);
+        const focusAlpha  = isFocusDimNode ? 0.07 : 1;
+        const breathScale = 1 + 0.055 * Math.sin(t * 0.022 + n.breathPhase);
+        const r = Math.max(0.5, n.r * p.sc * breathScale * (isSel ? 1.28 : isHov ? 1.16 : 1));
+        const depthAlpha  = Math.max(0.22, Math.min(1, 0.3 + Math.min(p.sc, 4)));
 
-        const halo = ctx.createRadialGradient(p.px, p.py, r * 0.2, p.px, p.py, r + 18);
-        halo.addColorStop(0, `rgba(${col.rgb},${(isSel?0.24:isHov?0.18:0.1)*alpha})`);
+        ctx.globalAlpha = depthAlpha * focusAlpha;
+
+        // Layer 1: wide outer halo
+        const haloR = r * 3.2;
+        const halo  = ctx.createRadialGradient(p.px, p.py, r * 0.4, p.px, p.py, haloR);
+        halo.addColorStop(0, `rgba(${col.rgb},${isSel ? 0.20 : isHov ? 0.14 : 0.07})`);
         halo.addColorStop(1, "transparent");
-        ctx.beginPath(); ctx.arc(p.px, p.py, r+18, 0, Math.PI*2);
+        ctx.beginPath(); ctx.arc(p.px, p.py, haloR, 0, Math.PI * 2);
         ctx.fillStyle = halo; ctx.fill();
 
-        ctx.beginPath(); ctx.arc(p.px, p.py, r, 0, Math.PI*2);
-        ctx.fillStyle = col.bg; ctx.strokeStyle = col.fill;
-        ctx.lineWidth = (isSel ? 2.5 : isHov ? 2 : 1.5) * p.sc;
-        ctx.globalAlpha = alpha; ctx.fill();
-        if (isSel) { ctx.shadowColor = col.fill; ctx.shadowBlur = 10; }
-        ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+        // Layer 2: pulsing orbit ring
+        const ringPulse = 0.22 + 0.13 * Math.sin(t * 0.038 + n.breathPhase + 1.2);
+        ctx.beginPath(); ctx.arc(p.px, p.py, r * 1.55, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${col.rgb},${ringPulse})`;
+        ctx.lineWidth = 0.7 * p.sc; ctx.stroke();
 
-        if (r > 10) {
-          const hw = r * 0.52;
-          ctx.strokeStyle = col.fill; ctx.lineWidth = 1.2 * p.sc; ctx.globalAlpha = alpha * 0.7;
-          [[p.px-hw, p.py-hw, 1, 1], [p.px+hw, p.py+hw, -1, -1]].forEach(([bx, by, sx, sy]) => {
-            ctx.beginPath(); ctx.moveTo(bx+sx*r*0.28, by); ctx.lineTo(bx, by); ctx.lineTo(bx, by+sy*r*0.28); ctx.stroke();
+        // Layer 3: main body
+        ctx.beginPath(); ctx.arc(p.px, p.py, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${col.rgb},0.08)`; ctx.fill();
+        ctx.strokeStyle = `rgba(${col.rgb},${isSel ? 0.95 : isHov ? 0.72 : 0.52})`;
+        ctx.lineWidth = (isSel ? 2.5 : isHov ? 2 : 1.5) * p.sc;
+        if (isSel) { ctx.shadowColor = col.fill; ctx.shadowBlur = 14 * p.sc; }
+        ctx.stroke(); ctx.shadowBlur = 0;
+
+        // Layer 4: inner core glow
+        const coreR    = Math.max(1, r * 0.3);
+        const coreGrad = ctx.createRadialGradient(p.px, p.py, 0, p.px, p.py, coreR);
+        coreGrad.addColorStop(0, `rgba(${col.rgb},0.88)`);
+        coreGrad.addColorStop(1, `rgba(${col.rgb},0.08)`);
+        ctx.beginPath(); ctx.arc(p.px, p.py, coreR, 0, Math.PI * 2);
+        ctx.fillStyle = coreGrad; ctx.fill();
+
+        // HUD corner brackets for selected
+        if (isSel && r > 6) {
+          const hw = r * 1.42, bl = r * 0.38;
+          ctx.strokeStyle = col.fill; ctx.lineWidth = 1.5 * p.sc;
+          ctx.shadowColor = col.fill; ctx.shadowBlur = 6;
+          const corners: [number, number, number, number][] = [
+            [-hw, -hw, 1, 1], [hw, -hw, -1, 1], [-hw, hw, 1, -1], [hw, hw, -1, -1],
+          ];
+          corners.forEach(([ox, oy, sx, sy]) => {
+            ctx.beginPath();
+            ctx.moveTo(p.px + ox + sx * bl, p.py + oy);
+            ctx.lineTo(p.px + ox, p.py + oy);
+            ctx.lineTo(p.px + ox, p.py + oy + sy * bl);
+            ctx.stroke();
           });
-          ctx.globalAlpha = 1;
+          ctx.shadowBlur = 0;
         }
 
+        // Glyph
         const glyph = n.type === "semantic" ? "S" : n.type === "procedural" ? "P" : "F";
-        ctx.font = `bold ${Math.max(8, r*0.5)}px 'Space Mono',monospace`;
-        ctx.fillStyle = col.fill; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.globalAlpha = alpha;
+        ctx.font = `bold ${Math.max(8, r * 0.5)}px 'Space Mono',monospace`;
+        ctx.fillStyle = `rgba(${col.rgb},0.9)`;
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText(glyph, p.px, p.py);
-        ctx.textBaseline = "alphabetic"; ctx.globalAlpha = 1;
+        ctx.textBaseline = "alphabetic";
 
-        const labelThreshold = 12;
-        if ((isHov || isSel || r > labelThreshold) && p.sc > 0.45) {
+        // Label
+        if ((isHov || isSel || r > 12) && p.sc > 0.42) {
           const fs = Math.max(8, Math.round(9 * Math.min(p.sc, 1.2)));
-          ctx.font = `${isHov||isSel ? 700 : 400} ${fs}px 'Space Mono',monospace`;
-          ctx.fillStyle = isHov||isSel ? col.fill : "rgba(90,122,138,0.82)";
-          ctx.globalAlpha = alpha * (isHov||isSel ? 1 : 0.75);
+          ctx.font = `${isHov || isSel ? 700 : 400} ${fs}px 'Space Mono',monospace`;
+          ctx.fillStyle = isHov || isSel ? col.fill : "rgba(90,122,138,0.75)";
+          ctx.globalAlpha = depthAlpha * focusAlpha * (isHov || isSel ? 1 : 0.75);
           const lbl = n.label.length > 22 ? n.label.slice(0, 20) + "…" : n.label;
           ctx.fillText(lbl.toUpperCase(), p.px, p.py + r + 12 * p.sc);
-          ctx.globalAlpha = 1;
         }
+        ctx.globalAlpha = 1;
         n._px = p.px; n._py = p.py; n._pr = r;
       });
 
-      // Tooltip
+      // ── Click bursts ───────────────────────────────────────────────
+      const bursts = clickBurstsRef.current;
+      for (let i = bursts.length - 1; i >= 0; i--) {
+        const b = bursts[i];
+        b.radius += 3.5; b.alpha *= 0.87;
+        if (b.alpha < 0.01) { bursts.splice(i, 1); continue; }
+        ctx.beginPath(); ctx.arc(b.px, b.py, b.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${b.rgb},${b.alpha})`; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(b.px, b.py, b.radius * 0.6, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${b.rgb},${b.alpha * 0.45})`; ctx.lineWidth = 0.8; ctx.stroke();
+      }
+
+      // Vignette
+      const vig = ctx.createRadialGradient(cx, cy, Math.min(W, H) * 0.28, cx, cy, Math.max(W, H) * 0.82);
+      vig.addColorStop(0, "transparent");
+      vig.addColorStop(1, "rgba(0,0,0,0.62)");
+      ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
+
+      // ── Tooltip ────────────────────────────────────────────────────
       if (hoveredRef.current) {
         const n = hoveredRef.current, col = NODE_COLORS[n.type];
-        if (n._px == null || n._py == null || (n._pr ?? 0) < 0.1) {
-          // culled or invalid — skip
-        } else {
-        const tx = Math.min((n._px ?? 0) + 16, W - 180);
-        const ty = Math.max((n._py ?? 0) - 48, 8);
-        ctx.fillStyle = "rgba(14,21,32,0.98)"; ctx.strokeStyle = "rgba(0,212,255,0.18)"; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.rect(tx, ty, 172, 40); ctx.fill(); ctx.stroke();
-        ctx.font = "bold 9px 'Orbitron',sans-serif"; ctx.fillStyle = col.fill; ctx.textAlign = "left";
-        ctx.fillText(TYPE_LABELS[n.type].toUpperCase(), tx+10, ty+16);
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.9)";
-        const lbl = n.label.length > 26 ? n.label.slice(0, 24) + "…" : n.label;
-        ctx.fillText(lbl, tx+10, ty+30);
+        if (n._px != null && n._py != null && (n._pr ?? 0) >= 0.1 && n._px >= 0) {
+          const connCount = edges.filter((e) => e.src === n.id || e.tgt === n.id).length;
+          const tx = Math.min((n._px) + 18, W - 196);
+          const ty = Math.max((n._py) - 58, 8);
+          ctx.fillStyle = "rgba(8,12,16,0.96)"; ctx.strokeStyle = `rgba(${col.rgb},0.22)`; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.rect(tx, ty, 188, 52); ctx.fill(); ctx.stroke();
+          ctx.strokeStyle = col.fill; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(tx + 8, ty); ctx.lineTo(tx, ty); ctx.lineTo(tx, ty + 8); ctx.stroke();
+          ctx.font = "bold 9px 'Orbitron',sans-serif"; ctx.fillStyle = col.fill; ctx.textAlign = "left";
+          ctx.fillText(TYPE_LABELS[n.type].toUpperCase(), tx + 10, ty + 17);
+          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.9)";
+          const lbl = n.label.length > 26 ? n.label.slice(0, 24) + "…" : n.label;
+          ctx.fillText(lbl, tx + 10, ty + 31);
+          ctx.fillStyle = `rgba(${col.rgb},0.52)`;
+          ctx.fillText(`${connCount} connection${connCount !== 1 ? "s" : ""}`, tx + 10, ty + 44);
         }
       }
 
-      if (tickRef.current < 80) {
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.75)"; ctx.textAlign = "center";
-        ctx.fillText("DRAG: ORBIT  ·  SHIFT / RMB: PAN  ·  SCROLL: DOLLY (MOVE IN/OUT)", W/2, H-14);
+      // HUD info
+      if (t < 80) {
+        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.7)"; ctx.textAlign = "center";
+        ctx.fillText("DRAG: ORBIT  ·  SHIFT/RMB: PAN  ·  SCROLL: DOLLY  ·  DBL-CLICK: FOCUS  ·  ESC: RESET", W / 2, H - 14);
       }
-      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.75)"; ctx.textAlign = "right";
-      ctx.fillText(`DOLLY ${Math.round(cam.distance)}u`, W-16, H-14);
+      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.45)"; ctx.textAlign = "right";
+      ctx.fillText(`${Math.round(cam.distance)}u`, W - 16, H - 14);
 
       ctx.restore();
     }
@@ -883,21 +960,36 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
     return () => { cancelAnimationFrame(frameRef.current); ro.disconnect(); };
   }, [data]);
 
-  // Non-passive wheel so the shell scroll area does not steal zoom.
+  // Keyboard shortcuts
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        focusNodeRef.current = null; setFocusMode(false);
+        selectedRef.current = null; setSelected(null);
+      }
+      if (e.key === "r" || e.key === "R") {
+        camRef.current = { target: { x: 0, y: 0, z: 0 }, yaw: 0.42, pitch: -0.28, distance: 2200 };
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Non-passive wheel
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const cam = camRef.current;
+      lastInteractionRef.current = Date.now();
       const factor = e.deltaY > 0 ? 1.08 : 1 / 1.08;
-      cam.distance = Math.max(300, Math.min(12000, cam.distance * factor));
+      camRef.current.distance = Math.max(300, Math.min(12000, camRef.current.distance * factor));
     };
     canvas.addEventListener("wheel", onWheel, { passive: false });
     return () => { canvas.removeEventListener("wheel", onWheel); };
   }, []);
 
-  // End drags that end outside the canvas.
+  // End drags outside canvas
   useEffect(() => {
     const end = () => {
       if (!dragRef.current.active) return;
@@ -907,10 +999,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
     };
     window.addEventListener("pointerup", end);
     window.addEventListener("pointercancel", end);
-    return () => {
-      window.removeEventListener("pointerup", end);
-      window.removeEventListener("pointercancel", end);
-    };
+    return () => { window.removeEventListener("pointerup", end); window.removeEventListener("pointercancel", end); };
   }, []);
 
   function getNodeAt(ex: number, ey: number): GraphNode | null {
@@ -920,7 +1009,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
     let closest: GraphNode | null = null, closestD = Infinity;
     stateRef.current.nodes.forEach((n) => {
       if (n._px == null || n._py == null || n._pr == null || n._pr < 0.1 || n._px < 0) return;
-      const d = Math.sqrt((mx - n._px)**2 + (my - n._py)**2);
+      const d = Math.sqrt((mx - n._px) ** 2 + (my - n._py) ** 2);
       if (d < n._pr + 8 && d < closestD) { closestD = d; closest = n; }
     });
     return closest;
@@ -929,6 +1018,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
   function onMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
     e.preventDefault();
     if (e.button > 2) return;
+    lastInteractionRef.current = Date.now();
     dragRef.current = { active: true, button: e.button, lx: e.clientX, ly: e.clientY, moved: false };
   }
 
@@ -937,7 +1027,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
     if (drag.active) {
       const dx = e.clientX - drag.lx, dy = e.clientY - drag.ly;
       drag.moved = true;
-      // Same as memory-graph.jsx: orbit with primary drag; pan with RMB or Shift+drag (3D view).
+      lastInteractionRef.current = Date.now();
       const pan = drag.button === 2 || e.shiftKey;
       const c = camRef.current;
       if (pan) {
@@ -961,12 +1051,35 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
 
   function onMouseUp(e: React.MouseEvent<HTMLCanvasElement>) {
     const drag = dragRef.current; drag.active = false;
+    lastInteractionRef.current = Date.now();
     canvasRef.current!.style.cursor = "grab";
     if (!drag.moved) {
       const n = getNodeAt(e.clientX, e.clientY);
-      const next = (n && selectedRef.current?.id === n.id) ? null : n;
-      selectedRef.current = next;
-      setSelected(next as SelectedNode | null);
+      const now = Date.now();
+      const last = lastClickRef.current;
+      const isDoubleClick = !!(last && last.nodeId === n?.id && now - last.time < 350);
+
+      if (n) {
+        const col = NODE_COLORS[n.type];
+        clickBurstsRef.current.push({ px: n._px ?? 0, py: n._py ?? 0, radius: (n._pr ?? 10) * 1.1, alpha: 0.75, rgb: col.rgb });
+        if (isDoubleClick) {
+          if (focusNodeRef.current === n.id) {
+            focusNodeRef.current = null; setFocusMode(false);
+          } else {
+            focusNodeRef.current = n.id; setFocusMode(true);
+          }
+          lastClickRef.current = null;
+        } else {
+          const next = selectedRef.current?.id === n.id ? null : n;
+          selectedRef.current = next;
+          setSelected(next as SelectedNode | null);
+          lastClickRef.current = { time: now, nodeId: n.id };
+        }
+      } else {
+        selectedRef.current = null; setSelected(null);
+        focusNodeRef.current = null; setFocusMode(false);
+        lastClickRef.current = null;
+      }
     }
   }
 
@@ -984,6 +1097,12 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
           style={{ display: "block", width: "100%", height: "100%" }}
         />
 
+        {focusMode && (
+          <div className={styles.focusModeIndicator}>
+            FOCUS MODE · DBL-CLICK TO EXIT
+          </div>
+        )}
+
         <div className={styles.graphLegend}>
           {(Object.entries(NODE_COLORS) as [NodeType, typeof NODE_COLORS[NodeType]][]).map(([type, c]) => (
             <div key={type} className={styles.graphLegendItem}>
@@ -995,7 +1114,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
 
         <button
           className={styles.graphResetBtn}
-          onClick={() => { camRef.current = { ...DEFAULT_CAM }; }}
+          onClick={() => { camRef.current = { target: { x: 0, y: 0, z: 0 }, yaw: 0.42, pitch: -0.28, distance: 2200 }; }}
         >
           Reset view
         </button>
@@ -1054,7 +1173,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
                 </span>
               </div>
               <div className={styles.barTrackSlim} style={{ height: 2 }}>
-                <div style={{ height: "100%", width: `${selected.data.authorityWeight * 100}%`, background: "rgba(160,156,142,0.5)" }} />
+                <div style={{ height: "100%", width: `${selected.data.authorityWeight * 100}%`, background: "rgba(90,122,138,0.4)" }} />
               </div>
             </div>
           )}
@@ -1066,7 +1185,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
             {selected.data.status && (
               <JarvisTag
                 label={selected.data.status}
-                color={selected.data.status === "Active" ? "#79a88b" : "#b58a49"}
+                color={selected.data.status === "Active" ? "#00ff88" : "#e8a020"}
               />
             )}
             {selected.data.evidenceCount != null && (
@@ -1161,7 +1280,14 @@ export function MemoryGraphPanel() {
   const res = useAsyncResource(load, "graph-data");
 
   if (res.status === "loading") {
-    return <p className={styles.loadingText}>Initialising memory network…</p>;
+    return (
+      <div className={styles.graphLoadingWrap}>
+        <div className={styles.graphLoadingLabel}>INITIALISING MEMORY NETWORK</div>
+        <div className={styles.graphLoadingBar}>
+          <div className={styles.graphLoadingBarFill} />
+        </div>
+      </div>
+    );
   }
   if (res.status === "error") {
     return (

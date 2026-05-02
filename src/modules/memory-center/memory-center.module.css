@@ -1186,6 +1186,69 @@
   cursor: pointer;
 }
 
+.focusModeIndicator {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 16px;
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  background: rgba(8, 12, 16, 0.88);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+  animation: focusModeIn 0.2s ease;
+}
+
+@keyframes focusModeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.graphLoadingWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: calc(100vh - var(--topbar-height) - 200px);
+  min-height: 480px;
+}
+
+.graphLoadingLabel {
+  font-family: var(--font-display);
+  font-size: 9px;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.graphLoadingBar {
+  width: 200px;
+  height: 1px;
+  background: rgba(0, 212, 255, 0.1);
+  overflow: hidden;
+}
+
+.graphLoadingBarFill {
+  height: 100%;
+  background: var(--accent);
+  animation: graphScan 1.8s ease-in-out infinite;
+}
+
+@keyframes graphScan {
+  0%   { width: 0%;   margin-left: 0%; }
+  50%  { width: 60%;  margin-left: 20%; }
+  100% { width: 0%;   margin-left: 100%; }
+}
+
 /* ── Timeline panel ─────────────────────────────────────────────── */
 
 .timelineToolbar {
