@@ -8,7 +8,8 @@ import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { ProgressBar } from "@/components/jarvis/ProgressBar";
 import {
   createSideLearningSession,
-  fetchSideLearningSessionsForUser,
+  deleteSideLearningSession,
+  fetchSideLearningSessionsByLifecycle,
   getSideLearningSession,
   refreshSideLearningTopicProposals,
   selectSideLearningTopic,
@@ -48,12 +49,20 @@ function sessionMinutes(detail: SideLearningSessionDetail): number | null {
   return Math.max(0, Math.round((b - a) / 60000));
 }
 
+function sessionSummaryHeadline(s: SideLearningSessionSummary): string {
+  const t = s.selectedTopicTitle?.trim();
+  if (t) return t;
+  return "Learning session";
+}
+
 export function SideLearningExperience() {
   const [mainTab, setMainTab] = useState<"learn" | "history">("learn");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [detail, setDetail] = useState<SideLearningSessionDetail | null>(null);
   const [history, setHistory] = useState<SideLearningSessionSummary[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [ongoingSessions, setOngoingSessions] = useState<SideLearningSessionSummary[]>([]);
+  const [landingLoading, setLandingLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [hint, setHint] = useState("");
@@ -61,6 +70,7 @@ export function SideLearningExperience() {
   const [chooseExtraFeedback, setChooseExtraFeedback] = useState("");
   const [rerollFeedback, setRerollFeedback] = useState("");
   const [reflectionDraft, setReflectionDraft] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadSession = useCallback(async () => {
     if (!sessionId) return;
@@ -108,8 +118,8 @@ export function SideLearningExperience() {
     (async () => {
       setHistoryLoading(true);
       try {
-        const rows = await fetchSideLearningSessionsForUser();
-        if (!cancelled) setHistory(rows);
+        const page = await fetchSideLearningSessionsByLifecycle("archive");
+        if (!cancelled) setHistory(page.items);
       } catch {
         if (!cancelled) setHistory([]);
       } finally {
@@ -120,6 +130,25 @@ export function SideLearningExperience() {
       cancelled = true;
     };
   }, [mainTab]);
+
+  useEffect(() => {
+    if (mainTab !== "learn" || sessionId) return;
+    let cancelled = false;
+    (async () => {
+      setLandingLoading(true);
+      try {
+        const page = await fetchSideLearningSessionsByLifecycle("ongoing");
+        if (!cancelled) setOngoingSessions(page.items);
+      } catch {
+        if (!cancelled) setOngoingSessions([]);
+      } finally {
+        if (!cancelled) setLandingLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [mainTab, sessionId]);
 
   const proposals = useMemo(() => (detail ? parseTopicProposals(detail.topicProposalsJson) : []), [detail]);
   const sections = useMemo(() => (detail ? parseSessionSections(detail.sessionContentJson) : []), [detail]);
@@ -145,6 +174,25 @@ export function SideLearningExperience() {
     setChooseExtraFeedback("");
     setRerollFeedback("");
     setReflectionDraft("");
+  };
+
+  const confirmDeleteSession = async (id: string) => {
+    if (deletingId) return;
+    if (!window.confirm("Delete this session? This cannot be undone.")) return;
+    setDeletingId(id);
+    setError(null);
+    try {
+      await deleteSideLearningSession(id);
+      setHistory((h) => h.filter((x) => x.id !== id));
+      setOngoingSessions((o) => o.filter((x) => x.id !== id));
+      if (sessionId === id) {
+        resetFlow();
+      }
+    } catch (e) {
+      setError(extractApiMessage(e));
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const startSession = async () => {
@@ -258,26 +306,29 @@ export function SideLearningExperience() {
           {historyLoading ? (
             <p className={styles.muted}>Loading…</p>
           ) : history.length === 0 ? (
-            <p className={styles.muted}>No sessions yet.</p>
+            <p className={styles.muted}>No completed sessions yet.</p>
           ) : (
-            history.map((s, i) => (
-              <button
-                key={s.id}
-                type="button"
-                className={styles.historyRowBtn}
-                style={{ borderBottom: i < history.length - 1 ? "1px solid var(--color-border)" : "none" }}
-                onClick={() => openHistorySession(s.id)}
-              >
-                <div className={styles.historyRowInner}>
-                  <div>
-                    <div className={styles.historyTitle}>{s.id}</div>
-                    <div className={styles.historyDate}>
-                      {s.phase} · {new Date(s.updatedAt).toLocaleString()}
+            history.map((s) => (
+              <div key={s.id} className={styles.sessionListRow}>
+                <button type="button" className={styles.sessionListOpen} onClick={() => openHistorySession(s.id)}>
+                  <div className={styles.historyRowInner}>
+                    <div className={styles.sessionListTextBlock}>
+                      <div className={styles.sessionListHeadline}>{sessionSummaryHeadline(s)}</div>
+                      <div className={styles.sessionListId}>{s.id}</div>
+                      <div className={styles.historyDate}>
+                        {s.phase} · {new Date(s.updatedAt).toLocaleString()}
+                      </div>
                     </div>
+                    <span className={styles.historyChev}>→</span>
                   </div>
-                  <span className={styles.historyChev}>→</span>
-                </div>
-              </button>
+                </button>
+                <JarvisButton
+                  label={deletingId === s.id ? "…" : "Delete"}
+                  variant="outline"
+                  className={styles.sessionListDelete}
+                  onClick={() => void confirmDeleteSession(s.id)}
+                />
+              </div>
             ))
           )}
         </JarvisCard>
@@ -324,6 +375,37 @@ export function SideLearningExperience() {
             <JarvisButton label={busy ? "Starting…" : "Start"} variant="primary" onClick={() => void startSession()} />
           </div>
         </JarvisCard>
+        {landingLoading ? (
+          <p className={styles.muted}>Loading your sessions…</p>
+        ) : ongoingSessions.length > 0 ? (
+          <>
+            <h3 className={styles.sectionHeading}>Continue a session</h3>
+            <JarvisCard hover={false}>
+              {ongoingSessions.map((s) => (
+                <div key={s.id} className={styles.sessionListRow}>
+                  <button type="button" className={styles.sessionListOpen} onClick={() => setSessionId(s.id)}>
+                    <div className={styles.historyRowInner}>
+                      <div className={styles.sessionListTextBlock}>
+                        <div className={styles.sessionListHeadline}>{sessionSummaryHeadline(s)}</div>
+                        <div className={styles.sessionListId}>{s.id}</div>
+                        <div className={styles.historyDate}>
+                          {s.phase} · {new Date(s.updatedAt).toLocaleString()}
+                        </div>
+                      </div>
+                      <span className={styles.historyChev}>→</span>
+                    </div>
+                  </button>
+                  <JarvisButton
+                    label={deletingId === s.id ? "…" : "Delete"}
+                    variant="outline"
+                    className={styles.sessionListDelete}
+                    onClick={() => void confirmDeleteSession(s.id)}
+                  />
+                </div>
+              ))}
+            </JarvisCard>
+          </>
+        ) : null}
       </div>
     );
   }

@@ -8,8 +8,16 @@ export type NewsItemSummary = {
 export type SideLearningSessionSummary = {
   id: string;
   phase: string;
+  /** Chosen topic title after selection; absent/null before the user picks a topic. */
+  selectedTopicTitle?: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type SideLearningListLifecycle = "ongoing" | "archive";
+
+export type SideLearningSessionListPage = {
+  items: SideLearningSessionSummary[];
 };
 
 export type CreateSideLearningSessionResponse = {

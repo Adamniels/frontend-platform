@@ -3,8 +3,9 @@ import { fetchDashboardSummary } from "@/lib/api/adapters/dashboard";
 import { fetchNewsFeed } from "@/lib/api/adapters/news";
 import {
   createSideLearningSession,
+  deleteSideLearningSession,
   fetchSideLearningSessions,
-  fetchSideLearningSessionsForUser,
+  fetchSideLearningSessionsByLifecycle,
   getSideLearningSession,
   refreshSideLearningTopicProposals,
   selectSideLearningTopic,
@@ -40,6 +41,10 @@ describe("backend adapters", () => {
           );
         }
 
+        if (method === "DELETE" && /^\/api\/v1\/side-learning\/sessions\/[^/]+$/.test(path)) {
+          return new Response(null, { status: 204 });
+        }
+
         if (method === "GET" && /^\/api\/v1\/side-learning\/sessions\/[^/]+$/.test(path)) {
           return new Response(
             JSON.stringify({
@@ -71,6 +76,47 @@ describe("backend adapters", () => {
           return new Response("{}", { status: 200, headers: { "content-type": "application/json" } });
         }
 
+        if (method === "GET" && path === "/api/v1/side-learning/sessions") {
+          const lifecycle = new URL(url).searchParams.get("lifecycle");
+          const ts = new Date().toISOString();
+          if (lifecycle === "ongoing") {
+            return new Response(
+              JSON.stringify({
+                items: [
+                  {
+                    id: "sl-on",
+                    phase: "awaitingTopicSelection",
+                    selectedTopicTitle: null,
+                    createdAt: ts,
+                    updatedAt: ts,
+                  },
+                ],
+              }),
+              { status: 200, headers: { "content-type": "application/json" } },
+            );
+          }
+          if (lifecycle === "archive") {
+            return new Response(
+              JSON.stringify({
+                items: [
+                  {
+                    id: "sl-1",
+                    phase: "completed",
+                    selectedTopicTitle: "Temporal workflows",
+                    createdAt: ts,
+                    updatedAt: ts,
+                  },
+                ],
+              }),
+              { status: 200, headers: { "content-type": "application/json" } },
+            );
+          }
+          return new Response(JSON.stringify({ error: "lifecycle query is required" }), {
+            status: 400,
+            headers: { "content-type": "application/json" },
+          });
+        }
+
         const payloadByPath: Record<string, unknown> = {
           "/api/v1/dashboard/summary": {
             greeting: "Welcome back",
@@ -79,14 +125,6 @@ describe("backend adapters", () => {
             savedItems: 43,
           },
           "/api/v1/news/feed": [{ id: "n1", title: "headline", source: "Wire", publishedAt: new Date().toISOString() }],
-          "/api/v1/side-learning/sessions": [
-            {
-              id: "sl-1",
-              phase: "completed",
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            },
-          ],
           "/api/v1/workflow-runs": [{ id: "wr1", name: "Run", status: "running", updatedAt: new Date().toISOString() }],
           "/api/v1/saved-items": [{ id: "sv1", title: "Saved", kind: "article", savedAt: new Date().toISOString() }],
           "/api/v1/settings": { theme: "system", digestEmail: true },
@@ -131,9 +169,11 @@ describe("backend adapters", () => {
     expect(typeof sessions[0]?.phase).toBe("string");
   });
 
-  it("returns side learning sessions for user (no-store list)", async () => {
-    const sessions = await fetchSideLearningSessionsForUser();
-    expect(sessions.length).toBeGreaterThan(0);
+  it("returns side learning sessions by lifecycle (archive)", async () => {
+    const page = await fetchSideLearningSessionsByLifecycle("archive");
+    expect(page.items.length).toBeGreaterThan(0);
+    expect(typeof page.items[0]?.phase).toBe("string");
+    expect(page.items[0]?.selectedTopicTitle).toBe("Temporal workflows");
   });
 
   it("creates a side learning session", async () => {
@@ -146,6 +186,10 @@ describe("backend adapters", () => {
     const d = await getSideLearningSession("sl-abc");
     expect(d.id).toBe("sl-abc");
     expect(d.phase).toBe("awaitingTopicSelection");
+  });
+
+  it("deletes a side learning session", async () => {
+    await expect(deleteSideLearningSession("sl-abc")).resolves.toBeUndefined();
   });
 
   it("posts side learning mutations", async () => {

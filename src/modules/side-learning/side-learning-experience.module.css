@@ -31,6 +31,15 @@
   margin: 0 0 4px;
 }
 
+.sectionHeading {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 8px 0 0;
+}
+
 .filters {
   display: flex;
   gap: 6px;
@@ -167,16 +176,34 @@
   padding: 14px 0;
 }
 
-.historyTitle {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  color: var(--color-text);
-  margin-bottom: 3px;
-}
-
 .historyDate {
   font-size: 11px;
   color: var(--color-text-muted);
+}
+
+.sessionListTextBlock {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.sessionListHeadline {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.sessionListId {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  opacity: 0.72;
+  margin-bottom: 4px;
+  word-break: break-all;
+  line-height: 1.35;
 }
 
 .score {
@@ -276,8 +303,20 @@
   line-height: 1.7;
 }
 
-.historyRowBtn {
-  width: 100%;
+.sessionListRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sessionListRow:last-child {
+  border-bottom: none;
+}
+
+.sessionListOpen {
+  flex: 1;
+  min-width: 0;
   text-align: left;
   background: none;
   border: none;
@@ -285,6 +324,10 @@
   cursor: pointer;
   color: inherit;
   font: inherit;
+}
+
+.sessionListDelete {
+  flex-shrink: 0;
 }
 
 .historyRowInner {

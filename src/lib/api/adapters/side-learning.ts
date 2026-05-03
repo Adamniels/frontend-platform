@@ -1,19 +1,27 @@
 import type {
   CreateSideLearningSessionResponse,
+  SideLearningListLifecycle,
   SideLearningSessionDetail,
+  SideLearningSessionListPage,
   SideLearningSessionSummary,
 } from "@/types/content";
 import { apiRequest } from "@/lib/api/client";
 
-const readCache = { next: { revalidate: 30 } as const };
-
+/** @deprecated Prefer fetchSideLearningSessionsByLifecycle — list API requires `lifecycle`. */
 export async function fetchSideLearningSessions(): Promise<SideLearningSessionSummary[]> {
-  return apiRequest<SideLearningSessionSummary[]>("/api/v1/side-learning/sessions", readCache);
+  const page = await fetchSideLearningSessionsByLifecycle("ongoing", { next: { revalidate: 30 } });
+  return page.items;
 }
 
-/** Client-friendly list fetch without ISR `next` hints (avoids keyed cache surprises in the browser). */
-export async function fetchSideLearningSessionsForUser(): Promise<SideLearningSessionSummary[]> {
-  return apiRequest<SideLearningSessionSummary[]>("/api/v1/side-learning/sessions", { cache: "no-store" });
+export async function fetchSideLearningSessionsByLifecycle(
+  lifecycle: SideLearningListLifecycle,
+  cacheOptions: { cache?: RequestCache; next?: { revalidate?: number } } = {},
+): Promise<SideLearningSessionListPage> {
+  const params = new URLSearchParams({ lifecycle });
+  return apiRequest<SideLearningSessionListPage>(`/api/v1/side-learning/sessions?${params}`, {
+    cache: cacheOptions.cache ?? "no-store",
+    next: cacheOptions.next,
+  });
 }
 
 export async function createSideLearningSession(body: {
@@ -29,6 +37,11 @@ export async function createSideLearningSession(body: {
 export async function getSideLearningSession(sessionId: string): Promise<SideLearningSessionDetail> {
   const id = encodeURIComponent(sessionId);
   return apiRequest<SideLearningSessionDetail>(`/api/v1/side-learning/sessions/${id}`, { cache: "no-store" });
+}
+
+export async function deleteSideLearningSession(sessionId: string): Promise<void> {
+  const id = encodeURIComponent(sessionId);
+  await apiRequest<unknown>(`/api/v1/side-learning/sessions/${id}`, { method: "DELETE", cache: "no-store" });
 }
 
 export async function selectSideLearningTopic(
