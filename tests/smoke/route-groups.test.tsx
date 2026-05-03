@@ -47,7 +47,7 @@ describe("route group: content (news + side learning)", () => {
   it("renders side learning topics", () => {
     render(<SideLearningExperience />);
     expect(screen.getByRole("heading", { name: /learning topics/i })).toBeInTheDocument();
-    expect(screen.getByText(/AI Ethics in Practice/i)).toBeInTheDocument();
+    expect(screen.getByText(/Start a learning session/i)).toBeInTheDocument();
   });
 });
 

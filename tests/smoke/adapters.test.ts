@@ -1,7 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchDashboardSummary } from "@/lib/api/adapters/dashboard";
 import { fetchNewsFeed } from "@/lib/api/adapters/news";
-import { fetchSideLearningSessions } from "@/lib/api/adapters/side-learning";
+import {
+  createSideLearningSession,
+  fetchSideLearningSessions,
+  fetchSideLearningSessionsForUser,
+  getSideLearningSession,
+  refreshSideLearningTopicProposals,
+  selectSideLearningTopic,
+  submitSideLearningReflection,
+  updateSideLearningProgress,
+} from "@/lib/api/adapters/side-learning";
 import { fetchWorkflowRuns } from "@/lib/api/adapters/workflow-runs";
 import { fetchSavedItems } from "@/lib/api/adapters/saved-items";
 import { fetchUserSettings } from "@/lib/api/adapters/settings";
@@ -15,9 +24,53 @@ describe("backend adapters", () => {
     process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost:5120";
     vi.stubGlobal(
       "fetch",
-      vi.fn(async (input: string | URL) => {
+      vi.fn(async (input: string | URL, init?: RequestInit) => {
         const url = String(input);
         const path = new URL(url).pathname;
+        const method = (init?.method ?? "GET").toUpperCase();
+
+        if (method === "POST" && path === "/api/v1/side-learning/sessions") {
+          return new Response(
+            JSON.stringify({
+              sessionId: "sl-new",
+              phase: "proposingTopics",
+              workflowRunId: "wr-side",
+            }),
+            { status: 200, headers: { "content-type": "application/json" } },
+          );
+        }
+
+        if (method === "GET" && /^\/api\/v1\/side-learning\/sessions\/[^/]+$/.test(path)) {
+          return new Response(
+            JSON.stringify({
+              id: path.split("/").pop(),
+              phase: "awaitingTopicSelection",
+              initialPrompt: "hint",
+              selectedTopicTitle: null,
+              selectedTopicReason: null,
+              topicProposalsJson: JSON.stringify([{ title: "T1", rationale: "", estimatedMinutes: 10, difficulty: "easy", targetSkillGap: "" }]),
+              sessionContentJson: "{}",
+              sectionsProgressJson: "{}",
+              reflectionText: null,
+              workflowRunId: "wr1",
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }),
+            { status: 200, headers: { "content-type": "application/json" } },
+          );
+        }
+
+        if (
+          method === "POST" &&
+          path.startsWith("/api/v1/side-learning/sessions/") &&
+          (path.endsWith("/select-topic") ||
+            path.endsWith("/refresh-topic-proposals") ||
+            path.endsWith("/progress") ||
+            path.endsWith("/reflect"))
+        ) {
+          return new Response("{}", { status: 200, headers: { "content-type": "application/json" } });
+        }
+
         const payloadByPath: Record<string, unknown> = {
           "/api/v1/dashboard/summary": {
             greeting: "Welcome back",
@@ -76,6 +129,30 @@ describe("backend adapters", () => {
     const sessions = await fetchSideLearningSessions();
     expect(sessions.length).toBeGreaterThan(0);
     expect(typeof sessions[0]?.phase).toBe("string");
+  });
+
+  it("returns side learning sessions for user (no-store list)", async () => {
+    const sessions = await fetchSideLearningSessionsForUser();
+    expect(sessions.length).toBeGreaterThan(0);
+  });
+
+  it("creates a side learning session", async () => {
+    const res = await createSideLearningSession({ initialPrompt: "Learn X" });
+    expect(res.sessionId).toBe("sl-new");
+    expect(res.phase).toBe("proposingTopics");
+  });
+
+  it("fetches a side learning session by id", async () => {
+    const d = await getSideLearningSession("sl-abc");
+    expect(d.id).toBe("sl-abc");
+    expect(d.phase).toBe("awaitingTopicSelection");
+  });
+
+  it("posts side learning mutations", async () => {
+    await selectSideLearningTopic("sl-abc", { topicTitle: "T1", feedback: "more" });
+    await refreshSideLearningTopicProposals("sl-abc", { feedback: "retry" });
+    await updateSideLearningProgress("sl-abc", { sectionId: "goal", completed: true });
+    await submitSideLearningReflection("sl-abc", { reflection: "great" });
   });
 
   it("returns workflow runs", async () => {
