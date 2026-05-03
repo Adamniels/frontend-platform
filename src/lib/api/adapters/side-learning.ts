@@ -1,8 +1,8 @@
-import type { SideLearningTopic } from "@/types/content";
+import type { SideLearningSessionSummary } from "@/types/content";
 import { apiRequest } from "@/lib/api/client";
 
 const readCache = { next: { revalidate: 30 } as const };
 
-export async function fetchSideLearningTopics(): Promise<SideLearningTopic[]> {
-  return apiRequest<SideLearningTopic[]>("/api/v1/side-learning/topics", readCache);
+export async function fetchSideLearningSessions(): Promise<SideLearningSessionSummary[]> {
+  return apiRequest<SideLearningSessionSummary[]>("/api/v1/side-learning/sessions", readCache);
 }

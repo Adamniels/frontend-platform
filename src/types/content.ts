@@ -5,10 +5,11 @@ export type NewsItemSummary = {
   publishedAt: string;
 };
 
-export type SideLearningTopic = {
+export type SideLearningSessionSummary = {
   id: string;
-  title: string;
-  progressPercent: number;
+  phase: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type SavedItemSummary = {

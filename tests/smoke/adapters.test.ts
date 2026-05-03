@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchDashboardSummary } from "@/lib/api/adapters/dashboard";
 import { fetchNewsFeed } from "@/lib/api/adapters/news";
-import { fetchSideLearningTopics } from "@/lib/api/adapters/side-learning";
+import { fetchSideLearningSessions } from "@/lib/api/adapters/side-learning";
 import { fetchWorkflowRuns } from "@/lib/api/adapters/workflow-runs";
 import { fetchSavedItems } from "@/lib/api/adapters/saved-items";
 import { fetchUserSettings } from "@/lib/api/adapters/settings";
@@ -26,7 +26,14 @@ describe("backend adapters", () => {
             savedItems: 43,
           },
           "/api/v1/news/feed": [{ id: "n1", title: "headline", source: "Wire", publishedAt: new Date().toISOString() }],
-          "/api/v1/side-learning/topics": [{ id: "s1", title: "Foundations", progressPercent: 40 }],
+          "/api/v1/side-learning/sessions": [
+            {
+              id: "sl-1",
+              phase: "completed",
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            },
+          ],
           "/api/v1/workflow-runs": [{ id: "wr1", name: "Run", status: "running", updatedAt: new Date().toISOString() }],
           "/api/v1/saved-items": [{ id: "sv1", title: "Saved", kind: "article", savedAt: new Date().toISOString() }],
           "/api/v1/settings": { theme: "system", digestEmail: true },
@@ -65,9 +72,10 @@ describe("backend adapters", () => {
     expect(typeof items[0]?.title).toBe("string");
   });
 
-  it("returns side learning topics", async () => {
-    const topics = await fetchSideLearningTopics();
-    expect(topics.length).toBeGreaterThan(0);
+  it("returns side learning sessions", async () => {
+    const sessions = await fetchSideLearningSessions();
+    expect(sessions.length).toBeGreaterThan(0);
+    expect(typeof sessions[0]?.phase).toBe("string");
   });
 
   it("returns workflow runs", async () => {

@@ -1,6 +1,4 @@
-// NOTE: GET /api/v1/side-learning/topics exists — wire SideLearningExperience to the real API
-// and delete this file once that is done.
-// TODO: remove once SideLearningExperience uses real API data
+// Mock UI data until SideLearningExperience is wired to /api/v1/side-learning/sessions (Phase 5).
 export type MockTopic = {
   id: number;
   title: string;
