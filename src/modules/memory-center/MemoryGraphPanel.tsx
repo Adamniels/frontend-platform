@@ -693,7 +693,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
   const selectedRef        = useRef<GraphNode | null>(null);
   const hoveredRef         = useRef<GraphNode | null>(null);
   const focusNodeRef       = useRef<string | null>(null);
-  const lastInteractionRef = useRef<number>(Date.now());
+  const lastInteractionRef = useRef(0);
   const lastClickRef       = useRef<{ time: number; nodeId: string } | null>(null);
   const clickBurstsRef     = useRef<Array<{ px: number; py: number; radius: number; alpha: number; rgb: string }>>([]);
 
@@ -703,6 +703,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
   useEffect(() => {
     const canvas = canvasRef.current, container = containerRef.current;
     if (!canvas || !container) return;
+    lastInteractionRef.current = Date.now();
     tickRef.current = 0;
     stateRef.current = buildGraph(data);
 
@@ -886,7 +887,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
 
         // Glyph
         const glyph = n.type === "semantic" ? "S" : n.type === "procedural" ? "P" : "F";
-        ctx.font = `bold ${Math.max(8, r * 0.5)}px 'Space Mono',monospace`;
+        ctx.font = `bold ${Math.max(10, r * 0.5)}px 'Space Mono',monospace`;
         ctx.fillStyle = `rgba(${col.rgb},0.9)`;
         ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText(glyph, p.px, p.py);
@@ -894,7 +895,7 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
 
         // Label
         if ((isHov || isSel || r > 12) && p.sc > 0.42) {
-          const fs = Math.max(8, Math.round(9 * Math.min(p.sc, 1.2)));
+          const fs = Math.max(10, Math.round(11 * Math.min(p.sc, 1.2)));
           ctx.font = `${isHov || isSel ? 700 : 400} ${fs}px 'Space Mono',monospace`;
           ctx.fillStyle = isHov || isSel ? col.fill : "rgba(90,122,138,0.75)";
           ctx.globalAlpha = depthAlpha * focusAlpha * (isHov || isSel ? 1 : 0.75);
@@ -934,9 +935,9 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
           ctx.beginPath(); ctx.rect(tx, ty, 188, 52); ctx.fill(); ctx.stroke();
           ctx.strokeStyle = col.fill; ctx.lineWidth = 1.5;
           ctx.beginPath(); ctx.moveTo(tx + 8, ty); ctx.lineTo(tx, ty); ctx.lineTo(tx, ty + 8); ctx.stroke();
-          ctx.font = "bold 9px 'Orbitron',sans-serif"; ctx.fillStyle = col.fill; ctx.textAlign = "left";
+          ctx.font = "bold 11px 'Orbitron',sans-serif"; ctx.fillStyle = col.fill; ctx.textAlign = "left";
           ctx.fillText(TYPE_LABELS[n.type].toUpperCase(), tx + 10, ty + 17);
-          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.9)";
+          ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.9)";
           const lbl = n.label.length > 26 ? n.label.slice(0, 24) + "…" : n.label;
           ctx.fillText(lbl, tx + 10, ty + 31);
           ctx.fillStyle = `rgba(${col.rgb},0.52)`;
@@ -946,10 +947,10 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
 
       // HUD info
       if (t < 80) {
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.7)"; ctx.textAlign = "center";
+        ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.7)"; ctx.textAlign = "center";
         ctx.fillText("DRAG: ORBIT  ·  SHIFT/RMB: PAN  ·  SCROLL: DOLLY  ·  DBL-CLICK: FOCUS  ·  ESC: RESET", W / 2, H - 14);
       }
-      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.45)"; ctx.textAlign = "right";
+      ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.45)"; ctx.textAlign = "right";
       ctx.fillText(`${Math.round(cam.distance)}u`, W - 16, H - 14);
 
       ctx.restore();
@@ -1239,7 +1240,7 @@ function NodeAction({ label, variant, nodeId, action, onDone }: NodeActionProps)
 
   return (
     <>
-      {err && <span style={{ fontSize: 9, color: "#ef4444", fontFamily: "var(--font-mono)" }}>{err}</span>}
+      {err && <span style={{ fontSize: 11, color: "var(--color-danger)", fontFamily: "var(--font-mono)" }}>{err}</span>}
       <button className={cls} disabled={busy} onClick={() => void run()}>
         {busy ? "…" : label}
       </button>

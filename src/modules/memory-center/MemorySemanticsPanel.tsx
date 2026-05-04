@@ -83,10 +83,10 @@ function EvidencePanel({ semanticId }: { semanticId: number }) {
       {res.data.map((ev: SemanticEvidenceV1) => (
         <li key={ev.eventId}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--color-text)", letterSpacing: "0.5px" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text)", letterSpacing: "0.5px" }}>
               {ev.eventType}
             </span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--color-text-dim)" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-dim)" }}>
               str {Math.round(ev.strength * 100)}%
             </span>
           </div>
@@ -175,7 +175,7 @@ function SemanticCard({ sem, onMutated }: SemanticCardProps) {
       {expanded && (
         <div className={styles.semanticCardExpanded}>
           {err && (
-            <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--color-danger)", margin: 0 }}>{err}</p>
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-danger)", margin: 0 }}>{err}</p>
           )}
 
           <div className={styles.dateMeta}>

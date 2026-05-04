@@ -47,7 +47,7 @@
 
 .logoSub {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-muted);
   letter-spacing: 1.8px;
   text-transform: uppercase;
@@ -113,7 +113,7 @@
 }
 
 .userPlan {
-  font-size: 7.5px;
+  font-size: var(--fs-label-xs);
   color: var(--accent);
   font-family: var(--font-mono);
   letter-spacing: 1px;
@@ -215,7 +215,7 @@
 
 .notificationMeta span {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-muted);
   letter-spacing: 1px;
 }

@@ -26,7 +26,7 @@
 
 .h2 {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: var(--fs-display-section);
   color: var(--accent);
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -35,7 +35,7 @@
 
 .h3 {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-page-subtitle);
   font-weight: 700;
   letter-spacing: 1.6px;
   text-transform: uppercase;
@@ -50,7 +50,7 @@
   align-items: stretch;
   flex-wrap: nowrap;
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   margin: 0 0 0 0;
   padding: 0;
   box-sizing: border-box;
@@ -63,17 +63,17 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 0 18px;
+  padding: 0 20px;
   margin: 0;
   border: none;
   border-bottom: 2px solid transparent;
   border-right: 1px solid var(--accent-dim);
   background: transparent;
-  color: var(--color-text-dim);
+  color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-sm);
   font-weight: 700;
-  letter-spacing: 1.1px;
+  letter-spacing: 1.4px;
   text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
@@ -94,10 +94,10 @@
 }
 
 .memoryTabCount {
-  font-size: 8.5px;
-  padding: 1px 5px;
+  font-size: var(--fs-label-xs);
+  padding: 2px 7px;
   border: 1px solid var(--accent-dim);
-  color: var(--color-text-dim);
+  color: var(--color-text-muted);
   line-height: 1.2;
   font-weight: 700;
 }
@@ -143,7 +143,7 @@
   flex-wrap: wrap;
   gap: 8px 14px;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--fs-label-sm);
   font-weight: 700;
   color: var(--color-text-muted);
   letter-spacing: 0.35px;
@@ -171,7 +171,7 @@
 
 .label {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -209,13 +209,13 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 11.5px;
+  font-size: var(--fs-label-sm);
   font-weight: 600;
   color: var(--color-text-muted);
 }
 
 .barTrack {
-  height: 6px;
+  height: var(--bar-h-md);
   background: color-mix(in srgb, var(--color-text) 8%, transparent);
   overflow: hidden;
 }
@@ -229,7 +229,7 @@
 /* Slim 2px variant */
 .barTrackSlim {
   flex: 1;
-  height: 2px;
+  height: var(--bar-h-slim);
   background: var(--color-border);
   overflow: hidden;
 }
@@ -263,7 +263,7 @@
 .pill {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   padding: 3px 8px;
   border: 1px solid var(--accent-dim);
@@ -293,7 +293,7 @@
   background: rgba(181, 111, 111, 0.06);
   color: #b56f6f;
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.1px;
   text-transform: uppercase;
@@ -318,7 +318,7 @@
   background: rgba(181, 138, 73, 0.06);
   color: #b58a49;
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.1px;
   text-transform: uppercase;
@@ -343,7 +343,7 @@
   background: rgba(121, 168, 139, 0.06);
   color: #79a88b;
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.1px;
   text-transform: uppercase;
@@ -368,7 +368,7 @@
   background: transparent;
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.1px;
   text-transform: uppercase;
@@ -401,7 +401,7 @@
 }
 
 .aside {
-  font-size: 11px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-muted);
   line-height: 1.5;
   padding: 12px 14px;
@@ -424,7 +424,7 @@
 
 .toolbarLabel {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-muted);
   letter-spacing: 1.2px;
@@ -449,7 +449,7 @@
 
 .toolbarCount {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-muted);
   letter-spacing: 1px;
@@ -457,20 +457,20 @@
 
 .toolbarCountAccent {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.1px;
   color: #34d399;
 }
 
 .filterBtn {
-  height: 24px;
-  padding: 0 10px;
+  height: 28px;
+  padding: 0 12px;
   border: 1px solid var(--color-border);
   background: transparent;
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.1px;
   text-transform: uppercase;
@@ -491,12 +491,12 @@
 }
 
 .sortSelect {
-  height: 24px;
-  padding: 0 6px;
+  height: 28px;
+  padding: 0 8px;
   border: 1px solid var(--accent-dim);
   background: var(--color-card);
   color: var(--color-text-muted);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-family: var(--font-mono);
   font-weight: 700;
   cursor: pointer;
@@ -528,7 +528,7 @@
   text-align: center;
   color: var(--color-text-dim);
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.2px;
   text-transform: uppercase;
@@ -553,7 +553,7 @@
 
 .emptyAllClearTitle {
   font-family: var(--font-display);
-  font-size: 10px;
+  font-size: var(--fs-label-xs);
   color: #34d399;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -561,7 +561,7 @@
 
 .emptyAllClearSub {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 1.2px;
@@ -571,7 +571,7 @@
 .loadingText {
   padding: 40px 24px;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 1.2px;
@@ -629,7 +629,7 @@
 
 .semanticCardKey {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text);
   letter-spacing: 0.4px;
@@ -637,7 +637,7 @@
 
 .semanticCardEvCount {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 0.9px;
@@ -645,8 +645,8 @@
 
 .semanticCardClaim {
   font-size: 14px;
-  color: var(--color-text-muted);
-  line-height: 1.65;
+  color: var(--color-text);
+  line-height: 1.7;
   margin: 0;
   font-weight: 500;
 }
@@ -666,7 +666,7 @@
 
 .semanticCardBarLabel {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-muted);
   letter-spacing: 1.1px;
@@ -677,7 +677,7 @@
 
 .semanticCardBarValue {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   min-width: 28px;
   text-align: right;
@@ -685,7 +685,7 @@
 }
 
 .chevron {
-  font-size: 9px;
+  font-size: var(--fs-label-xs);
   color: var(--accent-dim);
   margin-top: 2px;
   transition: transform 0.2s;
@@ -720,7 +720,7 @@
 
 .dateMetaLabel {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 1.1px;
@@ -729,7 +729,7 @@
 
 .dateMetaValue {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-muted);
 }
@@ -776,7 +776,7 @@
 
 .priorityBoxLabel {
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-dim);
   letter-spacing: 0.5px;
 }
@@ -811,7 +811,7 @@
 
 .ruleStatLabel {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 1.1px;
@@ -821,7 +821,7 @@
 
 .ruleStatSource {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 0.8px;
@@ -841,7 +841,7 @@
 
 .ruleContentLabel {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 1.1px;
@@ -851,7 +851,7 @@
 
 .ruleContentText {
   font-size: 14px;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   line-height: 1.7;
   margin: 0;
   font-weight: 500;
@@ -895,13 +895,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: var(--fs-label-xs);
   flex-shrink: 0;
 }
 
 .reviewCardTypeName {
   font-family: var(--font-display);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -910,7 +910,7 @@
 .reviewCardDate {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 0.8px;
@@ -928,7 +928,7 @@
   background: var(--color-surface-hover);
   border: 1px solid var(--color-border);
   font-size: 14px;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   line-height: 1.7;
   position: relative;
   font-weight: 500;
@@ -952,7 +952,7 @@
 
 .confDiffLabel {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 1.1px;
@@ -963,7 +963,7 @@
 
 .confDiffValue {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   min-width: 28px;
   text-align: right;
@@ -972,7 +972,7 @@
 
 .confDiffDelta {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.1px;
   text-align: right;
@@ -988,7 +988,7 @@
 
 .mergeFromLabel {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 1.1px;
@@ -1004,7 +1004,7 @@
 
 .reasonBlockLabel {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text-dim);
   letter-spacing: 1.1px;
@@ -1013,7 +1013,7 @@
 }
 
 .reasonBlockText {
-  font-size: 11px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-muted);
   line-height: 1.6;
   margin: 0;
@@ -1021,7 +1021,7 @@
 
 .reviewResolved {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 1.1px;
   text-transform: uppercase;
@@ -1047,7 +1047,7 @@
 
 .pendingLabel {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: #b58a49;
   letter-spacing: 1.2px;
@@ -1077,7 +1077,7 @@
 
 .nodeDetailType {
   font-family: var(--font-display);
-  font-size: 9px;
+  font-size: var(--fs-label-xs);
   letter-spacing: 2px;
   text-transform: uppercase;
 }
@@ -1094,7 +1094,7 @@
 
 .nodeDetailKey {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: 7px;
@@ -1116,7 +1116,7 @@
 }
 
 .nodeDetailBarLabel {
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   letter-spacing: 1px;
@@ -1124,7 +1124,7 @@
 }
 
 .nodeDetailBarValue {
-  font-size: 9px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   font-family: var(--font-mono);
 }
@@ -1163,7 +1163,7 @@
 }
 
 .graphLegendLabel {
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-dim);
   font-family: var(--font-mono);
   letter-spacing: 1px;
@@ -1174,12 +1174,12 @@
   position: absolute;
   bottom: 16px;
   right: 16px;
-  height: 24px;
-  padding: 0 10px;
+  height: 28px;
+  padding: 0 12px;
   border: 1px solid var(--accent-dim);
   background: var(--color-card);
   color: var(--accent);
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   font-family: var(--font-mono);
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -1195,7 +1195,7 @@
   border: 1px solid rgba(0, 212, 255, 0.35);
   background: rgba(8, 12, 16, 0.88);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--accent);
@@ -1223,7 +1223,7 @@
 
 .graphLoadingLabel {
   font-family: var(--font-display);
-  font-size: 9px;
+  font-size: var(--fs-label-xs);
   color: var(--accent);
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -1263,14 +1263,14 @@
 
 .timelineZoomLabel {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-dim);
   letter-spacing: 1px;
 }
 
 .timelineZoomBtn {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border: 1px solid var(--accent-dim);
   background: transparent;
   color: var(--accent);
@@ -1284,13 +1284,13 @@
 }
 
 .timelineFitBtn {
-  height: 24px;
-  padding: 0 10px;
+  height: 28px;
+  padding: 0 12px;
   border: 1px solid var(--accent-dim);
   background: transparent;
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
@@ -1318,14 +1318,14 @@
 
 .timelineLegendLabel {
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--fs-label-xs);
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
 .timelineEventCount {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-dim);
   letter-spacing: 0.8px;
 }
@@ -1362,7 +1362,7 @@
 
 .eventDetailPayloadLabel {
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-dim);
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -1383,7 +1383,7 @@
 
 .eventDetailPayloadKey {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   color: var(--color-text-dim);
   letter-spacing: 0.8px;
   text-transform: uppercase;
@@ -1392,7 +1392,7 @@
 
 .eventDetailPayloadVal {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--fs-label-xs);
   font-weight: 700;
   text-align: right;
   word-break: break-all;

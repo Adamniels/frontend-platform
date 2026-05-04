@@ -75,15 +75,15 @@ export function InsightsView(props: InsightsViewProps) {
                   <JarvisButton
                     label="Confirm"
                     variant="primary"
+                    size="sm"
                     onClick={() => setConfirmed((c) => [...c, mem.id])}
-                    className={styles.btnSm}
                   />
                 ) : null}
                 <JarvisButton
                   label="Remove"
                   variant="ghost"
+                  size="sm"
                   onClick={() => setCorrected((c) => [...c, mem.id])}
-                  className={styles.btnSm}
                 />
               </div>
             </div>

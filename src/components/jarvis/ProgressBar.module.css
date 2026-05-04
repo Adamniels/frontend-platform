@@ -9,7 +9,7 @@
 }
 
 .label {
-  font-size: 9px;
+  font-size: var(--fs-label-xs);
   font-family: var(--font-mono);
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -17,13 +17,13 @@
 }
 
 .val {
-  font-size: 10px;
+  font-size: var(--fs-label-sm);
   font-family: var(--font-mono);
   letter-spacing: 1px;
 }
 
 .track {
-  height: 2px;
+  height: var(--bar-h-slim);
   background: var(--accent-track);
   overflow: hidden;
 }

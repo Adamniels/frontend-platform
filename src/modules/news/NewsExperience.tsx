@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
+import { SegmentedControl } from "@/components/jarvis/SegmentedControl";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import styles from "./news-experience.module.css";
 
@@ -104,18 +105,13 @@ export function NewsExperience() {
     <div className={`${styles.page} screenEnter`}>
       <div className={styles.toolbar}>
         <h2 className={styles.h2}>Personalized feed</h2>
-        <div className={styles.filters}>
-          {CATEGORIES.map((c) => (
-            <button
-              key={c}
-              type="button"
-              className={filter === c ? styles.chipOn : styles.chip}
-              onClick={() => setFilter(c)}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          aria-label="Filter by category"
+          compact
+          items={CATEGORIES.map((c) => ({ id: c, label: c }))}
+          value={filter}
+          onChange={setFilter}
+        />
       </div>
       {filtered.map((a) => (
         <JarvisCard key={a.id} onClick={() => setSelected(a.id)} className={styles.listCard}>

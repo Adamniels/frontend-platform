@@ -1,0 +1,85 @@
+/* Sharp HUD segmented control — matches memory tab family, reusable for filters. */
+.root {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-card) 92%, white 8%);
+  box-sizing: border-box;
+}
+
+.rootFill {
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.rootCompact .segment {
+  min-height: var(--toolbar-chrome-h);
+  padding: 0 12px;
+  font-size: var(--fs-label-xs);
+  letter-spacing: 1.2px;
+  gap: 5px;
+}
+
+.rootCompact .badge {
+  padding: 1px 5px;
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 18px;
+  min-height: 44px;
+  margin: 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-right: 1px solid var(--accent-dim);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label-sm);
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    background 0.15s,
+    border-bottom-color 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.segment:hover {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.segmentActive {
+  border-bottom-color: var(--accent);
+  background: var(--accent-active);
+  color: var(--accent);
+}
+
+/* Only strip (fill) mode: drop trailing divider */
+.segmentStripLast {
+  border-right: none;
+}
+
+.badge {
+  font-size: var(--fs-label-xs);
+  padding: 2px 7px;
+  border: 1px solid var(--accent-dim);
+  color: var(--color-text-muted);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.badgeAlert {
+  border-color: rgba(255, 149, 0, 0.5);
+  color: var(--color-warning);
+}

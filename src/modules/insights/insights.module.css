@@ -11,7 +11,7 @@
 
 .h2 {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: var(--fs-display-section);
   color: var(--accent);
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -51,7 +51,7 @@
 }
 
 .kicker {
-  font-size: 11px;
+  font-size: var(--fs-label-sm);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -70,11 +70,6 @@
   flex-direction: column;
   gap: 6px;
   flex-shrink: 0;
-}
-
-.btnSm {
-  font-size: 12px;
-  padding: 6px 14px;
 }
 
 .err {

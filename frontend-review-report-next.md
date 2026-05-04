@@ -42,6 +42,8 @@ These came from the first review or immediate follow-ups and are **done** in the
 
 ### 3.2 Standards and consistency (medium)
 
+*Partially addressed (UX readability pass, 2026):* shared type tokens in [`globals.css`](./src/app/globals.css) (`--fs-label-*`, `--bar-h-*`, lifted `--color-text-dim`); new [`SegmentedControl`](./src/components/jarvis/SegmentedControl.tsx) for sharp HUD filters; [`JarvisButton` `size="sm"`](./src/components/jarvis/JarvisButton.tsx); Memory Center + shell micro-type scaled up; [`JarvisInlineError`](./src/components/jarvis/JarvisInlineError.module.css) uses `--color-danger`. Remaining gaps below.*
+
 | Item | Path / area | Issue |
 |------|-------------|--------|
 | **Mixed module patterns** | `news`, `side-learning`, `saved-items` | `*Screen` is thin server wrapper around client `*Experience` only — no server-fetched list data yet (when backend exists, align with dashboard/insights). |

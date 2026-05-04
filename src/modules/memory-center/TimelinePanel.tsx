@@ -173,7 +173,7 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
         ctx.setLineDash([]);
         if (tl.scale > 30) {
           const label = d.toLocaleDateString("en-SE", { month: "short", day: "numeric" }).toUpperCase();
-          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.82)"; ctx.textAlign = "left";
+          ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.82)"; ctx.textAlign = "left";
           ctx.fillText(label, x + 4, axisY + 12);
         }
         d.setDate(d.getDate() + 1);
@@ -191,7 +191,7 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
         ctx.setLineDash([4, 4]);
         ctx.beginPath(); ctx.moveTo(nowX, 20); ctx.lineTo(nowX, H - 20); ctx.stroke();
         ctx.setLineDash([]); ctx.shadowBlur = 0;
-        ctx.font = "7px 'Space Mono',monospace"; ctx.fillStyle = "#b58a49"; ctx.textAlign = "center";
+        ctx.font = "10px 'Space Mono',monospace"; ctx.fillStyle = "#b58a49"; ctx.textAlign = "center";
         ctx.fillText("NOW", nowX, 14);
       }
 
@@ -246,14 +246,14 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
         ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
 
         const icon = EV_ICONS[ev.eventType] ?? "·";
-        ctx.font = `${Math.max(7, r*0.9)}px monospace`;
+        ctx.font = `${Math.max(10, r*0.9)}px monospace`;
         ctx.fillStyle = lane.color; ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.globalAlpha = entryAlpha * 0.9; ctx.fillText(icon, x, laneY);
         ctx.textBaseline = "alphabetic"; ctx.globalAlpha = 1;
 
         if (tl.scale > 80 || isHov || isSel) {
           const lbl = ev.eventType.replace(/_/g, " ").toUpperCase();
-          const fs  = Math.min(9, Math.max(7, tl.scale * 0.04));
+          const fs  = Math.min(12, Math.max(10, tl.scale * 0.04));
           ctx.font = `${isHov||isSel?"bold ":""}${fs}px 'Space Mono',monospace`;
           ctx.fillStyle = isHov||isSel ? lane.color : "rgba(122,118,105,0.82)";
           ctx.textAlign = "center"; ctx.globalAlpha = entryAlpha * (isHov||isSel ? 1 : 0.7);
@@ -276,12 +276,12 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
         ctx.beginPath(); ctx.arc(LABEL_W - 12, laneY, 4, 0, Math.PI*2);
         ctx.fillStyle = lane.color; ctx.shadowColor = lane.color; ctx.shadowBlur = 4;
         ctx.fill(); ctx.shadowBlur = 0;
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = `rgba(${lane.rgb},0.85)`;
+        ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = `rgba(${lane.rgb},0.85)`;
         ctx.textAlign = "right"; ctx.textBaseline = "middle";
         ctx.fillText(lane.label, LABEL_W - 22, laneY);
         ctx.textBaseline = "alphabetic";
       });
-      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.78)";
+      ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.78)";
       ctx.textAlign = "right"; ctx.textBaseline = "middle";
       ctx.fillText("TIMELINE", LABEL_W - 22, H * AXIS_Y_FRAC);
       ctx.textBaseline = "alphabetic";
@@ -296,19 +296,19 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
           ctx.strokeStyle = "rgba(0,212,255,0.18)"; ctx.lineWidth = 1;
           ctx.beginPath(); ctx.rect(tx, ty, 192, 50); ctx.fill(); ctx.stroke();
           const evDate = new Date(ev.occurredAt);
-          ctx.font = "bold 9px 'Space Mono',monospace"; ctx.fillStyle = lane.color; ctx.textAlign = "left";
+          ctx.font = "bold 11px 'Space Mono',monospace"; ctx.fillStyle = lane.color; ctx.textAlign = "left";
           ctx.fillText(ev.eventType.replace(/_/g," ").toUpperCase(), tx+10, ty+16);
-          ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.82)";
+          ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.82)";
           ctx.fillText(evDate.toLocaleDateString("en-SE",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).toUpperCase(), tx+10, ty+30);
           if (ev.workflowId) { ctx.fillStyle="rgba(160,156,142,0.82)"; ctx.fillText(ev.workflowId, tx+10, ty+44); }
         }
       }
 
       if (tickRef.current < 90) {
-        ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "center";
+        ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "center";
         ctx.fillText("SCROLL: ZOOM  ·  DRAG: PAN  ·  CLICK: SELECT", W/2, H-12);
       }
-      ctx.font = "8px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "right";
+      ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "right";
       ctx.fillText(`${tl.scale.toFixed(0)}PX/DAY`, W-12, H-12);
 
       ctx.restore();
@@ -411,16 +411,16 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
               <JarvisTag label={selected.domain ?? "—"} color={lane.color} />
               <button className={styles.nodeDetailClose} onClick={() => { selectedRef.current = null; setSelected(null); }}>✕</button>
             </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 700, color: "var(--color-text)", letterSpacing: "0.5px", textTransform: "uppercase", lineHeight: 1.5 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, color: "var(--color-text)", letterSpacing: "0.5px", textTransform: "uppercase", lineHeight: 1.5 }}>
               {selected.eventType.replace(/_/g, " ")}
             </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, color: "var(--color-text-dim)", letterSpacing: "0.8px" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-dim)", letterSpacing: "0.8px" }}>
               {new Date(selected.occurredAt).toLocaleDateString("en-SE", { weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).toUpperCase()}
             </div>
             {selected.workflowId && (
               <div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: 7, color: "var(--color-text-dim)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 3 }}>Workflow</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: lane.color }}>{selected.workflowId}</div>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-dim)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 3 }}>Workflow</div>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: lane.color }}>{selected.workflowId}</div>
               </div>
             )}
             {selected.payload && Object.keys(selected.payload).length > 0 && (

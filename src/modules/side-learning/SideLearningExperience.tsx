@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
+import { SegmentedControl } from "@/components/jarvis/SegmentedControl";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { ProgressBar } from "@/components/jarvis/ProgressBar";
 import {
@@ -55,6 +56,29 @@ function sessionSummaryHeadline(s: SideLearningSessionSummary): string {
   return "Learning session";
 }
 
+const LEARN_HISTORY_SEGMENTS = [
+  { id: "learn", label: "Learn" },
+  { id: "history", label: "History" },
+] as const;
+
+function LearnHistoryTabs({
+  value,
+  onChange,
+}: {
+  value: "learn" | "history";
+  onChange: (v: "learn" | "history") => void;
+}) {
+  return (
+    <SegmentedControl
+      aria-label="Learn or history"
+      compact
+      items={[...LEARN_HISTORY_SEGMENTS]}
+      value={value}
+      onChange={(id) => onChange(id as "learn" | "history")}
+    />
+  );
+}
+
 export function SideLearningExperience() {
   const [mainTab, setMainTab] = useState<"learn" | "history">("learn");
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -80,6 +104,7 @@ export function SideLearningExperience() {
 
   useEffect(() => {
     if (!sessionId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clear detail when session cleared
       setDetail(null);
       return;
     }
@@ -159,6 +184,7 @@ export function SideLearningExperience() {
 
   useEffect(() => {
     if (sections.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- keep index in range when sections change
       setSectionIdx(0);
       return;
     }
@@ -288,18 +314,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "History" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         {error ? <div className={styles.errorBanner}>{error}</div> : null}
         <JarvisCard hover={false}>
@@ -341,18 +356,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "Learn" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         {error ? <div className={styles.errorBanner}>{error}</div> : null}
         <JarvisCard hover={false} className={styles.topicCard}>
@@ -415,18 +419,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "Learn" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         <p className={styles.muted}>Loading session…</p>
       </div>
@@ -438,18 +431,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "Learn" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         <JarvisCard hover={false}>
           <p className={styles.body}>This session failed. You can start again.</p>
@@ -465,18 +447,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "Learn" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         {error ? <div className={styles.errorBanner}>{error}</div> : null}
         <JarvisCard hover={false}>
@@ -495,18 +466,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "Learn" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         {error ? <div className={styles.errorBanner}>{error}</div> : null}
         <div className={styles.proposalGrid}>
@@ -565,18 +525,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "Learn" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         {error ? <div className={styles.errorBanner}>{error}</div> : null}
         <JarvisCard hover={false}>
@@ -591,18 +540,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "Learn" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         {error ? <div className={styles.errorBanner}>{error}</div> : null}
         <JarvisCard hover={false}>
@@ -617,18 +555,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "Learn" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         {error ? <div className={styles.errorBanner}>{error}</div> : null}
         <div className={styles.memoryBanner}>
@@ -662,18 +589,7 @@ export function SideLearningExperience() {
       <div className={`${styles.page} screenEnter`}>
         <div className={styles.toolbar}>
           <h2 className={styles.h2}>Learning topics</h2>
-          <div className={styles.filters}>
-            {(["Learn", "History"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className={v === "Learn" ? styles.chipOn : styles.chip}
-                onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         {error ? <div className={styles.errorBanner}>{error}</div> : null}
         <JarvisCard hover={false}>
@@ -781,18 +697,7 @@ export function SideLearningExperience() {
     <div className={`${styles.page} screenEnter`}>
       <div className={styles.toolbar}>
         <h2 className={styles.h2}>Learning topics</h2>
-        <div className={styles.filters}>
-          {(["Learn", "History"] as const).map((v) => (
-            <button
-              key={v}
-              type="button"
-              className={v === "Learn" ? styles.chipOn : styles.chip}
-              onClick={() => setMainTab(v === "History" ? "history" : "learn")}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
+        <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
       </div>
       {error ? <div className={styles.errorBanner}>{error}</div> : null}
       <JarvisCard hover={false}>

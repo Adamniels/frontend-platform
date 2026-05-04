@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
+import { SegmentedControl } from "@/components/jarvis/SegmentedControl";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { MOCK_SAVED_ITEMS, MOCK_SAVED_ITEM_TYPES } from "./saved-items-mock";
 import styles from "./saved-experience.module.css";
@@ -34,16 +35,13 @@ export function SavedItemsExperience() {
           placeholder="Search…"
           aria-label="Search saved"
         />
-        {MOCK_SAVED_ITEM_TYPES.map((t) => (
-          <button
-            key={t}
-            type="button"
-            className={filter === t ? styles.chipOn : styles.chip}
-            onClick={() => setFilter(t)}
-          >
-            {t}
-          </button>
-        ))}
+        <SegmentedControl
+          aria-label="Filter by type"
+          compact
+          items={MOCK_SAVED_ITEM_TYPES.map((t) => ({ id: t, label: t }))}
+          value={filter}
+          onChange={setFilter}
+        />
       </div>
       {visible.map((item) => (
         <JarvisCard key={item.id} className={styles.card} hover={false}>

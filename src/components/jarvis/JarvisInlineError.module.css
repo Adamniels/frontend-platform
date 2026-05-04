@@ -1,8 +1,8 @@
 .wrap {
   padding: var(--space-5);
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 35%, transparent);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
   max-width: 42rem;
 }
 
@@ -12,7 +12,7 @@
   font-size: 0.85rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(248, 250, 252, 0.9);
+  color: var(--color-text);
 }
 
 .message {

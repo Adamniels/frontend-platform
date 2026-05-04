@@ -147,7 +147,7 @@ function RuleCard({ rule, onMutated }: RuleCardProps) {
 
       {expanded && (
         <div className={styles.semanticCardExpanded}>
-          {err && <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--color-danger)", margin: 0 }}>{err}</p>}
+          {err && <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-danger)", margin: 0 }}>{err}</p>}
 
           {loadingDetail ? (
             <p className={styles.muted} style={{ fontSize: 11 }}>Loading rule detail…</p>

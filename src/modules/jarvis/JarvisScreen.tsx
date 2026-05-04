@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MOCK_ACTIVE_SESSION, MOCK_QUICK_ACTIONS } from "./jarvis-mock";
+import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { ProgressRing } from "@/components/jarvis/ProgressRing";
 import { JarvisIcon } from "@/components/jarvis/JarvisIcon";
 import styles from "./jarvis-screen.module.css";
@@ -42,10 +43,14 @@ export function JarvisScreen() {
               <br />
               Keep the momentum going.
             </p>
-            <button type="button" className={styles.cta} onClick={() => router.push("/insights")}>
-              View recent insights
-              <JarvisIcon name="arrow" size={13} color="currentColor" />
-            </button>
+            <JarvisButton
+              className={styles.cta}
+              label="View recent insights"
+              variant="outline"
+              size="sm"
+              icon={<JarvisIcon name="arrow" size={13} color="currentColor" />}
+              onClick={() => router.push("/insights")}
+            />
           </div>
           <div className={styles.sessionCol}>
             <div className={styles.sessionLabel}>Continue Session</div>
@@ -62,10 +67,14 @@ export function JarvisScreen() {
                     Estimated <strong>{MOCK_ACTIVE_SESSION.estimatedMinutes} min</strong> to complete.
                   </p>
                 </div>
-                <button type="button" className={styles.resumeBtn} onClick={() => router.push("/side-learning")}>
-                  Resume session
-                  <JarvisIcon name="chevron" size={12} color="currentColor" />
-                </button>
+                <JarvisButton
+                  className={styles.resumeBtn}
+                  label="Resume session"
+                  variant="outline"
+                  size="sm"
+                  icon={<JarvisIcon name="chevron" size={12} color="currentColor" />}
+                  onClick={() => router.push("/side-learning")}
+                />
               </div>
             </div>
           </div>
@@ -86,14 +95,20 @@ export function JarvisScreen() {
               aria-label="Jarvis prompt"
             />
             <div className={styles.chatActions}>
-              <button type="button" className={styles.chatAct}>
-                <JarvisIcon name="attach" size={12} color="currentColor" />
-                Attach
-              </button>
-              <button type="button" className={styles.chatAct}>
-                <JarvisIcon name="mic" size={12} color="currentColor" />
-                Voice
-              </button>
+              <JarvisButton
+                className={styles.chatAct}
+                label="Attach"
+                variant="ghost"
+                size="sm"
+                icon={<JarvisIcon name="attach" size={12} color="currentColor" />}
+              />
+              <JarvisButton
+                className={styles.chatAct}
+                label="Voice"
+                variant="ghost"
+                size="sm"
+                icon={<JarvisIcon name="mic" size={12} color="currentColor" />}
+              />
               <button type="button" className={`${styles.chatSend} ${prompt.trim() ? styles.chatSendOn : ""}`}>
                 <JarvisIcon name="send" size={12} color={prompt.trim() ? "#070c14" : "var(--color-text-dim)"} />
               </button>
@@ -102,13 +117,15 @@ export function JarvisScreen() {
 
           <div className={styles.quick}>
             {MOCK_QUICK_ACTIONS.map((action) => (
-              <button key={action.label} type="button" className={styles.quickBtn} onClick={() => router.push(action.href)}>
-                <span className={styles.quickLeft}>
-                  <JarvisIcon name={action.icon} size={12} color="var(--accent)" />
-                  {action.label}
-                </span>
-                <JarvisIcon name="chevron" size={10} color="var(--color-text-dim)" />
-              </button>
+              <JarvisButton
+                key={action.label}
+                className={styles.quickBtn}
+                label={action.label}
+                variant="ghost"
+                size="sm"
+                icon={<JarvisIcon name={action.icon} size={12} color="var(--accent)" />}
+                onClick={() => router.push(action.href)}
+              />
             ))}
           </div>
         </div>

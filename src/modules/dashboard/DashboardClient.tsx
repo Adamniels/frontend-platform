@@ -6,6 +6,7 @@ import { animate, stagger } from "animejs";
 import { prefersReducedMotion } from "@/lib/anime/motion";
 import type { DashboardSummary } from "@/types/dashboard";
 import { MOCK_INPUT_ITEMS, MOCK_PROGRESS_METRICS, MOCK_QUICK_ACTIONS, MOCK_SESSION_CARD } from "./dashboard-mock";
+import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
@@ -146,9 +147,14 @@ export function DashboardClient(props: DashboardClientProps) {
           <div className={styles.meta}>QUICK ACTIONS</div>
           <div className={styles.quickGrid}>
             {MOCK_QUICK_ACTIONS.map((action) => (
-              <button key={action.label} type="button" className={styles.quickBtn} onClick={() => router.push(action.href)}>
-                {action.label}
-              </button>
+              <JarvisButton
+                key={action.label}
+                label={action.label}
+                variant="outline"
+                size="sm"
+                className={styles.quickBtn}
+                onClick={() => router.push(action.href)}
+              />
             ))}
           </div>
         </JarvisCard>
@@ -164,12 +170,20 @@ export function DashboardClient(props: DashboardClientProps) {
                 <span>{item.text}</span>
               </div>
               <div className={styles.actions}>
-                <button type="button" onClick={() => router.push("/input-needed")}>
-                  Act
-                </button>
-                <button type="button" onClick={() => setDismissed((d) => [...d, item.id])}>
-                  Skip
-                </button>
+                <JarvisButton
+                  label="Act"
+                  variant="primary"
+                  size="sm"
+                  className={styles.actPrimary}
+                  onClick={() => router.push("/input-needed")}
+                />
+                <JarvisButton
+                  label="Skip"
+                  variant="ghost"
+                  size="sm"
+                  className={styles.actGhost}
+                  onClick={() => setDismissed((d) => [...d, item.id])}
+                />
               </div>
             </div>
           </JarvisCard>

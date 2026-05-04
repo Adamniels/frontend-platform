@@ -80,3 +80,19 @@
 .variant_outline:hover {
   background: var(--accent-hover);
 }
+
+/* Compact HUD actions (replaces ad-hoc 8px mono buttons) */
+.size_sm {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label-xs);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  gap: 5px;
+}
+
+.size_sm .ripple {
+  width: 18px;
+  height: 18px;
+}

@@ -171,7 +171,7 @@ export function SettingsClient({ settings }: SettingsClientProps) {
           {["Export my data", "Reset preferences", "Clear memory"].map((l) => (
             <div key={l} className={styles.privacyRow}>
               <span>{l}</span>
-              <JarvisButton label="Open" variant="ghost" className={styles.miniBtn} />
+              <JarvisButton label="Open" variant="ghost" size="sm" className={styles.miniBtn} />
             </div>
           ))}
         </JarvisCard>

@@ -13,6 +13,8 @@ type JarvisButtonProps = {
   label: string;
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   variant?: JarvisButtonVariant;
+  /** `sm` = mono uppercase HUD control; `md` = default sans body button */
+  size?: "sm" | "md";
   icon?: ReactNode;
   type?: "button" | "submit";
   className?: string;
@@ -23,6 +25,7 @@ export function JarvisButton({
   label,
   onClick,
   variant = "ghost",
+  size = "md",
   icon,
   type = "button",
   className,
@@ -63,7 +66,12 @@ export function JarvisButton({
       type={type}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
-      className={cn(styles.btn, styles[`variant_${variant}` as keyof typeof styles], className)}
+      className={cn(
+        styles.btn,
+        styles[`variant_${variant}` as keyof typeof styles],
+        size === "sm" && styles.size_sm,
+        className,
+      )}
       style={style}
     >
       <span ref={ringRef} className={styles.ring} aria-hidden />

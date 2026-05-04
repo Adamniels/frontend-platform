@@ -28,8 +28,9 @@
 
   /* ─── Text ────────────────────────────────────────────── */
   --color-text: #cce8f0;
-  --color-text-muted: #5a7a8a;
-  --color-text-dim: #34505e;
+  /* Brighter greys for inactive nav / labels on dark surfaces */
+  --color-text-muted: #8eb4c8;
+  --color-text-dim: #6b94aa;
 
   /* ─── Borders ─────────────────────────────────────────── */
   --color-border: rgba(0, 212, 255, 0.08);
@@ -65,6 +66,25 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-8: 40px;
+
+  /* ─── Type scale (HUD / body) ─────────────────────────── */
+  --fs-label-xs: 11px;
+  --fs-label-sm: 12px;
+  --fs-label-md: 13px;
+  --fs-body-sm: 13px;
+  --fs-body-md: 14px;
+  --fs-body-lg: 15px;
+  /* Orbitron section titles (toolbar / page chrome) */
+  --fs-display-section: 18px;
+  /* Search + compact segmented row (saved library, news, etc.) */
+  --toolbar-chrome-h: 36px;
+  /* Mono line under tabs, e.g. MEMORY GRAPH */
+  --fs-page-subtitle: 14px;
+
+  /* Bar tracks (progress / confidence) */
+  --bar-h-slim: 4px;
+  --bar-h-md: 8px;
+
   --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
   --font-display: var(--font-orbitron), "Orbitron", var(--font-sans);
   --font-mono: var(--font-space-mono), "Space Mono", ui-monospace, monospace;

@@ -62,10 +62,11 @@ export function ProfileClient({ profile }: ProfileClientProps) {
             <button
               key={i}
               type="button"
-              className={styles.interestChip}
+              className={styles.interestChipBtn}
               onClick={() => setInterests((a) => a.filter((x) => x !== i))}
+              aria-label={`Remove interest ${i}`}
             >
-              {i} ×
+              <JarvisTag label={`${i} ×`} />
             </button>
           ))}
         </div>
