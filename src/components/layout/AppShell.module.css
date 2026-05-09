@@ -12,45 +12,22 @@
   width: var(--sidebar-width);
   flex-shrink: 0;
   background: var(--color-sidebar);
-  border-right: 1px solid var(--color-border-strong);
+  border-right: 1px solid color-mix(in srgb, white 10%, transparent);
   display: flex;
   flex-direction: column;
   padding: 0;
-  gap: var(--space-2);
+  gap: 0;
   z-index: 6;
+  min-height: 0;
 }
 
 .logoRow {
   display: flex;
-  align-items: stretch;
-  padding: 0;
-  justify-content: center;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.logoOrb {
-  width: 32px;
-  height: 32px;
-  display: flex;
   align-items: center;
-  justify-content: center;
+  padding: 0;
+  justify-content: flex-start;
+  border-bottom: 1px solid color-mix(in srgb, white 8%, transparent);
   flex-shrink: 0;
-}
-
-.logoTitle {
-  font-family: var(--font-display);
-  font-size: 14px;
-  color: var(--accent);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-
-.logoSub {
-  font-family: var(--font-mono);
-  font-size: var(--fs-label-xs);
-  color: var(--color-text-muted);
-  letter-spacing: 1.8px;
-  text-transform: uppercase;
 }
 
 .mainColumn {
@@ -59,6 +36,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--color-canvas);
 }
 
 .content {
@@ -68,34 +46,36 @@
   filter: brightness(var(--shell-brightness, 1));
   z-index: 5;
   position: relative;
-  padding: 22px 28px;
+  padding: var(--content-padding-y) var(--content-padding-x);
+  background: var(--color-canvas);
 }
 
 .userRow {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 9px 12px;
-  border-top: 1px solid var(--color-border);
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid color-mix(in srgb, white 8%, transparent);
   margin: 0;
   position: relative;
   z-index: 2;
+  flex-shrink: 0;
 }
 
 .avatar {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
-  border: 1px solid var(--accent-dim);
+  border: 1px solid color-mix(in srgb, white 18%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--accent);
-  font-family: var(--font-display);
+  color: var(--accent-mid);
+  font-family: var(--font-sans);
   border-radius: 50%;
-  background: var(--accent-card);
+  background: color-mix(in srgb, white 8%, transparent);
 }
 
 .userMeta {
@@ -104,9 +84,10 @@
 }
 
 .userName {
-  font-size: 11px;
-  color: var(--color-text);
+  font-size: var(--fs-label-sm);
+  color: var(--color-sidebar-text);
   font-family: var(--font-sans);
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -114,10 +95,9 @@
 
 .userPlan {
   font-size: var(--fs-label-xs);
-  color: var(--accent);
-  font-family: var(--font-mono);
-  letter-spacing: 1px;
-  opacity: 0.8;
+  color: var(--color-sidebar-text-muted);
+  font-family: var(--font-sans);
+  font-weight: 500;
 }
 
 .hexGrid {
@@ -125,11 +105,11 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: var(--hexgrid-opacity, 0.025);
+  opacity: var(--hexgrid-opacity, 0);
   background-image:
-    linear-gradient(to right, var(--color-border-strong) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--color-border-strong) 1px, transparent 1px);
-  background-size: 42px 42px;
+    linear-gradient(to right, rgba(15, 23, 42, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 .scanlines {
@@ -137,22 +117,41 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--accent-scanline) 2px, var(--accent-scanline) 4px);
-  opacity: var(--scanlines-opacity, 1);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    color-mix(in srgb, var(--accent) 6%, transparent) 2px,
+    color-mix(in srgb, var(--accent) 6%, transparent) 4px
+  );
+  opacity: var(--scanlines-opacity, 0);
 }
 
 .notifications {
   position: fixed;
   right: 0;
-  top: var(--topbar-height);
+  top: 0;
+  padding-top: var(--topbar-height);
   bottom: 0;
-  width: 320px;
-  background: color-mix(in srgb, var(--color-bg) 92%, white 8%);
-  border-left: 1px solid var(--color-border-strong);
+  width: min(360px, 100vw - 48px);
+  background: var(--color-card);
+  border-left: 1px solid var(--color-border);
   z-index: 80;
   display: flex;
   flex-direction: column;
-  /* entrance driven by anime.js */
+  box-shadow: var(--shadow-md);
+  animation: notifSlide 0.2s ease-out;
+}
+
+@keyframes notifSlide {
+  from {
+    transform: translateX(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .notificationsHead {
@@ -164,11 +163,12 @@
 }
 
 .notificationsHead span {
-  font-family: var(--font-display);
-  font-size: 11px;
-  color: var(--accent);
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 
 .notificationsHead button {
@@ -191,19 +191,18 @@
 .notificationCard {
   text-align: left;
   border: 1px solid var(--color-border);
-  background: var(--color-card);
-  padding: 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  padding: 12px 14px;
   cursor: pointer;
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .notificationCard:hover {
-  border-color: color-mix(in srgb, var(--accent) 30%, var(--color-border));
-  box-shadow: 0 2px 8px var(--color-shadow-md);
-  transform: translateY(-1px);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .notificationMeta {
@@ -214,16 +213,16 @@
 }
 
 .notificationMeta span {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--fs-label-xs);
   color: var(--color-text-muted);
-  letter-spacing: 1px;
+  font-weight: 500;
 }
 
 .notificationCard p {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: var(--fs-label-md);
   color: var(--color-text);
   margin: 0;
-  line-height: 1.6;
+  line-height: 1.55;
 }

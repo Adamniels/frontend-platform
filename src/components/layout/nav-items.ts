@@ -23,18 +23,41 @@ export type SidebarNavBottomLink = {
   showPendingBadge?: boolean;
 };
 
-export const sidebarPrimaryNav: SidebarNavLink[] = [
-  { kind: "link", href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { kind: "link", href: "/jarvis", label: "Jarvis", icon: "jarvis", indent: true },
-  { kind: "link", href: "/news", label: "News", icon: "news" },
-  { kind: "link", href: "/side-learning", label: "Learn", icon: "learn" },
-  { kind: "link", href: "/saved-items", label: "Saved", icon: "saved" },
-  { kind: "link", href: "/insights", label: "Insights", icon: "insights" },
-  { kind: "link", href: "/memory", label: "Memory", icon: "brain" },
-  { kind: "link", href: "/profile", label: "Profile", icon: "profile" },
-  { kind: "link", href: "/stats", label: "Stats", icon: "stats", indent: true },
-  { kind: "link", href: "/workflow-runs", label: "Workflow runs", icon: "workflow" },
+export type SidebarNavSection = {
+  heading: string;
+  items: SidebarNavLink[];
+};
+
+export const sidebarPrimarySections: SidebarNavSection[] = [
+  {
+    heading: "Main",
+    items: [
+      { kind: "link", href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+      { kind: "link", href: "/jarvis", label: "Jarvis", icon: "jarvis", indent: true },
+      { kind: "link", href: "/news", label: "News", icon: "news" },
+      { kind: "link", href: "/side-learning", label: "Learn", icon: "learn" },
+      { kind: "link", href: "/saved-items", label: "Saved", icon: "saved" },
+      { kind: "link", href: "/insights", label: "Insights", icon: "insights" },
+    ],
+  },
+  {
+    heading: "Platform",
+    items: [
+      { kind: "link", href: "/memory", label: "Memory", icon: "brain" },
+      { kind: "link", href: "/profile", label: "Profile", icon: "profile" },
+    ],
+  },
+  {
+    heading: "Operations",
+    items: [
+      { kind: "link", href: "/stats", label: "Stats", icon: "stats", indent: true },
+      { kind: "link", href: "/workflow-runs", label: "Workflow runs", icon: "workflow" },
+    ],
+  },
 ];
+
+/** Flat list of primary nav links (same order as sections). */
+export const sidebarPrimaryNav: SidebarNavLink[] = sidebarPrimarySections.flatMap((s) => s.items);
 
 export const sidebarBottomNav: (SidebarNavBottomLink | SidebarNavAction)[] = [
   {

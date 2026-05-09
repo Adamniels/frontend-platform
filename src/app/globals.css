@@ -1,63 +1,70 @@
-/* Platform design tokens — CSS Modules + variables only (no Tailwind). */
+/* Platform design tokens — admin light workspace + dark sidebar (CSS Modules + variables). */
 :root {
-  /* ─── Primary accent — electric cyan ─────────────────── */
-  --accent: #00d4ff;
-  --accent-hex: #00d4ff;
-  --accent-mid: #5de4ff;
-  --accent-dim: rgba(0, 212, 255, 0.18);
-  --accent-hover: rgba(0, 212, 255, 0.08);
-  --accent-active: rgba(0, 212, 255, 0.14);
-  --accent-subtle: rgba(0, 212, 255, 0.05);
-  --accent-track: rgba(0, 212, 255, 0.12);
-  --accent-glow: rgba(0, 212, 255, 0.20);
-  --accent-card: rgba(0, 212, 255, 0.04);
-  --accent-scanline: rgba(0, 212, 255, 0.04);
+  /* ─── Primary accent — muted teal ─────────────────────── */
+  --accent: #0d9488;
+  --accent-hex: #0d9488;
+  --accent-mid: #14b8a6;
+  --accent-dim: color-mix(in srgb, var(--accent) 22%, transparent);
+  --accent-hover: color-mix(in srgb, var(--accent) 10%, transparent);
+  --accent-active: color-mix(in srgb, var(--accent) 16%, transparent);
+  --accent-subtle: color-mix(in srgb, var(--accent) 6%, transparent);
+  --accent-track: color-mix(in srgb, var(--accent) 14%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 12%, transparent);
+  --accent-card: color-mix(in srgb, var(--accent) 4%, transparent);
+  --accent-scanline: color-mix(in srgb, var(--accent) 4%, transparent);
 
-  /* ─── Accent alt — amber warmth ───────────────────────── */
-  --accent-alt: #e8a020;
-  --accent-alt-dim: rgba(232, 160, 32, 0.16);
-  --accent-alt-glow: rgba(232, 160, 32, 0.22);
+  /* ─── Accent alt — amber (warnings, secondary highlights) ─ */
+  --accent-alt: #d97706;
+  --accent-alt-dim: color-mix(in srgb, var(--accent-alt) 18%, transparent);
+  --accent-alt-glow: color-mix(in srgb, var(--accent-alt) 14%, transparent);
 
   /* ─── Surfaces ────────────────────────────────────────── */
-  --color-bg: #080c10;
-  --color-sidebar: #0b1018;
-  --color-card: #0e1520;
-  --color-card-hover: #111a26;
-  --color-surface: #111c2a;
-  --color-surface-hover: #162234;
+  --color-bg: #eceef2;
+  --color-canvas: #eceef2;
+  --color-sidebar: #1e293b;
+  --color-sidebar-hover: #334155;
+  --color-card: #ffffff;
+  --color-card-hover: #f8fafc;
+  --color-surface: #f1f5f9;
+  --color-surface-hover: #e2e8f0;
 
   /* ─── Text ────────────────────────────────────────────── */
-  --color-text: #cce8f0;
-  /* Brighter greys for inactive nav / labels on dark surfaces */
-  --color-text-muted: #8eb4c8;
-  --color-text-dim: #6b94aa;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-dim: #94a3b8;
+  /* On dark sidebar */
+  --color-sidebar-text: #f1f5f9;
+  --color-sidebar-text-muted: rgba(241, 245, 249, 0.72);
+  --color-sidebar-text-dim: rgba(241, 245, 249, 0.48);
 
   /* ─── Borders ─────────────────────────────────────────── */
-  --color-border: rgba(0, 212, 255, 0.08);
-  --color-border-strong: rgba(0, 212, 255, 0.16);
+  --color-border: rgba(15, 23, 42, 0.08);
+  --color-border-strong: rgba(15, 23, 42, 0.12);
 
   /* ─── Shadows ─────────────────────────────────────────── */
-  --color-shadow: rgba(0, 0, 0, 0.40);
-  --color-shadow-md: rgba(0, 0, 0, 0.60);
+  --color-shadow: rgba(15, 23, 42, 0.06);
+  --color-shadow-md: rgba(15, 23, 42, 0.1);
+  --shadow-sm: 0 1px 2px var(--color-shadow);
+  --shadow-md: 0 4px 12px var(--color-shadow-md);
 
   /* ─── Semantic ────────────────────────────────────────── */
-  --color-green: #00ff88;
-  --color-purple: #a855f7;
-  --color-danger: #ff3b3b;
-  --color-warning: #e8a020;
+  --color-green: #059669;
+  --color-purple: #7c3aed;
+  --color-danger: #dc2626;
+  --color-warning: #d97706;
 
-  /* ─── Composite glows ─────────────────────────────────── */
-  --glow-accent: 0 0 12px rgba(0, 212, 255, 0.25), 0 0 40px rgba(0, 212, 255, 0.08);
-  --glow-accent-strong: 0 0 6px rgba(0, 212, 255, 0.50), 0 0 20px rgba(0, 212, 255, 0.20);
-  --glow-amber: 0 0 12px rgba(232, 160, 32, 0.25), 0 0 40px rgba(232, 160, 32, 0.08);
-  --glow-green: 0 0 10px rgba(0, 255, 136, 0.30);
-  --glow-danger: 0 0 10px rgba(255, 59, 59, 0.30);
+  /* ─── Subtle elevation (prefer borders on light UI) ───── */
+  --glow-accent: var(--shadow-sm);
+  --glow-accent-strong: var(--shadow-md);
+  --glow-amber: var(--shadow-sm);
+  --glow-green: var(--shadow-sm);
+  --glow-danger: 0 0 0 1px color-mix(in srgb, var(--color-danger) 25%, transparent);
 
   /* ─── Layout & spacing ────────────────────────────────── */
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
   --radius-pill: 999px;
   --space-1: 4px;
   --space-2: 8px;
@@ -66,34 +73,31 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-8: 40px;
+  --content-padding-x: 28px;
+  --content-padding-y: 24px;
 
-  /* ─── Type scale (HUD / body) ─────────────────────────── */
+  /* ─── Type scale ──────────────────────────────────────── */
   --fs-label-xs: 11px;
   --fs-label-sm: 12px;
   --fs-label-md: 13px;
-  --fs-body-sm: 13px;
-  --fs-body-md: 14px;
-  --fs-body-lg: 15px;
-  /* Orbitron section titles (toolbar / page chrome) */
-  --fs-display-section: 18px;
-  /* Search + compact segmented row (saved library, news, etc.) */
-  --toolbar-chrome-h: 36px;
-  /* Mono line under tabs, e.g. MEMORY GRAPH */
-  --fs-page-subtitle: 14px;
+  --fs-body-sm: 14px;
+  --fs-body-md: 15px;
+  --fs-body-lg: 16px;
+  --fs-display-section: 20px;
+  --toolbar-chrome-h: 40px;
+  --fs-page-subtitle: 15px;
 
-  /* Bar tracks (progress / confidence) */
   --bar-h-slim: 4px;
   --bar-h-md: 8px;
 
   --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
-  --font-display: var(--font-orbitron), "Orbitron", var(--font-sans);
+  --font-display: var(--font-inter), "Inter", system-ui, sans-serif;
   --font-mono: var(--font-space-mono), "Space Mono", ui-monospace, monospace;
-  --sidebar-width: 312px;
-  --topbar-height: 40px;
-  /* 1 = baseline (matches settings slider at 60). */
+  --sidebar-width: 272px;
+  --topbar-height: 56px;
   --shell-brightness: 1;
   --scanlines-opacity: 0;
-  --hexgrid-opacity: 0.04;
+  --hexgrid-opacity: 0;
 }
 
 *,
@@ -114,9 +118,9 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.5;
-  font-weight: 500;
+  font-size: var(--fs-body-md);
+  line-height: 1.55;
+  font-weight: 450;
   text-rendering: optimizeLegibility;
 }
 
@@ -128,10 +132,12 @@ body {
 a {
   color: var(--accent);
   text-decoration: none;
+  font-weight: 500;
 }
 
 a:hover {
   text-decoration: underline;
+  color: color-mix(in srgb, var(--accent) 85%, black);
 }
 
 :focus-visible {
@@ -141,27 +147,28 @@ a:hover {
 
 input::placeholder,
 textarea::placeholder {
-  color: color-mix(in srgb, var(--color-text-muted) 72%, transparent);
+  color: color-mix(in srgb, var(--color-text-muted) 75%, transparent);
 }
 
 input,
 textarea {
   color: var(--color-text);
-  font-weight: 500;
+  font-weight: 450;
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 212, 255, 0.15);
-  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-text-muted) 35%, transparent);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 212, 255, 0.30);
+  background: color-mix(in srgb, var(--color-text-muted) 55%, transparent);
 }
 
 @keyframes auroraFloat1 {
@@ -230,11 +237,11 @@ textarea {
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
   }
   50% {
-    opacity: 0.3;
-    box-shadow: 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
+    opacity: 0.65;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
   }
 }
 
@@ -277,7 +284,6 @@ textarea {
   }
 }
 
-/* Scan line sweep used by HUD entrance animations */
 @keyframes hudScan {
   0% {
     transform: translateY(-100%);
@@ -296,12 +302,12 @@ textarea {
 }
 
 ::selection {
-  background: rgba(0, 212, 255, 0.20);
-  color: #cce8f0;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--color-text);
 }
 
 .screenEnter {
-  animation: fadeSlideUp 0.3s cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation: fadeSlideUp 0.28s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {

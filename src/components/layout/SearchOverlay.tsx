@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { animate } from "animejs";
-import { prefersReducedMotion } from "@/lib/anime/motion";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { MOCK_SEARCH_HITS } from "./search-mock";
 import styles from "./SearchOverlay.module.css";
@@ -28,18 +26,6 @@ export function SearchOverlay({ open, onClose, onSelect }: SearchOverlayProps) {
     setQ("");
     onClose();
   }, [onClose]);
-
-  // Panel entrance animation
-  useEffect(() => {
-    if (!open || !panelRef.current || prefersReducedMotion()) return;
-    animate(panelRef.current, {
-      opacity: [0, 1],
-      translateY: [-14, 0],
-      scale: [0.97, 1],
-      duration: 260,
-      ease: "outExpo",
-    });
-  }, [open]);
 
   useEffect(() => {
     if (!open) return;

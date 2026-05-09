@@ -6,88 +6,101 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(6px);
 }
 
 .panel {
-  width: min(460px, 100%);
-  border-radius: 0;
-  border: 1px solid var(--color-border-strong);
-  background: color-mix(in srgb, var(--color-card) 95%, white 5%);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), var(--glow-accent);
-  padding: 24px;
-  animation: glitchIn 0.22s ease;
+  width: min(420px, 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-5);
+  animation: unlockIn 0.2s ease-out;
+}
+
+@keyframes unlockIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .title {
-  margin: 0 0 8px;
-  font-family: var(--font-display);
-  font-size: 16px;
-  letter-spacing: 2px;
-  color: var(--accent);
-  text-transform: uppercase;
+  margin: 0 0 6px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-display-section);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
 }
 
 .subtitle {
   margin: 0;
-  font-size: 10px;
-  font-family: var(--font-mono);
-  letter-spacing: 1px;
+  font-size: var(--fs-label-md);
+  font-family: var(--font-sans);
   color: var(--color-text-muted);
-  text-transform: uppercase;
 }
 
 .form {
-  margin-top: 20px;
+  margin-top: var(--space-5);
   display: grid;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .label {
-  font-size: 9px;
-  font-family: var(--font-mono);
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-size: var(--fs-label-sm);
+  font-family: var(--font-sans);
+  font-weight: 600;
   color: var(--color-text-muted);
 }
 
 .input {
   width: 100%;
-  height: 42px;
-  border-radius: 0;
+  height: 44px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   background: var(--color-card);
-  padding: 0 12px;
-  font-size: 12px;
-  font-family: var(--font-mono);
-  letter-spacing: 1px;
+  padding: 0 14px;
+  font-size: var(--fs-body-md);
+  font-family: var(--font-sans);
+}
+
+.input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--color-border));
 }
 
 .button {
-  margin-top: 6px;
-  height: 40px;
+  margin-top: var(--space-2);
+  height: 44px;
   border: 1px solid var(--accent);
-  border-radius: 0;
+  border-radius: var(--radius-md);
   background: var(--accent);
-  color: #070c14;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-weight: 700;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-md);
+  font-weight: 600;
   cursor: pointer;
 }
 
+.button:hover {
+  filter: brightness(1.03);
+}
+
 .button:disabled {
-  opacity: 0.55;
-  cursor: default;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .error {
   margin: 0;
-  color: #ff8d8d;
-  font-size: 11px;
-  font-family: var(--font-mono);
-  letter-spacing: 1px;
+  color: var(--color-danger);
+  font-size: var(--fs-label-sm);
+  font-family: var(--font-sans);
 }

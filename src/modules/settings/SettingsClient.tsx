@@ -21,7 +21,7 @@ import {
 import { SettingsToggle } from "./SettingsToggle";
 import styles from "./settings-experience.module.css";
 
-const ACCENTS = [{ label: "Platform Light", value: PLATFORM_LIGHT_ACCENT }];
+const ACCENTS = [{ label: "Default teal", value: PLATFORM_LIGHT_ACCENT }];
 
 type SettingsClientProps = { settings: UserSettings };
 
@@ -98,17 +98,17 @@ export function SettingsClient({ settings }: SettingsClientProps) {
           </div>
         </JarvisCard>
         <JarvisCard hover={false} className={styles.card}>
-          <div className={styles.sectionTitle}>Display</div>
+          <div className={styles.sectionTitle}>Display effects</div>
           <div className={styles.row}>
-            <span>Scan lines</span>
+            <span>Scan lines overlay</span>
             <SettingsToggle on={scanLines} onChange={applyScanLines} />
           </div>
           <div className={styles.row}>
-            <span>Hex grid background</span>
+            <span>Background grid</span>
             <SettingsToggle on={hexGrid} onChange={applyHexGrid} />
           </div>
           <div className={styles.row}>
-            <label htmlFor={brightnessRangeId}>HUD brightness</label>
+            <label htmlFor={brightnessRangeId}>Content brightness</label>
             <div className={styles.brightness}>
               <input
                 id={brightnessRangeId}

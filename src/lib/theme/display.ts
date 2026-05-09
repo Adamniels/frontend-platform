@@ -30,7 +30,7 @@ export function writeStoredScanlines(enabled: boolean): void {
 }
 
 export function readStoredHexGrid(): boolean {
-  return readBool(HEXGRID_STORAGE_KEY, true);
+  return readBool(HEXGRID_STORAGE_KEY, false);
 }
 
 export function writeStoredHexGrid(enabled: boolean): void {

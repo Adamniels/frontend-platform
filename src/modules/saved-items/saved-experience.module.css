@@ -16,11 +16,11 @@
 }
 
 .h2 {
-  font-family: var(--font-display);
-  font-size: var(--fs-display-section);
-  color: var(--accent);
-  letter-spacing: 3px;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: clamp(22px, 2vw, 26px);
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
   margin: 0 0 4px;
   margin-right: auto;
 }
@@ -31,7 +31,7 @@
 }
 
 .search {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-text);

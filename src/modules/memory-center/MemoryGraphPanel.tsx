@@ -763,16 +763,18 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
       ctx.save(); ctx.scale(dpr, dpr);
 
       // Background + grid
-      ctx.fillStyle = "#080c10"; ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(0,212,255,0.035)"; ctx.lineWidth = 0.5;
+      ctx.fillStyle = "#eceef2";
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "rgba(15,23,42,0.06)";
+      ctx.lineWidth = 0.5;
       for (let gx = 0; gx < W; gx += 42) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
       for (let gy = 0; gy < H; gy += 42) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
 
       // Central ambient glow
       const cx = W / 2, cy = H / 2;
       const amb = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.55);
-      amb.addColorStop(0, "rgba(0,212,255,0.05)");
-      amb.addColorStop(0.5, "rgba(0,212,255,0.016)");
+      amb.addColorStop(0, "rgba(13,148,136,0.06)");
+      amb.addColorStop(0.5, "rgba(13,148,136,0.02)");
       amb.addColorStop(1, "transparent");
       ctx.fillStyle = amb; ctx.fillRect(0, 0, W, H);
 
@@ -935,7 +937,9 @@ function MemoryGraphCanvas({ data }: MemoryGraphCanvasProps) {
           ctx.beginPath(); ctx.rect(tx, ty, 188, 52); ctx.fill(); ctx.stroke();
           ctx.strokeStyle = col.fill; ctx.lineWidth = 1.5;
           ctx.beginPath(); ctx.moveTo(tx + 8, ty); ctx.lineTo(tx, ty); ctx.lineTo(tx, ty + 8); ctx.stroke();
-          ctx.font = "bold 11px 'Orbitron',sans-serif"; ctx.fillStyle = col.fill; ctx.textAlign = "left";
+          ctx.font = "bold 11px Inter, system-ui, sans-serif";
+          ctx.fillStyle = col.fill;
+          ctx.textAlign = "left";
           ctx.fillText(TYPE_LABELS[n.type].toUpperCase(), tx + 10, ty + 17);
           ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.9)";
           const lbl = n.label.length > 26 ? n.label.slice(0, 24) + "…" : n.label;

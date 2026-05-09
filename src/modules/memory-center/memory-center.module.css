@@ -25,20 +25,20 @@
 }
 
 .h2 {
-  font-family: var(--font-display);
-  font-size: var(--fs-display-section);
-  color: var(--accent);
-  letter-spacing: 3px;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: clamp(22px, 2vw, 26px);
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
   margin: 0 0 4px;
 }
 
 .h3 {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--fs-page-subtitle);
-  font-weight: 700;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
   color: var(--color-text-muted);
   margin: 0 0 8px;
 }
@@ -55,26 +55,28 @@
   padding: 0;
   box-sizing: border-box;
   border-bottom: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-card) 92%, white 8%);
+  background: var(--color-card);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .memoryTab {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 0 20px;
+  gap: 8px;
+  padding: 0 18px;
   margin: 0;
   border: none;
   border-bottom: 2px solid transparent;
-  border-right: 1px solid var(--accent-dim);
+  border-right: 1px solid var(--color-border);
   background: transparent;
   color: var(--color-text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label-sm);
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-md);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: none;
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.15s, background 0.15s, border-bottom-color 0.15s;
@@ -89,8 +91,9 @@
 
 .memoryTabActive {
   border-bottom-color: var(--accent);
-  background: var(--accent-active);
-  color: var(--accent);
+  background: var(--accent-subtle);
+  color: var(--color-text);
+  font-weight: 600;
 }
 
 .memoryTabCount {
@@ -545,14 +548,14 @@
 }
 
 .emptyAllClearIcon {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 22px;
   color: #34d399;
   letter-spacing: 2px;
 }
 
 .emptyAllClearTitle {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: var(--fs-label-xs);
   color: #34d399;
   letter-spacing: 2px;
@@ -900,7 +903,7 @@
 }
 
 .reviewCardTypeName {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: var(--fs-label-xs);
   font-weight: 700;
   letter-spacing: 2px;
@@ -1076,7 +1079,7 @@
 }
 
 .nodeDetailType {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: var(--fs-label-xs);
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -1191,17 +1194,18 @@
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 5px 16px;
-  border: 1px solid rgba(0, 212, 255, 0.35);
-  background: rgba(8, 12, 16, 0.88);
-  font-family: var(--font-mono);
+  padding: 6px 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+  font-family: var(--font-sans);
   font-size: var(--fs-label-xs);
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
   text-transform: uppercase;
   pointer-events: none;
-  backdrop-filter: blur(4px);
+  box-shadow: var(--shadow-sm);
   white-space: nowrap;
   animation: focusModeIn 0.2s ease;
 }
@@ -1222,18 +1226,20 @@
 }
 
 .graphLoadingLabel {
-  font-family: var(--font-display);
-  font-size: var(--fs-label-xs);
-  color: var(--accent);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  opacity: 0.8;
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  opacity: 0.95;
 }
 
 .graphLoadingBar {
   width: 200px;
-  height: 1px;
-  background: rgba(0, 212, 255, 0.1);
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
   overflow: hidden;
 }
 

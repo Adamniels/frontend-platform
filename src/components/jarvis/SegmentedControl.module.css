@@ -1,11 +1,13 @@
-/* Sharp HUD segmented control — matches memory tab family, reusable for filters. */
+/* Segmented control — admin tabs / filters */
 .root {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: stretch;
   border: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-card) 92%, white 8%);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .rootFill {
@@ -29,20 +31,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 0 18px;
+  gap: 8px;
+  padding: 0 16px;
   min-height: 44px;
   margin: 0;
   border: none;
   border-bottom: 2px solid transparent;
-  border-right: 1px solid var(--accent-dim);
+  border-right: 1px solid var(--color-border);
   background: transparent;
   color: var(--color-text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label-sm);
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-md);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: none;
   cursor: pointer;
   transition:
     color 0.15s,
@@ -61,8 +63,9 @@
 
 .segmentActive {
   border-bottom-color: var(--accent);
-  background: var(--accent-active);
-  color: var(--accent);
+  background: var(--accent-subtle);
+  color: var(--color-text);
+  font-weight: 600;
 }
 
 /* Only strip (fill) mode: drop trailing divider */

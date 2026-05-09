@@ -1,10 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { animate, stagger, createTimeline } from "animejs";
-import { prefersReducedMotion } from "@/lib/anime/motion";
 import { AccessGateProvider, useAccessGate } from "./AccessGateProvider";
 import { BootOverlay } from "./BootOverlay";
 import { MainNav } from "./MainNav";
@@ -42,8 +40,6 @@ function AppShellFrame({ children }: AppShellProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { status, unlockError, unlock, lock, bootRunId, completeBoot } = useAccessGate();
-  const notificationsRef = useRef<HTMLElement>(null);
-
   useEffect(() => {
     const stored = readStoredAccent();
     if (stored) applyAccentToDocument(stored);
@@ -68,32 +64,6 @@ function AppShellFrame({ children }: AppShellProps) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  // Animate notification panel + cards when opened
-  useEffect(() => {
-    if (!notificationsOpen || !notificationsRef.current || prefersReducedMotion()) return;
-    const panel = notificationsRef.current;
-    const cards = Array.from(panel.querySelectorAll<HTMLElement>(`.${styles.notificationCard}`));
-
-    const tl = createTimeline();
-
-    tl.add(panel, {
-      translateX: [320, 0],
-      opacity: [0, 1],
-      duration: 300,
-      ease: "outExpo",
-    });
-
-    if (cards.length > 0) {
-      tl.add(cards, {
-        opacity: [0, 1],
-        translateY: [10, 0],
-        duration: 240,
-        ease: "outExpo",
-        delay: stagger(55),
-      }, "-=120");
-    }
-  }, [notificationsOpen]);
 
   return (
     <PendingInputProvider>
@@ -132,7 +102,7 @@ function AppShellFrame({ children }: AppShellProps) {
           <div className={styles.content}>{children}</div>
         </div>
         {notificationsOpen ? (
-          <aside ref={notificationsRef} className={styles.notifications}>
+          <aside className={styles.notifications}>
             <div className={styles.notificationsHead}>
               <span>Notifications</span>
               <button type="button" onClick={() => setNotificationsOpen(false)} aria-label="Close notifications">
@@ -191,7 +161,7 @@ function JarvisChevron() {
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M9 18l6-6-6-6"
-        stroke="var(--color-text-dim)"
+        stroke="var(--color-sidebar-text-dim)"
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"

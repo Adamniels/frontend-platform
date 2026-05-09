@@ -21,8 +21,11 @@ export function writeStoredBrightness(value: number): void {
   }
 }
 
+/** Maps settings slider (20–100) to a gentle content brightness for the light workspace. */
 export function applyBrightnessToDocument(percent: number): void {
   if (typeof document === "undefined") return;
   const v = Math.min(100, Math.max(20, percent));
-  document.documentElement.style.setProperty("--shell-brightness", String(v / 60));
+  const t = (v - 20) / 80;
+  const factor = 0.88 + t * 0.2;
+  document.documentElement.style.setProperty("--shell-brightness", String(factor));
 }

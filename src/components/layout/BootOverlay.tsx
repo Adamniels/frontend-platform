@@ -10,11 +10,11 @@ type BootOverlayProps = {
 };
 
 const BOOT_LINES = [
-  "LOADING NEURAL INTERFACE...",
-  "CALIBRATING USER MODEL...",
-  "SYNCING KNOWLEDGE GRAPH...",
-  "PERSONALIZING FEED...",
-  "SYSTEM READY",
+  "Loading workspace…",
+  "Applying preferences…",
+  "Preparing navigation…",
+  "Fetching latest state…",
+  "Ready",
 ];
 
 export function BootOverlay({ onComplete }: BootOverlayProps) {
@@ -47,8 +47,7 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
       onComplete: () => {
         animate(overlay, {
           opacity: [1, 0],
-          scale: [1, 1.04],
-          duration: 400,
+          duration: 320,
           ease: "outExpo",
           onComplete: () => {
             onComplete?.();
@@ -125,7 +124,7 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
         />
         <circle cx="40" cy="40" r="4" fill="var(--accent)" />
       </svg>
-      <div className={styles.label}>INITIALIZING JARVIS</div>
+      <div className={styles.label}>Loading</div>
       <div ref={counterRef} className={styles.counter}>000%</div>
       <div className={styles.bootSub}>
         {BOOT_LINES.map((line, i) => (

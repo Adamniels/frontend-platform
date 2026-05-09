@@ -110,7 +110,7 @@ export function JarvisScreen() {
                 icon={<JarvisIcon name="mic" size={12} color="currentColor" />}
               />
               <button type="button" className={`${styles.chatSend} ${prompt.trim() ? styles.chatSendOn : ""}`}>
-                <JarvisIcon name="send" size={12} color={prompt.trim() ? "#070c14" : "var(--color-text-dim)"} />
+                <JarvisIcon name="send" size={12} color={prompt.trim() ? "#ffffff" : "var(--color-text-dim)"} />
               </button>
             </div>
           </div>

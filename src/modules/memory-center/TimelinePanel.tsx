@@ -150,8 +150,10 @@ function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
 
       ctx.save(); ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#080c10"; ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(0,212,255,0.06)"; ctx.lineWidth = 0.5;
+      ctx.fillStyle = "#eceef2";
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "rgba(15,23,42,0.07)";
+      ctx.lineWidth = 0.5;
       for (let gx = 0; gx < W; gx += 42) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
       for (let gy = 0; gy < H; gy += 42) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
 

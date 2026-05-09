@@ -1,55 +1,70 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(10px);
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(6px);
   z-index: 200;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 100px;
+  padding-top: 12vh;
 }
 
 .panel {
   width: 100%;
-  max-width: 540px;
+  max-width: 520px;
   margin: 0 var(--space-4);
-  background: color-mix(in srgb, var(--color-card) 95%, white 5%);
-  border: 1px solid var(--color-border-strong);
-  border-radius: 0;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   padding: var(--space-5);
-  /* entrance driven by anime.js */
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), var(--glow-accent);
+  box-shadow: var(--shadow-md);
+  animation: searchPanelIn 0.22s ease-out;
+}
+
+@keyframes searchPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .input {
   width: 100%;
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--color-border);
-  color: var(--accent);
-  font-family: var(--font-display);
-  font-size: 16px;
-  letter-spacing: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body-md);
+  letter-spacing: 0;
   outline: none;
-  padding: 4px 0 14px;
+  padding: 12px 14px;
   margin-bottom: var(--space-4);
+}
+
+.input:focus {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--color-border));
 }
 
 .results {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .row {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 11px 12px;
-  border-radius: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.12s ease;
   border: none;
   width: 100%;
   background: transparent;
@@ -57,26 +72,27 @@
 }
 
 .row:hover {
-  background: var(--accent-hover);
+  background: var(--color-surface);
 }
 
 .title {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: var(--fs-body-md);
   color: var(--color-text);
+  font-weight: 500;
 }
 
 .empty {
   font-family: var(--font-sans);
-  font-size: 13px;
-  color: var(--color-text-dim);
-  padding: 8px 12px;
+  font-size: var(--fs-label-md);
+  color: var(--color-text-muted);
+  padding: 10px 12px;
 }
 
 .hint {
   margin-top: var(--space-4);
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: var(--fs-label-sm);
   color: var(--color-text-dim);
   padding-top: var(--space-3);
   border-top: 1px solid var(--color-border);

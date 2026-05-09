@@ -8,18 +8,19 @@
 }
 
 .greet {
-  font-family: var(--font-mono);
-  font-size: var(--fs-label-xs);
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-sm);
   color: var(--color-text-muted);
-  letter-spacing: 3px;
+  letter-spacing: 0.04em;
   margin-bottom: 6px;
 }
 
 .headline {
-  font-family: var(--font-display);
-  font-size: 22px;
-  color: var(--accent);
-  letter-spacing: 2px;
+  font-family: var(--font-sans);
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
@@ -54,9 +55,10 @@
 }
 
 .score {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 26px;
-  color: #ff9500;
+  font-weight: 700;
+  color: var(--color-warning);
 }
 
 .gridTwo {
@@ -81,9 +83,10 @@
 
 .cardTitle,
 .cardTitleAmber {
-  font-family: var(--font-display);
-  font-size: 14px;
-  letter-spacing: 1px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-md);
+  font-weight: 600;
+  letter-spacing: 0.01em;
   margin: 0 0 8px;
 }
 
@@ -92,15 +95,15 @@
 }
 
 .cardTitleAmber {
-  color: #ff9500;
+  color: var(--color-warning);
 }
 
 .cardBody {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: var(--fs-body-sm);
   color: var(--color-text);
   margin: 0;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 .tags {
@@ -119,8 +122,10 @@
 
 .statValue {
   margin-top: 4px;
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
   line-height: 1;
 }
 
