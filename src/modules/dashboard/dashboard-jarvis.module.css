@@ -61,6 +61,36 @@
   color: var(--color-warning);
 }
 
+.scoreHint {
+  margin-top: 6px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-xs);
+  color: var(--color-text-muted);
+  max-width: 22ch;
+  margin-left: auto;
+}
+
+.strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.statFootnote {
+  margin-top: 8px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-xs);
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.placeholderCopy {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body-sm);
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
 .gridTwo {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -95,3 +95,13 @@
   font-family: var(--font-sans);
   font-size: 14px;
 }
+
+.hint {
+  margin: 0;
+  padding: 0 4px 24px;
+  font-size: var(--fs-label-sm);
+  color: var(--color-text-dim);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  max-width: 52ch;
+}

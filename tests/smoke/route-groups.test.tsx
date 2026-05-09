@@ -4,10 +4,10 @@ import { afterEach } from "vitest";
 import { describe, expect, it } from "vitest";
 import { PendingInputProvider } from "@/components/layout/PendingInputContext";
 import { DashboardView } from "@/modules/dashboard";
-import { NewsExperience } from "@/modules/news";
+import { NewsView } from "@/modules/news";
 import { SideLearningExperience } from "@/modules/side-learning";
 import { WorkflowRunsView } from "@/modules/workflow-runs";
-import { SavedItemsExperience } from "@/modules/saved-items";
+import { SavedItemsView } from "@/modules/saved-items";
 import { SettingsView } from "@/modules/settings";
 import { ProfileView } from "@/modules/profile";
 import { StatsView } from "@/modules/stats";
@@ -30,6 +30,9 @@ describe("route group: dashboard", () => {
     render(
       <DashboardView
         data={{ greeting: "Hello", activeRuns: 1, itemsNeedingAttention: 0, savedItems: 47 }}
+        inputNeededItems={[]}
+        ongoingSession={null}
+        newsFeedCount={3}
       />,
     );
     expect(screen.getByRole("heading", { name: /overview/i })).toBeInTheDocument();
@@ -40,8 +43,8 @@ describe("route group: dashboard", () => {
 
 describe("route group: content (news + side learning)", () => {
   it("renders news feed chrome", () => {
-    render(<NewsExperience />);
-    expect(screen.getByRole("heading", { name: /personalized feed/i })).toBeInTheDocument();
+    render(<NewsView items={[]} />);
+    expect(screen.getByRole("heading", { name: /news feed/i })).toBeInTheDocument();
   });
 
   it("renders side learning topics", () => {
@@ -72,7 +75,7 @@ describe("route group: workflows", () => {
 
 describe("route group: library (saved items)", () => {
   it("renders saved library", () => {
-    render(<SavedItemsExperience />);
+    render(<SavedItemsView items={[]} />);
     expect(screen.getByRole("heading", { name: /saved library/i })).toBeInTheDocument();
   });
 });

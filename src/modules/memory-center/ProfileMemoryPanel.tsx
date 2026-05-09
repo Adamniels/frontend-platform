@@ -85,10 +85,9 @@ export function ProfileMemoryPanel() {
     <div>
       {err ? <JarvisInlineError title="Save failed" message={err} /> : null}
       <JarvisCard hover={false}>
-        <h3 className={styles.h3}>You told us</h3>
-        <p className={styles.lead}>
-          This is what you&apos;ve said directly to the platform. It carries the most weight when personalizing
-          your experience.
+        <div className={styles.sectionTitleJarvis}>Your answers</div>
+        <p className={styles.sectionLead}>
+          Edit the fields below and save. This is the highest-trust slice of memory for personalization.
         </p>
         <div className={styles.field}>
           <label className={styles.label} htmlFor={gId}>

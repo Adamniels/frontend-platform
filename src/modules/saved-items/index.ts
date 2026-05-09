@@ -1,2 +1,2 @@
 export { SavedItemsScreen } from "./SavedItemsScreen";
-export { SavedItemsExperience } from "./SavedItemsExperience";
+export { SavedItemsView } from "./SavedItemsView";

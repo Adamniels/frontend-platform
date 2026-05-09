@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { formatLoadError } from "@/lib/utils/error-message";
@@ -16,9 +17,6 @@ import {
   type ProceduralRuleSummaryV1,
   type ProfileMemoryV1,
 } from "@/lib/api/adapters/memory-center";
-import {
-  MOCK_RELATIONSHIPS,
-} from "./memory-mock";
 import styles from "./memory-center.module.css";
 
 // ── Colours ──────────────────────────────────────────────────────────────────
@@ -1286,33 +1284,44 @@ export function MemoryGraphPanel() {
 
   if (res.status === "loading") {
     return (
-      <div className={styles.graphLoadingWrap}>
-        <div className={styles.graphLoadingLabel}>INITIALISING MEMORY NETWORK</div>
-        <div className={styles.graphLoadingBar}>
-          <div className={styles.graphLoadingBarFill} />
+      <JarvisCard hover={false} className={styles.canvasChromeCard}>
+        <div className={styles.graphLoadingWrap}>
+          <div className={styles.graphLoadingLabel}>INITIALISING MEMORY NETWORK</div>
+          <div className={styles.graphLoadingBar}>
+            <div className={styles.graphLoadingBarFill} />
+          </div>
         </div>
-      </div>
+      </JarvisCard>
     );
   }
   if (res.status === "error") {
     return (
-      <div className={styles.errorWrap}>
+      <JarvisCard hover={false} className={styles.canvasChromeCard}>
         <JarvisInlineError title="Memory graph unavailable" message={formatLoadError(res.error)} />
-      </div>
+      </JarvisCard>
     );
   }
 
-  // TODO: replace MOCK_RELATIONSHIPS with GET /api/v1/memory/relationships when endpoint is available
   const graphData: GraphInputData = {
     semantics: res.data.semantics,
     rules: res.data.rules,
     profileFacts: profileToFacts(res.data.profile),
-    relationships: MOCK_RELATIONSHIPS,
+    relationships: [],
   };
 
   return (
     <div className={styles.canvasPanel}>
-      <MemoryGraphCanvas data={graphData} />
+      <JarvisCard hover={false} className={styles.graphNoticeCard}>
+        <div className={styles.sectionTitleJarvis}>Relationships</div>
+        <p className={styles.graphNoticeBody}>
+          Edges are not loaded: there is no memory relationships endpoint on{" "}
+          <code className={styles.inlineCode}>/api/v1</code> yet. Nodes below are live semantics, rules, and profile
+          facts; edges will appear when the API exists.
+        </p>
+      </JarvisCard>
+      <div className={styles.graphCanvasWrap}>
+        <MemoryGraphCanvas data={graphData} />
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { ReviewQueuePanel } from "@/modules/memory-center/ReviewQueuePanel";
-import memStyles from "@/modules/memory-center/memory-center.module.css";
+import { MemorySectionHeader } from "@/modules/memory-center/MemorySectionHeader";
 
 export const metadata = {
   title: "Memory — Review",
@@ -7,13 +7,12 @@ export const metadata = {
 
 export default function MemoryReviewPage() {
   return (
-    <div>
-      <h3 className={memStyles.h3}>Suggestions for you</h3>
-      <p className={memStyles.muted} style={{ marginBottom: 16, maxWidth: "56ch" }}>
-        Approve to add a suggestion to your memory, or skip if it doesn’t feel right. You can always revisit
-        learned items later.
-      </p>
+    <>
+      <MemorySectionHeader
+        title="Suggestions for you"
+        description="Approve to add a suggestion to your memory, or skip if it does not feel right. You can revisit learned items later."
+      />
       <ReviewQueuePanel />
-    </div>
+    </>
   );
 }

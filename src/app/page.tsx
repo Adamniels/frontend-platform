@@ -1,5 +1,5 @@
 import { StartScreen } from "@/modules/start";
 
-export default function HomePage() {
+export default async function HomePage() {
   return <StartScreen />;
 }

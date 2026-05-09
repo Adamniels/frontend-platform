@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
+import { ProgressBar } from "@/components/jarvis/ProgressBar";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import {
@@ -102,25 +104,25 @@ function RuleCard({ rule, onMutated }: RuleCardProps) {
   const ruleContent = detail?.ruleContent ?? rule.ruleContent ?? null;
 
   return (
-    <div className={`${styles.ruleCard} ${deprecated ? styles.ruleCardDeprecated : ""}`}>
-      <div style={{ cursor: "pointer", userSelect: "none" }} onClick={() => void expand()}>
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+    <JarvisCard hover={false} className={deprecated ? styles.memoryCardDimmed : undefined}>
+      <div className={styles.ruleCardHeaderClick} onClick={() => void expand()}>
+        <div className={styles.ruleCardTopRow}>
           <div className={styles.priorityBox}>
             <span className={styles.priorityBoxNum}>{rule.priority}</span>
             <span className={styles.priorityBoxLabel}>PRI</span>
           </div>
 
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className={styles.semanticCardMeta} style={{ marginBottom: 5 }}>
+          <div className={styles.ruleCardBodyGrow}>
+            <div className={`${styles.semanticCardMeta} ${styles.ruleMetaTight}`}>
               <span className={styles.semanticCardKey}>{rule.ruleName}</span>
               <JarvisTag label={rule.workflowType} color={wc.color} />
               <JarvisTag label={status} color={sc.color} />
               <JarvisTag label={`v${rule.version}`} />
             </div>
-            <p className={styles.semanticCardClaim} style={{ margin: 0 }}>
+            <p className={styles.ruleCardPreview}>
               {ruleContent
                 ? (ruleContent.length > 110 ? ruleContent.slice(0, 108) + "…" : ruleContent)
-                : <span style={{ color: "var(--color-text-dim)", fontStyle: "italic" }}>Content loading…</span>
+                : <span className={styles.ruleCardPreviewMuted}>Content loading…</span>
               }
             </p>
           </div>
@@ -133,13 +135,11 @@ function RuleCard({ rule, onMutated }: RuleCardProps) {
             <div className={styles.ruleStatLabel}>Priority</div>
             <PriorityDots value={rule.priority} />
           </div>
-          <div style={{ flex: 1 }}>
+          <div className={styles.semanticBarGrow}>
             <div className={styles.ruleStatLabel}>
-              Authority <span style={{ color: "var(--accent)" }}>{Math.round(rule.authorityWeight * 100)}%</span>
+              Authority <span className={styles.ruleStatAccent}>{Math.round(rule.authorityWeight * 100)}%</span>
             </div>
-            <div className={styles.barTrackSlim}>
-              <div style={{ height: "100%", width: `${rule.authorityWeight * 100}%`, background: "var(--accent)" }} />
-            </div>
+            <ProgressBar value={Math.round(rule.authorityWeight * 100)} label="" />
           </div>
           <div className={styles.ruleStatSource}>{(rule.source ?? "—").replace(/_/g, " ")}</div>
         </div>
@@ -147,10 +147,10 @@ function RuleCard({ rule, onMutated }: RuleCardProps) {
 
       {expanded && (
         <div className={styles.semanticCardExpanded}>
-          {err && <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-danger)", margin: 0 }}>{err}</p>}
+          {err ? <p className={styles.panelErrorText}>{err}</p> : null}
 
           {loadingDetail ? (
-            <p className={styles.muted} style={{ fontSize: 11 }}>Loading rule detail…</p>
+            <p className={`${styles.muted} ${styles.ruleDetailLoading}`}>Loading rule detail…</p>
           ) : ruleContent ? (
             <div className={styles.ruleContent}>
               <div className={styles.ruleContentCorner} />
@@ -197,7 +197,7 @@ function RuleCard({ rule, onMutated }: RuleCardProps) {
           </div>
         </div>
       )}
-    </div>
+    </JarvisCard>
   );
 }
 
@@ -234,7 +234,7 @@ export function ProceduralRulesPanel() {
   const activeCount = all.filter((r) => r.status === "Active").length;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", overflow: "hidden", height: "100%" }}>
+    <div className={styles.panelStack}>
       <div className={styles.toolbar}>
         {STATUSES.map((s) => {
           const sc     = s !== "All" ? ST_COL[s] : null;

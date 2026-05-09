@@ -1,5 +1,5 @@
 import { MemoryGraphPanel } from "@/modules/memory-center/MemoryGraphPanel";
-import memStyles from "@/modules/memory-center/memory-center.module.css";
+import { MemorySectionHeader } from "@/modules/memory-center/MemorySectionHeader";
 
 export const metadata = {
   title: "Memory — Graph",
@@ -7,9 +7,12 @@ export const metadata = {
 
 export default function MemoryGraphPage() {
   return (
-    <div>
-      <h3 className={memStyles.h3}>Memory graph</h3>
+    <>
+      <MemorySectionHeader
+        title="Memory graph"
+        description="Spatial view of live semantics, rules, and profile facts. Relationship edges appear when the API supports them."
+      />
       <MemoryGraphPanel />
-    </div>
+    </>
   );
 }

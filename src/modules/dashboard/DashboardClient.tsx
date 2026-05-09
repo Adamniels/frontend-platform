@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { animate, stagger } from "animejs";
 import { prefersReducedMotion } from "@/lib/anime/motion";
+import type { InputNeededItem } from "@/lib/api/adapters/input-needed";
+import type { OngoingSessionPreview } from "@/lib/side-learning/get-first-ongoing-session-preview";
 import type { DashboardSummary } from "@/types/dashboard";
-import { MOCK_INPUT_ITEMS, MOCK_PROGRESS_METRICS, MOCK_QUICK_ACTIONS, MOCK_SESSION_CARD } from "./dashboard-mock";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
@@ -13,7 +14,21 @@ import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { ProgressBar } from "@/components/jarvis/ProgressBar";
 import styles from "./dashboard-jarvis.module.css";
 
-type DashboardClientProps = { summary: DashboardSummary } | { loadError: string };
+const QUICK_ACTIONS = [
+  { label: "News feed", href: "/news" },
+  { label: "Side learning", href: "/side-learning" },
+  { label: "Saved items", href: "/saved-items" },
+  { label: "Insights", href: "/insights" },
+] as const;
+
+type DashboardClientProps =
+  | { loadError: string }
+  | {
+      summary: DashboardSummary;
+      inputNeededItems: InputNeededItem[];
+      ongoingSession: OngoingSessionPreview | null;
+      newsFeedCount: number | null;
+    };
 
 export function DashboardClient(props: DashboardClientProps) {
   const router = useRouter();
@@ -26,20 +41,20 @@ export function DashboardClient(props: DashboardClientProps) {
   });
 
   const summary = "summary" in props ? props.summary : null;
+  const inputNeededItems = "inputNeededItems" in props ? props.inputNeededItems : [];
+  const ongoingSession = "ongoingSession" in props ? props.ongoingSession : null;
+  const newsFeedCount = "newsFeedCount" in props ? props.newsFeedCount : null;
 
-  // Page reveal + card stagger entrance
   useEffect(() => {
     const el = containerRef.current;
     if (!el || prefersReducedMotion()) return;
 
-    // Scan reveal — content sweeps in from top
     animate(el, {
       clipPath: ["inset(0 0 100% 0)", "inset(0 0 0% 0)"],
       duration: 450,
       ease: "outExpo",
     });
 
-    // Cards stagger in
     const cards = el.querySelectorAll<HTMLElement>("[data-card]");
     animate(cards, {
       opacity: [0, 1],
@@ -48,7 +63,6 @@ export function DashboardClient(props: DashboardClientProps) {
       ease: "outExpo",
       delay: stagger(75, { start: 120 }),
     });
-
   }, []);
 
   const streakNote = useMemo(() => {
@@ -78,6 +92,23 @@ export function DashboardClient(props: DashboardClientProps) {
     );
   }
 
+  const articlesStat = newsFeedCount !== null ? String(newsFeedCount) : "—";
+  const savedStat = summary?.savedItems !== undefined ? String(summary.savedItems) : "—";
+
+  const sessionBody = ongoingSession ? (
+    <>
+      You have an active side-learning session. Estimated{" "}
+      <strong>{Math.max(ongoingSession.estimatedMinutesRemaining, 1)} min</strong> remaining in open sections.
+    </>
+  ) : (
+    <>Start a session from Side learning to track progress here.</>
+  );
+
+  const briefLead =
+    newsFeedCount !== null
+      ? `${newsFeedCount} article${newsFeedCount === 1 ? "" : "s"} in your feed from the API.`
+      : "Open the news feed to load items from GET /api/v1/news/feed.";
+
   return (
     <div ref={containerRef} className={styles.root}>
       <div className={styles.headerRow}>
@@ -89,40 +120,37 @@ export function DashboardClient(props: DashboardClientProps) {
           <p className={styles.sub}>{streakNote}</p>
         </div>
         <div className={styles.scoreBlock}>
-          <div className={styles.scoreLabel}>PERSONALIZATION SCORE</div>
-          <div className={styles.score}>94%</div>
+          <div className={styles.scoreLabel}>PERSONALIZATION</div>
+          <div className={styles.score}>N/A</div>
+          <div className={styles.scoreHint}>Not exposed by the API yet.</div>
         </div>
       </div>
 
       <div className={styles.gridTwo}>
         <JarvisCard onClick={() => router.push("/news")} className={styles.click}>
-          <div className={styles.meta}>TODAY · 3 NEW ARTICLES</div>
-          <h3 className={styles.cardTitle}>Daily brief ready</h3>
-          <p className={styles.cardBody}>
-            AI regulation frameworks advance in the EU, quantum breakthroughs at MIT, and agentic systems reshape
-            enterprise workflows.
-          </p>
+          <div className={styles.meta}>NEWS · FROM API</div>
+          <h3 className={styles.cardTitle}>News feed</h3>
+          <p className={styles.cardBody}>{briefLead}</p>
           <div className={styles.tags}>
-            <JarvisTag label="AI Policy" />
-            <JarvisTag label="Quantum" />
-            <JarvisTag label="Agents" color="#ff9500" />
+            <JarvisTag label="Open feed" />
           </div>
         </JarvisCard>
-        {/* TODO: wire to active session from GET /api/v1/side-learning/topics */}
         <JarvisCard onClick={() => router.push("/side-learning")} className={styles.click}>
-          <div className={styles.meta}>PAUSED · {MOCK_SESSION_CARD.progress}% COMPLETE</div>
-          <h3 className={styles.cardTitleAmber}>{MOCK_SESSION_CARD.title}</h3>
-          <p className={styles.cardBody}>You left off at the exercise section. Estimated {MOCK_SESSION_CARD.estimatedMinutes} min to complete.</p>
-          <ProgressBar value={MOCK_SESSION_CARD.progress} color="#ff9500" />
+          <div className={styles.meta}>SIDE LEARNING · {ongoingSession ? "ONGOING" : "IDLE"}</div>
+          <h3 className={styles.cardTitleAmber}>
+            {ongoingSession ? ongoingSession.title : "No active session"}
+          </h3>
+          <p className={styles.cardBody}>{sessionBody}</p>
+          {ongoingSession ? <ProgressBar value={ongoingSession.progressPct} color="#ff9500" /> : null}
         </JarvisCard>
       </div>
 
       <div className={styles.gridFour}>
         {[
-          ["Sessions", summary?.activeRuns ?? 24, "var(--accent)", ""],
-          ["Articles", 187, "var(--accent)", ""],
-          ["Saved", summary?.savedItems ?? 43, "#ff9500", ""],
-          ["Streak", 12, "#00ff88", "d"],
+          ["Sessions", String(summary?.activeRuns ?? 0), "var(--accent)", ""],
+          ["Articles", articlesStat, "var(--accent)", ""],
+          ["Saved", savedStat, "#ff9500", ""],
+          ["Streak", "—", "#00ff88", ""],
         ].map(([label, value, color, unit]) => (
           <JarvisCard key={label}>
             <div className={styles.statLabel}>{label}</div>
@@ -130,6 +158,9 @@ export function DashboardClient(props: DashboardClientProps) {
               {value}
               <span>{unit}</span>
             </div>
+            {label === "Streak" ? (
+              <div className={styles.statFootnote}>Not tracked by the API.</div>
+            ) : null}
           </JarvisCard>
         ))}
       </div>
@@ -138,15 +169,15 @@ export function DashboardClient(props: DashboardClientProps) {
         <JarvisCard>
           <div className={styles.meta}>PROGRESS</div>
           <div className={styles.stack}>
-            {MOCK_PROGRESS_METRICS.map((metric) => (
-              <ProgressBar key={metric.label} label={metric.label} value={metric.value} />
-            ))}
+            <p className={styles.placeholderCopy}>
+              Section-level progress lives on each side-learning session. Open Side learning for the full breakdown.
+            </p>
           </div>
         </JarvisCard>
         <JarvisCard>
           <div className={styles.meta}>QUICK ACTIONS</div>
           <div className={styles.quickGrid}>
-            {MOCK_QUICK_ACTIONS.map((action) => (
+            {QUICK_ACTIONS.map((action) => (
               <JarvisButton
                 key={action.label}
                 label={action.label}
@@ -160,8 +191,7 @@ export function DashboardClient(props: DashboardClientProps) {
         </JarvisCard>
       </div>
 
-      {/* TODO: replace with live items from GET /api/v1/human-input/items */}
-      {MOCK_INPUT_ITEMS.map((item) =>
+      {inputNeededItems.map((item) =>
         dismissed.includes(item.id) ? null : (
           <JarvisCard key={item.id}>
             <div className={styles.inputRow}>

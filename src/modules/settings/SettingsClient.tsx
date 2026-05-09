@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useId, useLayoutEffect, useState } from "react";
 import type { UserSettings } from "@/lib/api/adapters/settings";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
@@ -26,17 +27,12 @@ const ACCENTS = [{ label: "Default teal", value: PLATFORM_LIGHT_ACCENT }];
 type SettingsClientProps = { settings: UserSettings };
 
 export function SettingsClient({ settings }: SettingsClientProps) {
+  const router = useRouter();
   const brightnessRangeId = useId();
   const [curAccent, setCurAccent] = useState(() => readStoredAccent() ?? PLATFORM_LIGHT_ACCENT);
   const [brightness, setBrightness] = useState(() => readStoredBrightness() ?? 60);
   const [scanLines, setScanLines] = useState(() => readStoredScanlines());
   const [hexGrid, setHexGrid] = useState(() => readStoredHexGrid());
-  const [notifs, setNotifs] = useState({
-    brief: true,
-    sessions: true,
-    input: true,
-    memory: false,
-  });
 
   useLayoutEffect(() => {
     applyAccentToDocument(curAccent);
@@ -74,7 +70,27 @@ export function SettingsClient({ settings }: SettingsClientProps) {
       <div className={styles.main}>
         <h2 className={styles.h2}>Settings</h2>
         <JarvisCard hover={false} className={styles.card}>
-          <div className={styles.sectionTitle}>Accent color</div>
+          <div className={styles.sectionTitle}>Account (from server)</div>
+          <p className={styles.sectionLead}>
+            Values from <code className={styles.inlineCode}>GET /api/v1/settings</code>. Updating them in the UI is
+            not wired yet—use your account tools or a future settings API.
+          </p>
+          <div className={styles.serverKv}>
+            <span className={styles.serverKvLabel}>Theme</span>
+            <span className={styles.serverKvVal}>{settings.theme}</span>
+          </div>
+          <div className={styles.serverKv}>
+            <span className={styles.serverKvLabel}>Digest email</span>
+            <span className={styles.serverKvVal}>{settings.digestEmail ? "On" : "Off"}</span>
+          </div>
+        </JarvisCard>
+        <JarvisCard hover={false} className={styles.card}>
+          <div className={styles.sectionTitle}>On this device</div>
+          <p className={styles.sectionLead}>
+            Accent, scan lines, grid, and brightness are stored in <strong>localStorage</strong> only—they are not
+            sent to the server.
+          </p>
+          <div className={styles.subSectionTitle}>Accent color</div>
           <div className={styles.accentRow}>
             {ACCENTS.map((a) => (
               <button
@@ -89,16 +105,15 @@ export function SettingsClient({ settings }: SettingsClientProps) {
                   style={{
                     background: a.value,
                     outline: curAccent === a.value ? "2px solid var(--color-text)" : "2px solid transparent",
-                    boxShadow: curAccent === a.value ? `0 8px 18px color-mix(in srgb, ${a.value} 30%, transparent)` : "none",
+                    boxShadow:
+                      curAccent === a.value ? `0 8px 18px color-mix(in srgb, ${a.value} 30%, transparent)` : "none",
                   }}
                 />
                 <span className={styles.accentLabel}>{a.label}</span>
               </button>
             ))}
           </div>
-        </JarvisCard>
-        <JarvisCard hover={false} className={styles.card}>
-          <div className={styles.sectionTitle}>Display effects</div>
+          <div className={styles.subSectionTitle}>Display effects</div>
           <div className={styles.row}>
             <span>Scan lines overlay</span>
             <SettingsToggle on={scanLines} onChange={applyScanLines} />
@@ -129,29 +144,12 @@ export function SettingsClient({ settings }: SettingsClientProps) {
             </div>
           </div>
         </JarvisCard>
-        <JarvisCard hover={false} className={styles.card}>
-          <div className={styles.sectionTitle}>Notifications</div>
-          <div className={styles.row}>
-            <span>Daily brief ready</span>
-            <SettingsToggle on={notifs.brief} onChange={(v) => setNotifs((n) => ({ ...n, brief: v }))} />
-          </div>
-          <div className={styles.row}>
-            <span>New sessions available</span>
-            <SettingsToggle on={notifs.sessions} onChange={(v) => setNotifs((n) => ({ ...n, sessions: v }))} />
-          </div>
-          <div className={styles.row}>
-            <span>Workflow needs input</span>
-            <SettingsToggle on={notifs.input} onChange={(v) => setNotifs((n) => ({ ...n, input: v }))} />
-          </div>
-          <div className={styles.row}>
-            <span>Memory updates</span>
-            <SettingsToggle on={notifs.memory} onChange={(v) => setNotifs((n) => ({ ...n, memory: v }))} />
-          </div>
-        </JarvisCard>
         <JarvisCard hover={false} className={styles.cardMuted}>
-          <p className={styles.serverNote}>
-            Theme preference from server: <strong>{settings.theme}</strong>. Digest email:{" "}
-            <strong>{settings.digestEmail ? "on" : "off"}</strong>.
+          <div className={styles.sectionTitle}>Notifications</div>
+          <p className={styles.placeholderBody}>
+            There is no notifications or push-preferences API on <code className={styles.inlineCode}>/api/v1</code>{" "}
+            yet. Email digest is the only server-backed preference today (see Account above). In-app alerts will
+            appear here when the backend supports them.
           </p>
         </JarvisCard>
       </div>
@@ -161,17 +159,25 @@ export function SettingsClient({ settings }: SettingsClientProps) {
             <div className={styles.avatar}>OP</div>
             <div>
               <div className={styles.accountName}>Operator</div>
-              <div className={styles.accountPlan}>Pro Plan</div>
+              <div className={styles.accountPlan}>Session</div>
             </div>
           </div>
-          <JarvisButton label="Edit account" variant="ghost" className={styles.fullBtn} />
+          <JarvisButton
+            label="Open profile"
+            variant="ghost"
+            className={styles.fullBtn}
+            onClick={() => router.push("/profile")}
+          />
         </JarvisCard>
         <JarvisCard hover={false} className={styles.card}>
           <div className={styles.sectionTitle}>Data and privacy</div>
+          <p className={styles.sectionLead}>These actions are not connected to an API yet.</p>
           {["Export my data", "Reset preferences", "Clear memory"].map((l) => (
             <div key={l} className={styles.privacyRow}>
               <span>{l}</span>
-              <JarvisButton label="Open" variant="ghost" size="sm" className={styles.miniBtn} />
+              <span className={styles.unavailablePill} title="Not implemented">
+                Unavailable
+              </span>
             </div>
           ))}
         </JarvisCard>

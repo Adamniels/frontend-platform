@@ -1,26 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { JarvisTag } from "@/components/jarvis/JarvisTag";
-import { MOCK_SEARCH_HITS } from "./search-mock";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import styles from "./SearchOverlay.module.css";
 
 type SearchOverlayProps = {
   open: boolean;
   onClose: () => void;
-  onSelect?: (type: string, title: string) => void;
 };
 
-export function SearchOverlay({ open, onClose, onSelect }: SearchOverlayProps) {
+export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const [q, setQ] = useState("");
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
-
-  // TODO: replace with GET /api/v1/search when endpoint is available
-  const results = useMemo(
-    () => (q.length > 1 ? MOCK_SEARCH_HITS.filter((r) => r.title.toLowerCase().includes(q.toLowerCase())) : []),
-    [q],
-  );
 
   const close = useCallback(() => {
     setQ("");
@@ -77,6 +68,8 @@ export function SearchOverlay({ open, onClose, onSelect }: SearchOverlayProps) {
 
   if (!open) return null;
 
+  const typed = q.trim().length > 0;
+
   return (
     <div className={styles.backdrop} onClick={close} role="presentation">
       <div
@@ -94,29 +87,25 @@ export function SearchOverlay({ open, onClose, onSelect }: SearchOverlayProps) {
           className={styles.input}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search..."
+          placeholder="Search…"
           aria-label="Search query"
         />
         <div className={styles.results}>
-          {results.map((r, i) => (
-            <button
-              type="button"
-              key={`${r.title}-${i}`}
-              className={styles.row}
-              onClick={() => {
-                onSelect?.(r.type, r.title);
-                close();
-              }}
-            >
-              <JarvisTag label={r.type} />
-              <span className={styles.title}>{r.title}</span>
-            </button>
-          ))}
+          {typed ? (
+            <div className={styles.apiMissing} role="status">
+              <p className={styles.apiMissingTitle}>Search is not wired yet</p>
+              <p className={styles.apiMissingBody}>
+                There is no global search endpoint on <code className={styles.inlineCode}>/api/v1</code>. Use the
+                sidebar to open Dashboard, News, Side learning, and other areas.
+              </p>
+            </div>
+          ) : (
+            <p className={styles.idleHint}>
+              Command palette (⌘K / Ctrl+K). Results will appear here when a search API exists.
+            </p>
+          )}
         </div>
-        {q.length > 1 && results.length === 0 ? (
-          <div className={styles.empty}>No results for &quot;{q}&quot;</div>
-        ) : null}
-        <div className={styles.hint}>Press Esc to close · Enter to search</div>
+        <div className={styles.hint}>Press Esc to close</div>
       </div>
     </div>
   );

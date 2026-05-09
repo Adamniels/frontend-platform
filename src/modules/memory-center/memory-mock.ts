@@ -1,10 +1,6 @@
 /**
  * Mock data for Memory Center and app-wide features that don't yet have backend support.
  *
- * Live exports (still used by production code):
- *  - MOCK_RELATIONSHIPS  → MemoryGraphPanel (no /api/v1/memory/relationships endpoint yet)
- *  - MOCK_NOTIFICATIONS  → AppShell (no /api/v1/notifications endpoint yet)
- *
  * Dormant exports (types/data kept for reference; no longer used in production code paths):
  *  - MOCK_SEMANTICS, MOCK_EVENTS, MOCK_RULES, MOCK_PROFILE_FACTS, MOCK_REVIEW_QUEUE
  *    These were previously used as silent fallbacks — that pattern has been removed.
@@ -59,14 +55,6 @@ export type MockProfileFact = {
   value: string;
   confidence: number;
   status: string;
-};
-
-export type MockRelationship = {
-  id: number;
-  sourceId: number;
-  targetId: number;
-  type: string;
-  label: string;
 };
 
 export type MockReviewItem = {
@@ -146,21 +134,6 @@ export const MOCK_PROFILE_FACTS: MockProfileFact[] = [
   { id: 2, key: "role", value: "Software Engineer", confidence: 0.98, status: "Active" },
   { id: 3, key: "location", value: "Sweden (CET timezone)", confidence: 0.97, status: "Active" },
   { id: 4, key: "experience_years", value: "5+ years professional experience", confidence: 0.9, status: "Active" },
-];
-
-export const MOCK_RELATIONSHIPS: MockRelationship[] = [
-  { id: 1, sourceId: 4, targetId: 6, type: "Learning", label: "drives learning of" },
-  { id: 2, sourceId: 2, targetId: 3, type: "WorksOn", label: "used in" },
-  { id: 3, sourceId: 6, targetId: 2, type: "AppliedTo", label: "applied alongside" },
-  { id: 4, sourceId: 1, targetId: 12, type: "InterestedIn", label: "shapes" },
-  { id: 5, sourceId: 10, targetId: 3, type: "AppliedTo", label: "applied in" },
-  { id: 6, sourceId: 5, targetId: 3, type: "Uses", label: "used for" },
-  { id: 7, sourceId: 7, targetId: 4, type: "InterestedIn", label: "informs" },
-  { id: 8, sourceId: 8, targetId: 1, type: "AppliedTo", label: "guides" },
-  { id: 9, sourceId: 4, targetId: 7, type: "InterestedIn", label: "influences" },
-  { id: 10, sourceId: 11, targetId: 3, type: "WorksOn", label: "part of" },
-  { id: 11, sourceId: 6, targetId: 4, type: "Learning", label: "reinforces" },
-  { id: 12, sourceId: 12, targetId: 1, type: "AppliedTo", label: "applies to" },
 ];
 
 export const MOCK_REVIEW_QUEUE: MockReviewItem[] = [

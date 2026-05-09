@@ -8,6 +8,7 @@ import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import { CURRENT_USER_ID, fetchSemantic, fetchSemanticEvidence, type SemanticMemoryV1 } from "@/lib/api/adapters/memory-center";
 import { ScoreBar } from "./ScoreBar";
+import { MemorySectionHeader } from "./MemorySectionHeader";
 import styles from "./memory-center.module.css";
 
 function n(s: string) {
@@ -65,17 +66,21 @@ export function LearnedDetailPanel({ id }: Props) {
   const m = res.data;
 
   return (
-    <div>
+    <div className={styles.detailStack}>
+      <MemorySectionHeader
+        title="Semantic detail"
+        description="Why this entry exists, how confident we are, and supporting activity when available."
+      />
       <Link className={styles.link} href="/memory/learned">
-        ← All learned
+        ← All semantics
       </Link>
-      <JarvisCard hover={false} className="screenEnter" style={{ marginTop: 12 }}>
-        <h3 className={styles.h3}>You might notice</h3>
+      <JarvisCard hover={false} className={styles.detailCard}>
+        <div className={styles.sectionTitleJarvis}>You might notice</div>
         <p className={styles.claim}>{m.claim}</p>
         {m.key ? <p className={styles.muted}>Label: {m.key}</p> : null}
         {m.domain ? <p className={styles.muted}>Topic: {m.domain}</p> : null}
-        <p className={styles.muted} style={{ marginTop: 8 }}>
-          This is currently <strong style={{ color: "var(--accent)" }}>{statusLabel(m.status)}</strong>.
+        <p className={styles.detailStatusLine}>
+          This is currently <strong className={styles.detailStatusEm}>{statusLabel(m.status)}</strong>.
         </p>
         <p className={styles.aside}>{whyText(m)}</p>
         <ScoreBar
@@ -89,8 +94,8 @@ export function LearnedDetailPanel({ id }: Props) {
           hint="Raised by direct input or a review you approved."
         />
       </JarvisCard>
-      <JarvisCard hover={false} style={{ marginTop: 12 }}>
-        <h3 className={styles.h3}>Supporting activity</h3>
+      <JarvisCard hover={false} className={styles.detailCard}>
+        <div className={styles.sectionTitleJarvis}>Supporting activity</div>
         {ev.status === "loading" ? <p className={styles.muted}>Loading…</p> : null}
         {ev.status === "error" ? <JarvisInlineError title="Evidence" message={formatLoadError(ev.error)} /> : null}
         {ev.status === "success" && ev.data.length === 0 ? (
@@ -102,13 +107,11 @@ export function LearnedDetailPanel({ id }: Props) {
         {ev.status === "success" && ev.data.length > 0 ? (
           <ul className={styles.evidence}>
             {ev.data.map((e) => (
-              <li key={e.eventId}>
-                <div>
-                  <strong style={{ color: "var(--color-text)" }}>{e.eventType}</strong>
-                </div>
-                <div style={{ marginTop: 4 }}>{new Date(e.occurredAt).toLocaleString()}</div>
-                {e.note ? <div style={{ marginTop: 4 }}>Note: {e.note}</div> : null}
-                <div style={{ marginTop: 4, fontSize: 11 }}>Relevance: {Math.round(e.strength * 100)}%</div>
+              <li key={e.eventId} className={styles.evidenceItem}>
+                <div className={styles.evidenceType}>{e.eventType}</div>
+                <div className={styles.evidenceMeta}>{new Date(e.occurredAt).toLocaleString()}</div>
+                {e.note ? <div className={styles.evidenceNote}>Note: {e.note}</div> : null}
+                <div className={styles.evidenceStrength}>Relevance: {Math.round(e.strength * 100)}%</div>
               </li>
             ))}
           </ul>

@@ -1,2 +1,2 @@
 export { NewsScreen } from "./NewsScreen";
-export { NewsExperience } from "./NewsExperience";
+export { NewsView } from "./NewsView";

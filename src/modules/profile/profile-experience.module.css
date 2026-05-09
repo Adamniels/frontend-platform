@@ -18,6 +18,24 @@
   padding: 20px 22px;
 }
 
+.cardMuted {
+  padding: 20px 22px;
+  opacity: 0.92;
+}
+
+.placeholderBody {
+  margin: 0;
+  font-size: var(--fs-body-sm);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.inlineCode {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  color: var(--color-text);
+}
+
 .hero {
   display: flex;
   align-items: center;

@@ -1,5 +1,5 @@
 import { ProceduralRulesPanel } from "@/modules/memory-center/ProceduralRulesPanel";
-import memStyles from "@/modules/memory-center/memory-center.module.css";
+import { MemorySectionHeader } from "@/modules/memory-center/MemorySectionHeader";
 
 export const metadata = {
   title: "Memory — Rules",
@@ -7,9 +7,12 @@ export const metadata = {
 
 export default function MemoryProceduralPage() {
   return (
-    <div>
-      <h3 className={memStyles.h3}>How the platform should behave</h3>
+    <>
+      <MemorySectionHeader
+        title="How the platform should behave"
+        description="Procedural rules shape recommendations, summaries, and side workflows. Deprecate rules you no longer want applied."
+      />
       <ProceduralRulesPanel />
-    </div>
+    </>
   );
 }

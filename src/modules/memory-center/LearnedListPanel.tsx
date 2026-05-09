@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import Link from "next/link";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
+import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import { CURRENT_USER_ID, fetchSemantics, type SemanticMemoryV1 } from "@/lib/api/adapters/memory-center";
@@ -25,14 +26,16 @@ function statusLabel(s: string): string {
 }
 
 function LearnedCard({ m }: { m: SemanticMemoryV1 }) {
+  const pending = norm(m.status) === "pendingreview";
   return (
     <div className={styles.listItem}>
       <p className={styles.claim}>{m.claim}</p>
-      <div className={styles.meta}>
-        <span className={norm(m.status) === "pendingreview" ? styles.pillEmph : styles.pill}>
-          {statusLabel(m.status)}
-        </span>
-        {m.domain ? <span>Topic: {m.domain}</span> : null}
+      <div className={styles.learnedMetaRow}>
+        <JarvisTag
+          label={statusLabel(m.status)}
+          color={pending ? "var(--color-warning)" : "var(--color-text-muted)"}
+        />
+        {m.domain ? <JarvisTag label={m.domain} /> : null}
       </div>
       <ScoreBar label="How sure we are" value01={m.confidence} hint="Based on patterns in your activity." />
       <ScoreBar

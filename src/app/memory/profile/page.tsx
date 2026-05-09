@@ -1,5 +1,5 @@
 import { ProfileMemoryPanel } from "@/modules/memory-center/ProfileMemoryPanel";
-import memStyles from "@/modules/memory-center/memory-center.module.css";
+import { MemorySectionHeader } from "@/modules/memory-center/MemorySectionHeader";
 
 export const metadata = {
   title: "Memory — Profile",
@@ -7,13 +7,12 @@ export const metadata = {
 
 export default function MemoryProfilePage() {
   return (
-    <div>
-      <h3 className={memStyles.h3}>What you said directly</h3>
-      <p className={memStyles.muted} style={{ marginBottom: 16, maxWidth: "56ch" }}>
-        Goals and interests you enter here are treated as high-trust. They apply across workflows until you
-        change them.
-      </p>
+    <>
+      <MemorySectionHeader
+        title="What you said directly"
+        description="Goals and interests you enter here are high-trust. They apply across workflows until you change them."
+      />
       <ProfileMemoryPanel />
-    </div>
+    </>
   );
 }

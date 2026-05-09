@@ -1,24 +1,45 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import { CURRENT_USER_ID, fetchMemoryEvents, type MemoryEventV1 } from "@/lib/api/adapters/memory-center";
 import styles from "./memory-center.module.css";
+import {
+  MS_PER_DAY,
+  alignTickStart,
+  eventHitRadiusPx,
+  eventMarkerRadius,
+  formatTickLabel,
+  formatVisibleRangeLabel,
+  pickTickStep,
+} from "./timeline-canvas-helpers";
 
-// ── Lane config ───────────────────────────────────────────────────────────────
+/** Room for longest lane label ("RECOMMENDATION") right-aligned in monospace. */
+const LEFT_GUTTER = 142;
+const TOP_PAD = 18;
+const RULER_H = 50;
 
-const DOMAIN_LANES: Record<string, { y: number; color: string; rgb: string; label: string }> = {
-  Learning:       { y: 0.18, color: "#6b8fc3", rgb: "107,143,195", label: "LEARNING" },
-  Workflow:       { y: 0.38, color: "#b58a49", rgb: "181,138,73",  label: "WORKFLOW" },
-  Recommendation: { y: 0.62, color: "#b68bbd", rgb: "182,139,189", label: "RECOMMENDATION" },
-  Profile:        { y: 0.80, color: "#79a88b", rgb: "121,168,139", label: "PROFILE" },
-};
+/** Lane centers as fraction of inner height — tight 12% spacing, vertically centered. */
+const DOMAIN_LANES = {
+  Learning: { y: 0.3, color: "#6b8fc3", rgb: "107,143,195", label: "LEARNING" },
+  Workflow: { y: 0.42, color: "#b58a49", rgb: "181,138,73", label: "WORKFLOW" },
+  Recommendation: { y: 0.54, color: "#b68bbd", rgb: "182,139,189", label: "RECOMMENDATION" },
+  Profile: { y: 0.66, color: "#79a88b", rgb: "121,168,139", label: "PROFILE" },
+} as const;
 
-const AXIS_Y_FRAC = 0.50;
-const MS_PER_DAY  = 86400000;
+type DomainKey = keyof typeof DOMAIN_LANES;
 
 const EV_ICONS: Record<string, string> = {
   learning_session_completed: "◎",
@@ -33,420 +54,535 @@ const EV_ICONS: Record<string, string> = {
 };
 
 type TlEvent = MemoryEventV1 & {
-  _x?: number; _y?: number; _r?: number;
   payload?: Record<string, unknown>;
 };
 
-// ── Canvas component ──────────────────────────────────────────────────────────
+function laneKey(domain: string | null | undefined): DomainKey {
+  const s = (domain ?? "").trim().toLowerCase();
+  const hit = (Object.keys(DOMAIN_LANES) as DomainKey[]).find((k) => k.toLowerCase() === s);
+  return hit ?? "Workflow";
+}
 
-type TimelineCanvasProps = { events: TlEvent[]; outerRef: React.RefObject<HTMLDivElement | null> };
+function xFromTime(t: number, minT: number, scale: number, offset: number): number {
+  return LEFT_GUTTER + ((t - minT) / MS_PER_DAY) * scale + offset;
+}
 
-function TimelineCanvas({ events: rawEvents, outerRef }: TimelineCanvasProps) {
-  const canvasRef   = useRef<HTMLCanvasElement>(null);
-  const frameRef    = useRef<number>(0);
-  const tickRef     = useRef(0);
-  const dprRef      = useRef(1);
+function timeFromX(x: number, minT: number, scale: number, offset: number): number {
+  return minT + ((x - LEFT_GUTTER - offset) / scale) * MS_PER_DAY;
+}
 
+export type TimelineCanvasHandle = {
+  zoomIn: () => void;
+  zoomOut: () => void;
+  fit: () => void;
+};
+
+type TimelineCanvasProps = {
+  events: TlEvent[];
+  shellRef: React.RefObject<HTMLDivElement | null>;
+  onViewportLabelChange?: (label: string) => void;
+};
+
+type TooltipState = { ev: TlEvent; left: number; top: number };
+
+const TimelineCanvas = forwardRef<TimelineCanvasHandle, TimelineCanvasProps>(function TimelineCanvas(
+  { events: rawEvents, shellRef, onViewportLabelChange },
+  ref,
+) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<number>(0);
   const tlRef = useRef({
-    scale: 0, targetScale: 0,
-    offset: 0, targetOffset: 0,
-    minTime: 0, maxTime: 0,
+    scale: 1,
+    targetScale: 1,
+    offset: 0,
+    targetOffset: 0,
+    minTime: 0,
+    maxTime: 0,
     events: [] as TlEvent[],
     hovered: null as TlEvent | null,
-    entryProgress: 0,
   });
-
-  const dragRef     = useRef({ active: false, lx: 0, startOffset: 0 });
+  const dragRef = useRef({ active: false, lx: 0, startX: 0, dragged: false });
   const selectedRef = useRef<TlEvent | null>(null);
+  const lastViewportLabelRef = useRef("");
+  const onViewportLabelChangeRef = useRef(onViewportLabelChange);
+
   const [selected, setSelected] = useState<TlEvent | null>(null);
+  const [tooltip, setTooltip] = useState<TooltipState | null>(null);
 
-  function fitAll() {
+  useEffect(() => {
+    onViewportLabelChangeRef.current = onViewportLabelChange;
+  }, [onViewportLabelChange]);
+
+  const fitAll = useCallback(() => {
+    const canvas = canvasRef.current;
     const tl = tlRef.current;
-    const canvas = canvasRef.current; if (!canvas) return;
+    if (!canvas) return;
+    const { width: W } = canvas.getBoundingClientRect();
+    const usableW = Math.max(120, W - LEFT_GUTTER - 20);
+    const spanDays = Math.max((tl.maxTime - tl.minTime) / MS_PER_DAY, 0.25);
+    const s = usableW / (spanDays + 0.6);
+    const mid = (tl.minTime + tl.maxTime) / 2;
+    const cx = LEFT_GUTTER + (W - LEFT_GUTTER) / 2;
+    tl.targetScale = Math.max(6, Math.min(900, s));
+    tl.targetOffset = cx - LEFT_GUTTER - ((mid - tl.minTime) / MS_PER_DAY) * tl.targetScale;
+  }, []);
+
+  const zoomAround = useCallback((factor: number, anchorX: number | null) => {
+    const canvas = canvasRef.current;
+    const tl = tlRef.current;
+    if (!canvas) return;
     const W = canvas.getBoundingClientRect().width;
-    const span = (tl.maxTime - tl.minTime) / MS_PER_DAY;
-    const pad  = 2.5;
-    const s    = W / (span + pad * 2);
-    const o    = W * 0.5 - ((tl.maxTime + tl.minTime) / 2 / MS_PER_DAY) * s + (tl.minTime / MS_PER_DAY) * s;
-    tl.targetScale  = s;
-    tl.targetOffset = o - pad * s;
-  }
+    const cx = anchorX ?? LEFT_GUTTER + (W - LEFT_GUTTER) / 2;
+    const tMid = timeFromX(cx, tl.minTime, tl.targetScale, tl.targetOffset);
+    const newScale = Math.max(6, Math.min(900, tl.targetScale * factor));
+    tl.targetScale = newScale;
+    tl.targetOffset = cx - LEFT_GUTTER - ((tMid - tl.minTime) / MS_PER_DAY) * newScale;
+  }, []);
 
-  function zoomAround(factor: number) {
-    const tl = tlRef.current;
-    const canvas = canvasRef.current; if (!canvas) return;
-    const W  = canvas.getBoundingClientRect().width;
-    const cx = W / 2;
-    const newScale = Math.max(8, Math.min(800, tl.targetScale * factor));
-    const mid = tl.minTime + ((cx - tl.targetOffset) / tl.targetScale) * MS_PER_DAY;
-    tl.targetOffset = cx - ((mid - tl.minTime) / MS_PER_DAY) * newScale;
-    tl.targetScale  = newScale;
-  }
-
-  // Expose zoom/fit to toolbar via DOM events on the outer wrapper
-  useEffect(() => {
-    const el = outerRef.current; if (!el) return;
-    const onZoomIn  = () => zoomAround(1 / 0.7);
-    const onZoomOut = () => zoomAround(0.7);
-    const onFit     = () => fitAll();
-    el.addEventListener("tl:zoom-in",  onZoomIn);
-    el.addEventListener("tl:zoom-out", onZoomOut);
-    el.addEventListener("tl:fit",      onFit);
-    return () => {
-      el.removeEventListener("tl:zoom-in",  onZoomIn);
-      el.removeEventListener("tl:zoom-out", onZoomOut);
-      el.removeEventListener("tl:fit",      onFit);
-    };
-  }, [outerRef]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      zoomIn: () => zoomAround(1 / 0.78, null),
+      zoomOut: () => zoomAround(0.78, null),
+      fit: () => fitAll(),
+    }),
+    [fitAll, zoomAround],
+  );
 
   useEffect(() => {
-    const canvas    = canvasRef.current;
-    const container = outerRef.current;
-    if (!canvas || !container) return;
+    const c0 = canvasRef.current;
+    const s0 = shellRef.current;
+    if (c0 == null || s0 == null) return;
+    const canvas = c0;
+    const shell = s0;
 
     const sorted = [...rawEvents].sort(
-      (a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime()
+      (a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime(),
     );
-    const minTime = new Date(sorted[0]?.occurredAt ?? Date.now()).getTime();
-    const maxTime = new Date(sorted[sorted.length - 1]?.occurredAt ?? Date.now()).getTime();
+    const minTime = sorted.length
+      ? new Date(sorted[0]!.occurredAt).getTime()
+      : Date.now() - 7 * MS_PER_DAY;
+    const maxTime = sorted.length
+      ? new Date(sorted[sorted.length - 1]!.occurredAt).getTime()
+      : Date.now();
     const tl = tlRef.current;
-    tl.events = sorted; tl.minTime = minTime; tl.maxTime = maxTime;
-    tl.entryProgress = 0;
+    tl.events = sorted;
+    tl.minTime = minTime;
+    tl.maxTime = Math.max(maxTime, minTime + MS_PER_DAY * 0.25);
+    lastViewportLabelRef.current = "";
 
-    function initScale(W: number) {
-      const span = (maxTime - minTime) / MS_PER_DAY;
-      const pad  = 2.5;
-      const s    = W / (span + pad * 2);
-      const o    = W * 0.5 - ((maxTime + minTime) / 2 / MS_PER_DAY) * s + (minTime / MS_PER_DAY) * s;
-      tl.scale = s; tl.targetScale = s;
-      tl.offset = o - pad * s; tl.targetOffset = o - pad * s;
+    function sizeCanvasToShell() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = shell.getBoundingClientRect();
+      canvas.width = Math.max(1, rect.width * dpr);
+      canvas.height = Math.max(1, rect.height * dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
     }
 
-    function resize() {
-      const dpr  = window.devicePixelRatio || 1; dprRef.current = dpr;
-      const rect = container!.getBoundingClientRect();
-      canvas!.width  = rect.width  * dpr;
-      canvas!.height = rect.height * dpr;
-      canvas!.style.width  = rect.width  + "px";
-      canvas!.style.height = rect.height + "px";
-      if (tl.scale === 0) initScale(rect.width);
-    }
-    resize();
-    const ro = new ResizeObserver(resize); ro.observe(container);
-
-    function timeToX(t: number) { return tl.offset + ((t - tl.minTime) / MS_PER_DAY) * tl.scale; }
-    function xToTime(x: number) { return tl.minTime + ((x - tl.offset) / tl.scale) * MS_PER_DAY; }
-
-    function draw() {
-      const ctx  = canvas!.getContext("2d")!;
-      const dpr  = dprRef.current;
-      const W    = canvas!.width  / dpr;
-      const H    = canvas!.height / dpr;
-      const time = tickRef.current / 60;
-
-      tl.scale  += (tl.targetScale  - tl.scale)  * 0.14;
-      tl.offset += (tl.targetOffset - tl.offset)  * 0.14;
-      tl.entryProgress = Math.min(1, tl.entryProgress + 0.018);
-
-      ctx.save(); ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#eceef2";
-      ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(15,23,42,0.07)";
-      ctx.lineWidth = 0.5;
-      for (let gx = 0; gx < W; gx += 42) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
-      for (let gy = 0; gy < H; gy += 42) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
-
-      const axisY   = H * AXIS_Y_FRAC;
-      const LABEL_W = 120;
-
-      ctx.save();
-      ctx.beginPath(); ctx.rect(LABEL_W, 0, W - LABEL_W, H); ctx.clip();
-
-      const visStart = xToTime(LABEL_W), visEnd = xToTime(W);
-      const d = new Date(visStart); d.setHours(0, 0, 0, 0);
-      while (d.getTime() < visEnd) {
-        const x = timeToX(d.getTime());
-        const isMonday = d.getDay() === 1;
-        ctx.strokeStyle = isMonday ? "rgba(0,212,255,0.18)" : "rgba(0,212,255,0.05)";
-        ctx.lineWidth   = isMonday ? 1 : 0.5;
-        ctx.setLineDash(isMonday ? [] : [4, 6]);
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-        ctx.setLineDash([]);
-        if (tl.scale > 30) {
-          const label = d.toLocaleDateString("en-SE", { month: "short", day: "numeric" }).toUpperCase();
-          ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.82)"; ctx.textAlign = "left";
-          ctx.fillText(label, x + 4, axisY + 12);
-        }
-        d.setDate(d.getDate() + 1);
-      }
-
-      ctx.shadowColor = "rgba(0,212,255,0.25)"; ctx.shadowBlur = 4;
-      ctx.strokeStyle = "rgba(0,212,255,0.35)"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(LABEL_W, axisY); ctx.lineTo(W, axisY); ctx.stroke();
-      ctx.shadowBlur = 0;
-
-      const nowX = timeToX(new Date().getTime());
-      if (nowX >= LABEL_W && nowX <= W) {
-        ctx.strokeStyle = "rgba(181,138,73,0.6)"; ctx.lineWidth = 1.5;
-        ctx.shadowColor = "rgba(181,138,73,0.22)"; ctx.shadowBlur = 6;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath(); ctx.moveTo(nowX, 20); ctx.lineTo(nowX, H - 20); ctx.stroke();
-        ctx.setLineDash([]); ctx.shadowBlur = 0;
-        ctx.font = "10px 'Space Mono',monospace"; ctx.fillStyle = "#b58a49"; ctx.textAlign = "center";
-        ctx.fillText("NOW", nowX, 14);
-      }
-
-      Object.values(DOMAIN_LANES).forEach((lane) => {
-        const laneY = H * lane.y;
-        ctx.strokeStyle = `rgba(${lane.rgb},0.08)`; ctx.lineWidth = 0.5;
-        ctx.setLineDash([2, 8]);
-        ctx.beginPath(); ctx.moveTo(LABEL_W, laneY); ctx.lineTo(W, laneY); ctx.stroke();
-        ctx.setLineDash([]);
-      });
-
-      const hovId = tl.hovered?.id ?? null;
-      const selId = selectedRef.current?.id ?? null;
-
-      tl.events.forEach((ev, i) => {
-        const lane = DOMAIN_LANES[ev.domain ?? ""];
-        if (!lane) return;
-        const evTime = new Date(ev.occurredAt).getTime();
-        const x = timeToX(evTime);
-        if (x < LABEL_W - 20 || x > W + 20) return;
-
-        const laneY = H * lane.y;
-        const isHov = hovId === ev.id, isSel = selId === ev.id;
-        const entryDelay = (i / tl.events.length) * 0.6;
-        const entryAlpha = Math.min(1, Math.max(0, (tl.entryProgress - entryDelay) / 0.4));
-        if (entryAlpha <= 0) return;
-
-        ctx.strokeStyle = `rgba(${lane.rgb},${(isHov||isSel?0.7:0.3)*entryAlpha})`;
-        ctx.lineWidth = isHov||isSel ? 1.5 : 0.8;
-        ctx.beginPath(); ctx.moveTo(x, axisY);
-        const cpY = axisY + (laneY - axisY) * 0.5;
-        ctx.bezierCurveTo(x, cpY, x, cpY, x, laneY); ctx.stroke();
-
-        ctx.strokeStyle = `rgba(${lane.rgb},${0.8*entryAlpha})`; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(x, axisY-4); ctx.lineTo(x, axisY+4); ctx.stroke();
-
-        const pulse = 1 + Math.sin(time * 1.8 + i * 0.7) * 0.12;
-        const baseR = isHov||isSel ? 8 : 5.5;
-        const r     = baseR * pulse;
-
-        const halo = ctx.createRadialGradient(x, laneY, 0, x, laneY, r+14);
-        halo.addColorStop(0, `rgba(${lane.rgb},${(isHov||isSel?0.6:0.25)*entryAlpha})`);
-        halo.addColorStop(1, "transparent");
-        ctx.beginPath(); ctx.arc(x, laneY, r+14, 0, Math.PI*2); ctx.fillStyle = halo; ctx.fill();
-
-        ctx.beginPath(); ctx.arc(x, laneY, r, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(${lane.rgb},${0.15*entryAlpha})`;
-        ctx.strokeStyle = `rgba(${lane.rgb},${(isHov||isSel?1:0.8)*entryAlpha})`;
-        ctx.lineWidth = isHov||isSel ? 2 : 1.2;
-        ctx.globalAlpha = entryAlpha;
-        if (isSel) { ctx.shadowColor = lane.color; ctx.shadowBlur = 8; }
-        ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-
-        const icon = EV_ICONS[ev.eventType] ?? "·";
-        ctx.font = `${Math.max(10, r*0.9)}px monospace`;
-        ctx.fillStyle = lane.color; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.globalAlpha = entryAlpha * 0.9; ctx.fillText(icon, x, laneY);
-        ctx.textBaseline = "alphabetic"; ctx.globalAlpha = 1;
-
-        if (tl.scale > 80 || isHov || isSel) {
-          const lbl = ev.eventType.replace(/_/g, " ").toUpperCase();
-          const fs  = Math.min(12, Math.max(10, tl.scale * 0.04));
-          ctx.font = `${isHov||isSel?"bold ":""}${fs}px 'Space Mono',monospace`;
-          ctx.fillStyle = isHov||isSel ? lane.color : "rgba(122,118,105,0.82)";
-          ctx.textAlign = "center"; ctx.globalAlpha = entryAlpha * (isHov||isSel ? 1 : 0.7);
-          const labelY = laneY < axisY ? laneY - r - 8 : laneY + r + 14;
-          ctx.fillText(lbl.length > 20 ? lbl.slice(0,18)+"…" : lbl, x, labelY);
-          ctx.globalAlpha = 1;
-        }
-
-        ev._x = x; ev._y = laneY; ev._r = r + 8;
-      });
-
-      ctx.restore();
-
-      ctx.fillStyle = "rgba(11,16,24,0.98)"; ctx.fillRect(0, 0, LABEL_W, H);
-      ctx.strokeStyle = "rgba(0,212,255,0.15)"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(LABEL_W, 0); ctx.lineTo(LABEL_W, H); ctx.stroke();
-
-      Object.values(DOMAIN_LANES).forEach((lane) => {
-        const laneY = H * lane.y;
-        ctx.beginPath(); ctx.arc(LABEL_W - 12, laneY, 4, 0, Math.PI*2);
-        ctx.fillStyle = lane.color; ctx.shadowColor = lane.color; ctx.shadowBlur = 4;
-        ctx.fill(); ctx.shadowBlur = 0;
-        ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = `rgba(${lane.rgb},0.85)`;
-        ctx.textAlign = "right"; ctx.textBaseline = "middle";
-        ctx.fillText(lane.label, LABEL_W - 22, laneY);
-        ctx.textBaseline = "alphabetic";
-      });
-      ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.78)";
-      ctx.textAlign = "right"; ctx.textBaseline = "middle";
-      ctx.fillText("TIMELINE", LABEL_W - 22, H * AXIS_Y_FRAC);
-      ctx.textBaseline = "alphabetic";
-
-      if (tl.hovered && tl.hovered._x != null) {
-        const ev   = tl.hovered;
-        const lane = DOMAIN_LANES[ev.domain ?? ""];
-        if (lane) {
-          const tx = Math.min(ev._x! + 14, W - 200);
-          const ty = Math.max(ev._y! - 58, 8);
-          ctx.fillStyle = "rgba(14,21,32,0.98)";
-          ctx.strokeStyle = "rgba(0,212,255,0.18)"; ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.rect(tx, ty, 192, 50); ctx.fill(); ctx.stroke();
-          const evDate = new Date(ev.occurredAt);
-          ctx.font = "bold 11px 'Space Mono',monospace"; ctx.fillStyle = lane.color; ctx.textAlign = "left";
-          ctx.fillText(ev.eventType.replace(/_/g," ").toUpperCase(), tx+10, ty+16);
-          ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(90,122,138,0.82)";
-          ctx.fillText(evDate.toLocaleDateString("en-SE",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).toUpperCase(), tx+10, ty+30);
-          if (ev.workflowId) { ctx.fillStyle="rgba(160,156,142,0.82)"; ctx.fillText(ev.workflowId, tx+10, ty+44); }
-        }
-      }
-
-      if (tickRef.current < 90) {
-        ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "center";
-        ctx.fillText("SCROLL: ZOOM  ·  DRAG: PAN  ·  CLICK: SELECT", W/2, H-12);
-      }
-      ctx.font = "11px 'Space Mono',monospace"; ctx.fillStyle = "rgba(122,118,105,0.75)"; ctx.textAlign = "right";
-      ctx.fillText(`${tl.scale.toFixed(0)}PX/DAY`, W-12, H-12);
-
-      ctx.restore();
+    function applyFitAll() {
+      fitAll();
+      tl.scale = tl.targetScale;
+      tl.offset = tl.targetOffset;
     }
 
-    function loop() { draw(); tickRef.current++; frameRef.current = requestAnimationFrame(loop); }
-    frameRef.current = requestAnimationFrame(loop);
-    return () => { cancelAnimationFrame(frameRef.current); ro.disconnect(); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawEvents]);
+    let rootBg =
+      getComputedStyle(document.documentElement).getPropertyValue("--color-canvas").trim() || "#f1f4f8";
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    function refreshThemeBg() {
+      rootBg =
+        getComputedStyle(document.documentElement).getPropertyValue("--color-canvas").trim() || "#f1f4f8";
+    }
+
+    sizeCanvasToShell();
+    applyFitAll();
+
+    let lastViewportEmitAt = 0;
+    const VIEWPORT_LABEL_MIN_MS = 120;
+
+    const ro = new ResizeObserver(() => {
+      sizeCanvasToShell();
+      refreshThemeBg();
+    });
+    ro.observe(shell);
+
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const tl = tlRef.current;
-      const rect = canvas.getBoundingClientRect(), mx = e.clientX - rect.left;
-      const factor = e.deltaY > 0 ? 0.88 : 1.12;
-      const newScale = Math.max(8, Math.min(800, tl.targetScale * factor));
-      const timeAtCursor = tl.minTime + ((mx - tl.targetOffset) / tl.targetScale) * MS_PER_DAY;
-      tl.targetOffset = mx - ((timeAtCursor - tl.minTime) / MS_PER_DAY) * newScale;
-      tl.targetScale  = newScale;
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const dx = e.deltaX;
+      const dy = e.deltaY;
+      if (e.shiftKey) {
+        tl.targetOffset += dy;
+        return;
+      }
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      // Symmetric axes: only pan when clearly horizontal, only zoom when clearly vertical.
+      // Ignores ambiguous diagonals so horizontal scroll does not nudge zoom.
+      const panHorizontal = adx > ady * 1.2 && adx >= 2;
+      const zoomVertical = ady > adx * 1.2 && ady >= 2;
+      if (panHorizontal) {
+        tl.targetOffset -= dx;
+        return;
+      }
+      if (zoomVertical) {
+        const factor = dy > 0 ? 0.92 : 1 / 0.92;
+        zoomAround(factor, mx);
+      }
     };
     canvas.addEventListener("wheel", onWheel, { passive: false });
-    return () => { canvas.removeEventListener("wheel", onWheel); };
-  }, []);
 
-  useEffect(() => {
-    const end = () => {
-      if (!dragRef.current.active) return;
-      dragRef.current.active = false;
-      const c = canvasRef.current;
-      if (c) c.style.cursor = "grab";
-    };
-    window.addEventListener("pointerup", end);
-    window.addEventListener("pointercancel", end);
+    function draw() {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      const dpr = window.devicePixelRatio || 1;
+      const W = canvas.width / dpr;
+      const H = canvas.height / dpr;
+      const tl = tlRef.current;
+
+      tl.scale += (tl.targetScale - tl.scale) * 0.14;
+      tl.offset += (tl.targetOffset - tl.offset) * 0.14;
+
+      const axisTop = H - RULER_H;
+      const innerH = Math.max(80, axisTop - TOP_PAD);
+
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, W, H);
+
+      ctx.fillStyle = rootBg;
+      ctx.fillRect(0, 0, W, H);
+
+      const laneYs = (Object.keys(DOMAIN_LANES) as DomainKey[]).map((k) => {
+        const lane = DOMAIN_LANES[k];
+        return { key: k, lane, py: TOP_PAD + lane.y * innerH };
+      });
+
+      ctx.strokeStyle = "rgba(15, 23, 42, 0.07)";
+      ctx.lineWidth = 1;
+      for (const ly of laneYs) {
+        ctx.beginPath();
+        ctx.moveTo(LEFT_GUTTER, ly.py);
+        ctx.lineTo(W - 8, ly.py);
+        ctx.stroke();
+      }
+
+      const t0 = tl.minTime - MS_PER_DAY;
+      const t1 = tl.maxTime + MS_PER_DAY;
+      for (let t = Math.floor(t0 / MS_PER_DAY) * MS_PER_DAY; t <= t1; t += MS_PER_DAY) {
+        const x = xFromTime(t, tl.minTime, tl.scale, tl.offset);
+        if (x < LEFT_GUTTER - 4 || x > W + 4) continue;
+        ctx.beginPath();
+        ctx.moveTo(x, TOP_PAD);
+        ctx.lineTo(x, axisTop);
+        ctx.strokeStyle = "rgba(15, 23, 42, 0.045)";
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = "rgba(15, 23, 42, 0.04)";
+      ctx.fillRect(0, TOP_PAD, LEFT_GUTTER - 6, innerH);
+
+      ctx.font = "600 11px ui-monospace, SFMono-Regular, Menlo, monospace";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      for (const ly of laneYs) {
+        ctx.fillStyle = ly.lane.color;
+        ctx.fillText(ly.lane.label, LEFT_GUTTER - 8, ly.py);
+      }
+
+      const now = Date.now();
+      const nowX = xFromTime(now, tl.minTime, tl.scale, tl.offset);
+      if (nowX >= LEFT_GUTTER && nowX <= W - 4) {
+        ctx.setLineDash([4, 6]);
+        ctx.strokeStyle = "rgba(13, 148, 136, 0.45)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(nowX, TOP_PAD);
+        ctx.lineTo(nowX, axisTop);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "rgba(13, 148, 136, 0.9)";
+        ctx.font = "700 9px ui-monospace, SFMono-Regular, Menlo, monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("NOW", nowX, TOP_PAD - 6);
+      }
+
+      for (const ev of tl.events) {
+        const tEv = new Date(ev.occurredAt).getTime();
+        const x = xFromTime(tEv, tl.minTime, tl.scale, tl.offset);
+        const lk = laneKey(ev.domain);
+        const py = TOP_PAD + DOMAIN_LANES[lk].y * innerH;
+        if (x < LEFT_GUTTER - 20 || x > W + 20) continue;
+        const isHi = tl.hovered?.id === ev.id || selectedRef.current?.id === ev.id;
+        const r = eventMarkerRadius(isHi, tl.scale);
+        const col = DOMAIN_LANES[lk].color;
+        const glowR = isHi ? r + 8 : r + 4;
+        ctx.beginPath();
+        ctx.arc(x, py, glowR, 0, Math.PI * 2);
+        ctx.fillStyle = isHi ? `${col}50` : `${col}32`;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x, py, r, 0, Math.PI * 2);
+        ctx.fillStyle = col;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.9)";
+        ctx.lineWidth = isHi ? 2 : 1.25;
+        ctx.stroke();
+        const icon = EV_ICONS[ev.eventType] ?? "•";
+        ctx.fillStyle = "#fff";
+        ctx.font = "600 12px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(icon, x, py + 0.5);
+      }
+
+      const tLeft = timeFromX(LEFT_GUTTER, tl.minTime, tl.scale, tl.offset);
+      const tRight = timeFromX(W, tl.minTime, tl.scale, tl.offset);
+      const lo = Math.min(tLeft, tRight);
+      const hi = Math.max(tLeft, tRight);
+      const visibleMs = Math.max(MS_PER_DAY * 0.02, hi - lo);
+      const rangeLabel = formatVisibleRangeLabel(lo, hi);
+      const tEmit = performance.now();
+      if (
+        rangeLabel !== lastViewportLabelRef.current &&
+        tEmit - lastViewportEmitAt >= VIEWPORT_LABEL_MIN_MS
+      ) {
+        lastViewportLabelRef.current = rangeLabel;
+        lastViewportEmitAt = tEmit;
+        onViewportLabelChangeRef.current?.(rangeLabel);
+      }
+
+      ctx.strokeStyle = "rgba(15, 23, 42, 0.1)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(LEFT_GUTTER, axisTop);
+      ctx.lineTo(W - 8, axisTop);
+      ctx.stroke();
+
+      const plotW = Math.max(40, W - LEFT_GUTTER);
+      const step = pickTickStep(visibleMs, plotW);
+      ctx.fillStyle = "rgba(71, 85, 105, 0.88)";
+      ctx.font = "600 10px ui-monospace, SFMono-Regular, Menlo, monospace";
+      ctx.textBaseline = "top";
+      for (let tk = alignTickStart(lo - step, step); tk <= hi + step; tk += step) {
+        const x = xFromTime(tk, tl.minTime, tl.scale, tl.offset);
+        if (x < LEFT_GUTTER - 2 || x > W + 2) continue;
+        ctx.strokeStyle = "rgba(15, 23, 42, 0.14)";
+        ctx.beginPath();
+        ctx.moveTo(x, axisTop);
+        ctx.lineTo(x, axisTop + 7);
+        ctx.stroke();
+        ctx.textAlign = "center";
+        const label = formatTickLabel(tk, step);
+        ctx.fillText(label, x, axisTop + 11);
+      }
+
+      ctx.restore();
+    }
+
+    function loop() {
+      draw();
+      frameRef.current = requestAnimationFrame(loop);
+    }
+    frameRef.current = requestAnimationFrame(loop);
+
     return () => {
-      window.removeEventListener("pointerup", end);
-      window.removeEventListener("pointercancel", end);
+      cancelAnimationFrame(frameRef.current);
+      ro.disconnect();
+      canvas.removeEventListener("wheel", onWheel);
     };
-  }, []);
+  }, [rawEvents, shellRef, fitAll, zoomAround]);
 
-  function getEventAt(ex: number, ey: number): TlEvent | null {
-    const canvas = canvasRef.current; if (!canvas) return null;
+  function innerMetrics(canvasH: number) {
+    const axisTop = canvasH - RULER_H;
+    const innerH = Math.max(80, axisTop - TOP_PAD);
+    return { axisTop, innerH };
+  }
+
+  function getEventAt(mx: number, my: number): TlEvent | null {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
     const rect = canvas.getBoundingClientRect();
-    const mx = ex - rect.left, my = ey - rect.top;
-    for (const ev of tlRef.current.events) {
-      if (ev._x == null) continue;
-      const d = Math.sqrt((mx - ev._x)**2 + (my - (ev._y??0))**2);
-      if (d < (ev._r ?? 10)) return ev;
+    const x = mx - rect.left;
+    const y = my - rect.top;
+    const tl = tlRef.current;
+    const { innerH } = innerMetrics(rect.height);
+    const hitR = eventHitRadiusPx(tl.scale);
+    let best: TlEvent | null = null;
+    let bestD = hitR;
+    for (const ev of tl.events) {
+      const tEv = new Date(ev.occurredAt).getTime();
+      const ex = xFromTime(tEv, tl.minTime, tl.scale, tl.offset);
+      const lk = laneKey(ev.domain);
+      const ey = TOP_PAD + DOMAIN_LANES[lk].y * innerH;
+      const d = Math.hypot(ex - x, ey - y);
+      if (d < bestD) {
+        bestD = d;
+        best = ev;
+      }
     }
-    return null;
+    return best;
   }
 
-  function onMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
+  function updateTooltipFromPointer(clientX: number, clientY: number) {
+    const inner = innerRef.current;
+    if (!inner) return;
+    const hit = getEventAt(clientX, clientY);
+    tlRef.current.hovered = hit;
+    if (!hit) {
+      setTooltip(null);
+      return;
+    }
+    const b = inner.getBoundingClientRect();
+    const relX = clientX - b.left;
+    const relY = clientY - b.top;
+    const iw = inner.clientWidth;
+    const ih = inner.clientHeight;
+    const left = Math.min(Math.max(8, relX + 14), Math.max(8, iw - 268));
+    const top = Math.min(Math.max(8, relY + 14), Math.max(8, ih - 120));
+    setTooltip({ ev: hit, left, top });
+  }
+
+  function onPointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     if (dragRef.current.active) {
+      if (Math.abs(e.clientX - dragRef.current.startX) > 4) dragRef.current.dragged = true;
       const dx = e.clientX - dragRef.current.lx;
-      tlRef.current.targetOffset = dragRef.current.startOffset + dx;
       dragRef.current.lx = e.clientX;
-      dragRef.current.startOffset = tlRef.current.targetOffset;
-    } else {
-      tlRef.current.hovered = getEventAt(e.clientX, e.clientY);
-      canvasRef.current!.style.cursor = tlRef.current.hovered ? "pointer" : "grab";
+      tlRef.current.targetOffset -= dx;
+      return;
     }
+    const hit = getEventAt(e.clientX, e.clientY);
+    tlRef.current.hovered = hit;
+    canvas.style.cursor = hit ? "pointer" : "grab";
+    updateTooltipFromPointer(e.clientX, e.clientY);
   }
 
-  function onMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
-    dragRef.current = { active: true, lx: e.clientX, startOffset: tlRef.current.targetOffset };
-    canvasRef.current!.style.cursor = "grabbing";
+  function onPointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
+    const c = canvasRef.current;
+    if (!c) return;
+    c.setPointerCapture(e.pointerId);
+    dragRef.current = { active: true, lx: e.clientX, startX: e.clientX, dragged: false };
+    setTooltip(null);
+    c.style.cursor = "grabbing";
   }
 
-  function onMouseUp(e: React.MouseEvent<HTMLCanvasElement>) {
+  function onPointerUp(e: React.PointerEvent<HTMLCanvasElement>) {
+    const c = canvasRef.current;
+    if (c?.hasPointerCapture(e.pointerId)) c.releasePointerCapture(e.pointerId);
+    const didDrag = dragRef.current.dragged;
     dragRef.current.active = false;
-    canvasRef.current!.style.cursor = "grab";
-    const ev = getEventAt(e.clientX, e.clientY);
-    if (ev) {
-      const next = selectedRef.current?.id === ev.id ? null : ev;
-      selectedRef.current = next; setSelected(next);
+    if (c) c.style.cursor = "grab";
+    const hit = getEventAt(e.clientX, e.clientY);
+    if (hit && !didDrag) {
+      const next = selectedRef.current?.id === hit.id ? null : hit;
+      selectedRef.current = next;
+      setSelected(next);
     }
+    dragRef.current.dragged = false;
+    updateTooltipFromPointer(e.clientX, e.clientY);
   }
 
   return (
-    <div style={{ flex: 1, position: "relative", minWidth: 0, cursor: "grab" }}>
+    <div ref={innerRef} className={styles.timelineCanvasInner}>
       <canvas
         ref={canvasRef}
-        onMouseMove={onMouseMove} onMouseDown={onMouseDown}
-        onMouseUp={onMouseUp}
-        onMouseLeave={() => { tlRef.current.hovered = null; }}
-        style={{ display: "block", width: "100%", height: "100%" }}
+        className={styles.timelineCanvas}
+        onPointerMove={onPointerMove}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerLeave={() => {
+          if (dragRef.current.active) return;
+          tlRef.current.hovered = null;
+          setTooltip(null);
+          if (canvasRef.current) canvasRef.current.style.cursor = "grab";
+        }}
       />
-
-      {selected && (() => {
-        const lane = DOMAIN_LANES[selected.domain ?? ""] ?? DOMAIN_LANES.Workflow;
-        return (
-          <div className={styles.eventDetailPanel} style={{ position: "absolute", right: 0, top: 0, bottom: 0 }}>
-            <div style={{ position: "absolute", top: -1, left: -1, width: 8, height: 8, borderTop: `1.5px solid ${lane.color}`, borderLeft: `1.5px solid ${lane.color}` }} />
-            <div style={{ position: "absolute", bottom: -1, right: -1, width: 8, height: 8, borderBottom: `1.5px solid ${lane.color}`, borderRight: `1.5px solid ${lane.color}` }} />
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <JarvisTag label={selected.domain ?? "—"} color={lane.color} />
-              <button className={styles.nodeDetailClose} onClick={() => { selectedRef.current = null; setSelected(null); }}>✕</button>
-            </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, color: "var(--color-text)", letterSpacing: "0.5px", textTransform: "uppercase", lineHeight: 1.5 }}>
-              {selected.eventType.replace(/_/g, " ")}
-            </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-dim)", letterSpacing: "0.8px" }}>
-              {new Date(selected.occurredAt).toLocaleDateString("en-SE", { weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).toUpperCase()}
-            </div>
-            {selected.workflowId && (
-              <div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-dim)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 3 }}>Workflow</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: lane.color }}>{selected.workflowId}</div>
-              </div>
-            )}
-            {selected.payload && Object.keys(selected.payload).length > 0 && (
-              <div className={styles.eventDetailPayload}>
-                <div className={styles.eventDetailPayloadCorner} />
-                <div className={styles.eventDetailPayloadLabel}>Payload</div>
-                <div className={styles.eventDetailPayloadRows}>
-                  {Object.entries(selected.payload).map(([k, v]) => (
-                    <div key={k} className={styles.eventDetailPayloadRow}>
-                      <span className={styles.eventDetailPayloadKey}>{k.replace(/_/g, " ")}</span>
-                      <span className={styles.eventDetailPayloadVal} style={{ color: lane.color }}>{typeof v === "object" ? JSON.stringify(v) : String(v)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+      {tooltip ? (
+        <div className={styles.timelineTooltip} style={{ left: tooltip.left, top: tooltip.top }}>
+          <div className={styles.timelineTooltipDomain} style={{ color: DOMAIN_LANES[laneKey(tooltip.ev.domain)].color }}>
+            {tooltip.ev.domain ?? "—"}
           </div>
-        );
-      })()}
+          <div className={styles.timelineTooltipType}>{tooltip.ev.eventType.replace(/_/g, " ")}</div>
+          <div className={styles.timelineTooltipTime}>
+            {new Date(tooltip.ev.occurredAt).toLocaleString(undefined, {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}
+          </div>
+        </div>
+      ) : null}
+      {selected ? (
+        <div className={styles.eventDetailPanel}>
+          <div className={styles.timelineDetailHeader}>
+            {(() => {
+              const lane = DOMAIN_LANES[laneKey(selected.domain)];
+              return (
+                <>
+                  <JarvisTag label={selected.domain ?? "—"} color={lane.color} />
+                  <button
+                    type="button"
+                    className={styles.nodeDetailClose}
+                    onClick={() => {
+                      selectedRef.current = null;
+                      setSelected(null);
+                    }}
+                  >
+                    ✕
+                  </button>
+                </>
+              );
+            })()}
+          </div>
+          <div className={styles.timelineDetailType}>{selected.eventType.replace(/_/g, " ")}</div>
+          <div className={styles.timelineDetailDate}>
+            {new Date(selected.occurredAt).toLocaleString(undefined, {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </div>
+          {selected.workflowId ? (
+            <div className={styles.timelineDetailBlock}>
+              <div className={styles.timelineDetailLabel}>Workflow</div>
+              <div className={styles.timelineDetailValue}>{selected.workflowId}</div>
+            </div>
+          ) : null}
+          {selected.payload && Object.keys(selected.payload).length > 0 ? (
+            <div className={styles.eventDetailPayload}>
+              <div className={styles.eventDetailPayloadCorner} />
+              <div className={styles.eventDetailPayloadLabel}>Payload</div>
+              <div className={styles.eventDetailPayloadRows}>
+                {Object.entries(selected.payload).map(([k, v]) => (
+                  <div key={k} className={styles.eventDetailPayloadRow}>
+                    <span className={styles.eventDetailPayloadKey}>{k.replace(/_/g, " ")}</span>
+                    <span
+                      className={styles.eventDetailPayloadVal}
+                      style={{ color: DOMAIN_LANES[laneKey(selected.domain)].color }}
+                    >
+                      {typeof v === "object" ? JSON.stringify(v) : String(v)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
-}
-
-// ── Panel ─────────────────────────────────────────────────────────────────────
+});
 
 function toTlEvents(backendEvents: MemoryEventV1[]): TlEvent[] {
   return backendEvents.map((e) => ({
@@ -456,43 +592,84 @@ function toTlEvents(backendEvents: MemoryEventV1[]): TlEvent[] {
 }
 
 export function TimelinePanel() {
-  const load    = useCallback(() => fetchMemoryEvents(CURRENT_USER_ID, 100), []);
-  const res     = useAsyncResource(load, "timeline");
+  const load = useCallback(() => fetchMemoryEvents(CURRENT_USER_ID, 100), []);
+  const res = useAsyncResource(load, "timeline");
   const wrapRef = useRef<HTMLDivElement>(null);
+  const canvasHandleRef = useRef<TimelineCanvasHandle>(null);
+  const [rangeLabel, setRangeLabel] = useState("");
+
+  const events = useMemo(() => {
+    if (res.status !== "success") return [];
+    return toTlEvents(res.data);
+  }, [res]);
 
   if (res.status === "loading") {
-    return <p className={styles.loadingText}>Loading activity timeline…</p>;
+    return (
+      <JarvisCard hover={false} className={styles.canvasChromeCard}>
+        <p className={styles.timelineChromeLead}>Loading activity timeline…</p>
+      </JarvisCard>
+    );
   }
   if (res.status === "error") {
-    return <div className={styles.errorWrap}><JarvisInlineError title="Timeline" message={formatLoadError(res.error)} /></div>;
+    return (
+      <JarvisCard hover={false} className={styles.canvasChromeCard}>
+        <JarvisInlineError title="Timeline" message={formatLoadError(res.error)} />
+      </JarvisCard>
+    );
   }
 
-  const events = toTlEvents(res.data);
-
   if (events.length === 0) {
-    return <p className={styles.loadingText}>No events recorded yet.</p>;
+    return (
+      <JarvisCard hover={false} className={styles.canvasChromeCard}>
+        <p className={styles.timelineChromeLead}>No events recorded yet.</p>
+      </JarvisCard>
+    );
   }
 
   return (
-    <div className={styles.canvasPanel}>
-      {/* Toolbar */}
+    <div className={`${styles.canvasPanel} ${styles.timelineCanvasPanel}`}>
       <div className={styles.timelineToolbar}>
-        <span className={styles.timelineZoomLabel}>ZOOM</span>
-        <button className={styles.timelineZoomBtn} onClick={() => wrapRef.current?.dispatchEvent(new Event("tl:zoom-out"))}>−</button>
-        <button className={styles.timelineZoomBtn} onClick={() => wrapRef.current?.dispatchEvent(new Event("tl:zoom-in"))}>+</button>
-        <button className={styles.timelineFitBtn}  onClick={() => wrapRef.current?.dispatchEvent(new Event("tl:fit"))}>Fit all</button>
+        <span className={styles.timelineZoomLabel}>Zoom</span>
+        <button
+          type="button"
+          className={styles.timelineZoomBtn}
+          onClick={() => canvasHandleRef.current?.zoomOut()}
+          aria-label="Zoom out"
+        >
+          −
+        </button>
+        <button
+          type="button"
+          className={styles.timelineZoomBtn}
+          onClick={() => canvasHandleRef.current?.zoomIn()}
+          aria-label="Zoom in"
+        >
+          +
+        </button>
+        <button type="button" className={styles.timelineFitBtn} onClick={() => canvasHandleRef.current?.fit()}>
+          Fit all
+        </button>
+        {rangeLabel ? <span className={styles.timelineVisibleRange}>{rangeLabel}</span> : null}
         <div className={styles.timelineLegend}>
-          {Object.values(DOMAIN_LANES).map((lane) => (
-            <div key={lane.label} className={styles.timelineLegendItem}>
-              <div className={styles.timelineLegendDot} style={{ background: lane.color, boxShadow: `0 0 5px ${lane.color}` }} />
-              <span className={styles.timelineLegendLabel} style={{ color: `rgba(${lane.rgb},0.65)` }}>{lane.label}</span>
-            </div>
-          ))}
-          <span className={styles.timelineEventCount}>{events.length} EVENTS</span>
+          {(Object.keys(DOMAIN_LANES) as DomainKey[]).map((k) => {
+            const lane = DOMAIN_LANES[k];
+            return (
+              <div key={lane.label} className={styles.timelineLegendItem}>
+                <div className={styles.timelineLegendDot} style={{ background: lane.color }} />
+                <span className={styles.timelineLegendLabel}>{lane.label}</span>
+              </div>
+            );
+          })}
+          <span className={styles.timelineEventCount}>{events.length} events</span>
         </div>
       </div>
-      <div ref={wrapRef} style={{ flex: 1, minHeight: 0, display: "flex", overflow: "hidden" }}>
-        <TimelineCanvas events={events} outerRef={wrapRef} />
+      <div ref={wrapRef} className={styles.timelineCanvasShell}>
+        <TimelineCanvas
+          ref={canvasHandleRef}
+          events={events}
+          shellRef={wrapRef}
+          onViewportLabelChange={setRangeLabel}
+        />
       </div>
     </div>
   );

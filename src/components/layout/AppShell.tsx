@@ -11,8 +11,6 @@ import { SearchOverlay } from "./SearchOverlay";
 import { TopBar } from "./TopBar";
 import { UnlockOverlay } from "./UnlockOverlay";
 import { BrandLogo } from "./BrandLogo";
-import { JarvisTag } from "@/components/jarvis/JarvisTag";
-import { MOCK_NOTIFICATIONS } from "./layout-mock";
 import { applyAccentToDocument, readStoredAccent } from "@/lib/theme/accent";
 import { applyBrightnessToDocument, readStoredBrightness } from "@/lib/theme/brightness";
 import {
@@ -110,24 +108,13 @@ function AppShellFrame({ children }: AppShellProps) {
               </button>
             </div>
             <div className={styles.notificationsBody}>
-              {/* TODO: replace with GET /api/v1/notifications — using mock data until endpoint exists */}
-              {MOCK_NOTIFICATIONS.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={styles.notificationCard}
-                  onClick={() => {
-                    setNotificationsOpen(false);
-                    router.push("/input-needed");
-                  }}
-                >
-                  <div className={styles.notificationMeta}>
-                    <JarvisTag label={item.type} />
-                    <span>{item.time}</span>
-                  </div>
-                  <p>{item.text}</p>
-                </button>
-              ))}
+              <p className={styles.notificationsEmpty}>
+                No notification service is available on <code className={styles.inlineCode}>/api/v1</code> yet.
+                Check <button type="button" className={styles.inlineLink} onClick={() => router.push("/input-needed")}>
+                  Input needed
+                </button>{" "}
+                for items that require your attention.
+              </p>
             </div>
           </aside>
         ) : null}
@@ -140,18 +127,7 @@ function AppShellFrame({ children }: AppShellProps) {
           onUnlock={unlock}
         />
       ) : null}
-      <SearchOverlay
-        open={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        onSelect={(type) => {
-          setSearchOpen(false);
-          if (type === "Session") router.push("/side-learning");
-          else if (type === "Article") router.push("/news");
-          else if (type === "Topic") router.push("/insights");
-          else if (type === "Memory") router.push("/memory");
-          else router.push("/saved-items");
-        }}
-      />
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </PendingInputProvider>
   );
 }

@@ -71,11 +71,19 @@ function ProposalBody({ item, meta }: { item: ReviewCard; meta: ProposalMeta }) 
     case "NewSemantic":
     case "ReviseSemanticClaim":
       return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            {item.key && <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, color: meta.color }}>{item.key}</span>}
-            {item.domain && <JarvisTag label={item.domain} color={meta.color} />}
-            {item.confidence != null && <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: meta.color }}>conf:{Math.round(item.confidence * 100)}%</span>}
+        <div className={styles.reviewProposalStack}>
+          <div className={styles.reviewProposalRow}>
+            {item.key ? (
+              <span className={styles.reviewMonoStrong} style={{ color: meta.color }}>
+                {item.key}
+              </span>
+            ) : null}
+            {item.domain ? <JarvisTag label={item.domain} color={meta.color} /> : null}
+            {item.confidence != null ? (
+              <span className={styles.reviewMonoStrong} style={{ color: meta.color }}>
+                conf:{Math.round(item.confidence * 100)}%
+              </span>
+            ) : null}
           </div>
           {item.claim && (
             <div className={styles.claimBlock}>
@@ -88,8 +96,12 @@ function ProposalBody({ item, meta }: { item: ReviewCard; meta: ProposalMeta }) 
 
     case "AdjustConfidence":
       return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {item.targetKey && <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, color: meta.color }}>{item.targetKey}</span>}
+        <div className={styles.reviewProposalStack}>
+          {item.targetKey ? (
+            <span className={styles.reviewMonoStrong} style={{ color: meta.color }}>
+              {item.targetKey}
+            </span>
+          ) : null}
           {item.currentConfidence != null && item.proposedConfidence != null && (
             <ConfDiff current={item.currentConfidence} proposed={item.proposedConfidence} />
           )}
@@ -99,10 +111,14 @@ function ProposalBody({ item, meta }: { item: ReviewCard; meta: ProposalMeta }) 
     case "MergeDuplicate":
     case "MergeSemanticCandidates":
       return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-dim)", letterSpacing: "1px" }}>MERGE INTO</span>
-            {item.key && <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, color: meta.color }}>→ {item.key}</span>}
+        <div className={styles.reviewProposalStack}>
+          <div className={styles.reviewProposalRow}>
+            <span className={styles.reviewKickerDim}>MERGE INTO</span>
+            {item.key ? (
+              <span className={styles.reviewMonoStrong} style={{ color: meta.color }}>
+                → {item.key}
+              </span>
+            ) : null}
           </div>
           {item.mergeTargets && item.mergeTargets.length > 0 && (
             <div className={styles.mergeFrom}>
@@ -116,17 +132,31 @@ function ProposalBody({ item, meta }: { item: ReviewCard; meta: ProposalMeta }) 
     case "NewProceduralRule":
     case "ReviseProceduralRule":
       return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            {item.ruleName && <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, color: meta.color }}>{item.ruleName}</span>}
-            {item.workflowType && <JarvisTag label={item.workflowType} color={meta.color} />}
-            {item.authorityWeight != null && <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: meta.color }}>auth:{Math.round(item.authorityWeight * 100)}%</span>}
+        <div className={styles.reviewProposalStack}>
+          <div className={styles.reviewProposalRow}>
+            {item.ruleName ? (
+              <span className={styles.reviewMonoStrong} style={{ color: meta.color }}>
+                {item.ruleName}
+              </span>
+            ) : null}
+            {item.workflowType ? <JarvisTag label={item.workflowType} color={meta.color} /> : null}
+            {item.authorityWeight != null ? (
+              <span className={styles.reviewMonoStrong} style={{ color: meta.color }}>
+                auth:{Math.round(item.authorityWeight * 100)}%
+              </span>
+            ) : null}
           </div>
-          {item.ruleContent && (
-            <div style={{ padding: "8px 10px", background: `rgba(${meta.bgRgb},0.04)`, border: `1px solid rgba(${meta.bgRgb},0.15)`, fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--color-text)", lineHeight: 1.7, position: "relative", fontWeight: 500 }}>
+          {item.ruleContent ? (
+            <div
+              className={styles.reviewRuleSnippet}
+              style={{
+                background: `rgba(${meta.bgRgb},0.06)`,
+                borderColor: `rgba(${meta.bgRgb},0.22)`,
+              }}
+            >
               {item.ruleContent}
             </div>
-          )}
+          ) : null}
         </div>
       );
 
@@ -248,9 +278,9 @@ function ReviewCardRow({ item, onChanged }: ReviewCardProps) {
           label={item.status}
           color={statusColor}
         />
-        {item.priority != null && item.priority > 0 && (
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-dim)" }}>P{item.priority}</span>
-        )}
+        {item.priority != null && item.priority > 0 ? (
+          <span className={styles.reviewPriorityPill}>P{item.priority}</span>
+        ) : null}
         <span className={styles.reviewCardDate}>{formatDate(item.createdAt)}</span>
       </div>
 
@@ -268,7 +298,7 @@ function ReviewCardRow({ item, onChanged }: ReviewCardProps) {
       )}
 
       {/* Error */}
-      {err && <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-danger)", margin: "0 0 8px" }}>{err}</p>}
+      {err ? <p className={`${styles.panelErrorText} ${styles.reviewCardErr}`}>{err}</p> : null}
 
       {/* Actions */}
       {pending && (
@@ -318,7 +348,7 @@ export function ReviewQueuePanel() {
   const filtered      = filter === "All" ? withOverrides : withOverrides.filter((c) => c.status === "Pending");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", overflow: "hidden", height: "100%" }}>
+    <div className={styles.panelStack}>
       <div className={styles.toolbar}>
         {pendingCount > 0 && (
           <div className={styles.pendingBadge}>

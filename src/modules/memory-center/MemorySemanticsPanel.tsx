@@ -1,8 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { JarvisButton } from "@/components/jarvis/JarvisButton";
+import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { JarvisInlineError } from "@/components/jarvis/JarvisInlineError";
+import { ProgressBar } from "@/components/jarvis/ProgressBar";
+import { cn } from "@/lib/utils/cn";
 import { formatLoadError } from "@/lib/utils/error-message";
 import { useAsyncResource } from "@/lib/hooks/use-async-resource";
 import {
@@ -47,21 +51,6 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-SE", { year: "numeric", month: "short", day: "numeric" }).toUpperCase();
 }
 
-// ── Confidence bar ────────────────────────────────────────────────────────────
-
-function ConfBar({ value, color }: { value: number; color: string }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <div className={styles.barTrackSlim}>
-        <div style={{ height: "100%", width: `${value * 100}%`, background: color, boxShadow: `0 0 6px ${color}`, transition: "width 0.4s" }} />
-      </div>
-      <span className={styles.semanticCardBarValue} style={{ color }}>
-        {Math.round(value * 100)}%
-      </span>
-    </div>
-  );
-}
-
 // ── Evidence sub-panel ────────────────────────────────────────────────────────
 
 function EvidencePanel({ semanticId }: { semanticId: number }) {
@@ -82,20 +71,16 @@ function EvidencePanel({ semanticId }: { semanticId: number }) {
     <ul className={styles.evidence}>
       {res.data.map((ev: SemanticEvidenceV1) => (
         <li key={ev.eventId}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text)", letterSpacing: "0.5px" }}>
-              {ev.eventType}
-            </span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-dim)" }}>
-              str {Math.round(ev.strength * 100)}%
-            </span>
+          <div className={styles.evidenceRowHead}>
+            <span className={styles.evidenceTypeMono}>{ev.eventType}</span>
+            <span className={styles.evidenceStrengthMono}>str {Math.round(ev.strength * 100)}%</span>
           </div>
-          <div style={{ fontSize: 11, color: "var(--color-text-dim)" }}>
+          <div className={styles.evidenceDetailLine}>
             {formatDate(ev.occurredAt)}
             {ev.sourceKind ? ` · ${ev.sourceKind}` : ""}
             {ev.polarity ? ` · ${ev.polarity}` : ""}
           </div>
-          {ev.note && <div style={{ marginTop: 4, fontSize: 12, color: "var(--color-text-muted)", fontWeight: 500 }}>{ev.note}</div>}
+          {ev.note ? <div className={styles.evidenceNoteBody}>{ev.note}</div> : null}
         </li>
       ))}
     </ul>
@@ -136,7 +121,7 @@ function SemanticCard({ sem, onMutated }: SemanticCardProps) {
   };
 
   return (
-    <div className={`${styles.semanticCard} ${inactive ? styles.semanticCardInactive : ""}`}>
+    <JarvisCard hover={false} className={cn(inactive && styles.memoryCardDimmed)}>
       <div className={styles.semanticCardHeader} onClick={() => setExpanded((x) => !x)}>
         <div className={styles.semanticCardTitleRow}>
           <div className={styles.semanticCardInfo}>
@@ -159,14 +144,18 @@ function SemanticCard({ sem, onMutated }: SemanticCardProps) {
         <div className={styles.semanticCardBars}>
           <div className={styles.semanticCardBarRow}>
             <span className={styles.semanticCardBarLabel}>Confidence</span>
-            <div style={{ flex: 1 }}>
-              <ConfBar value={sem.confidence} color="#6b8fc3" />
+            <div className={styles.semanticBarGrow}>
+              <ProgressBar value={Math.round(sem.confidence * 100)} color="#6b8fc3" label="" />
             </div>
           </div>
           <div className={styles.semanticCardBarRow}>
             <span className={styles.semanticCardBarLabel}>Authority</span>
-            <div style={{ flex: 1 }}>
-              <ConfBar value={sem.authorityWeight} color="rgba(160,156,142,0.55)" />
+            <div className={styles.semanticBarGrow}>
+              <ProgressBar
+                value={Math.round(sem.authorityWeight * 100)}
+                color="rgba(160,156,142,0.75)"
+                label=""
+              />
             </div>
           </div>
         </div>
@@ -174,9 +163,7 @@ function SemanticCard({ sem, onMutated }: SemanticCardProps) {
 
       {expanded && (
         <div className={styles.semanticCardExpanded}>
-          {err && (
-            <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-danger)", margin: 0 }}>{err}</p>
-          )}
+          {err ? <p className={styles.panelErrorText}>{err}</p> : null}
 
           <div className={styles.dateMeta}>
             {sem.createdAt && (
@@ -195,25 +182,25 @@ function SemanticCard({ sem, onMutated }: SemanticCardProps) {
 
           {!inactive && (
             <div className={styles.rowActions}>
-              <button className={styles.btnDanger} disabled={busy} onClick={() => void doArchive()}>
+              <button type="button" className={styles.btnDanger} disabled={busy} onClick={() => void doArchive()}>
                 {busy ? "…" : "Archive"}
               </button>
-              <button className={styles.btnWarn} disabled={busy} onClick={() => void doReject()}>
+              <button type="button" className={styles.btnWarn} disabled={busy} onClick={() => void doReject()}>
                 {busy ? "…" : "Reject"}
               </button>
-              <button
-                className={styles.btnOutline}
+              <JarvisButton
+                label={showEvidence ? "Hide evidence" : "Evidence"}
+                variant="ghost"
+                size="sm"
                 onClick={() => setShowEvidence((x) => !x)}
-              >
-                {showEvidence ? "Hide evidence" : "Evidence"}
-              </button>
+              />
             </div>
           )}
 
           {showEvidence && <EvidencePanel semanticId={sem.id} />}
         </div>
       )}
-    </div>
+    </JarvisCard>
   );
 }
 
@@ -263,7 +250,7 @@ export function MemorySemanticsPanel() {
     });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", overflow: "hidden", height: "100%" }}>
+    <div className={styles.panelStack}>
       <div className={styles.toolbar}>
         <span className={styles.toolbarLabel}>Domain</span>
         {DOMAINS.map((d) => {
