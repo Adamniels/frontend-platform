@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { SegmentedControl } from "@/components/jarvis/SegmentedControl";
@@ -80,6 +80,8 @@ function LearnHistoryTabs({
 }
 
 export function SideLearningExperience() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [mainTab, setMainTab] = useState<"learn" | "history">("learn");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [detail, setDetail] = useState<SideLearningSessionDetail | null>(null);
@@ -95,12 +97,20 @@ export function SideLearningExperience() {
   const [rerollFeedback, setRerollFeedback] = useState("");
   const [reflectionDraft, setReflectionDraft] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const routeSessionId = searchParams.get("sessionId");
 
   const loadSession = useCallback(async () => {
     if (!sessionId) return;
     const d = await getSideLearningSession(sessionId);
     setDetail(d);
   }, [sessionId]);
+
+  useEffect(() => {
+    if (!routeSessionId || routeSessionId === sessionId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate local session state from deep link.
+    setSessionId(routeSessionId);
+    setMainTab("learn");
+  }, [routeSessionId, sessionId]);
 
   useEffect(() => {
     if (!sessionId) {
@@ -200,6 +210,7 @@ export function SideLearningExperience() {
     setChooseExtraFeedback("");
     setRerollFeedback("");
     setReflectionDraft("");
+    if (routeSessionId) router.replace("/side-learning");
   };
 
   const confirmDeleteSession = async (id: string) => {
@@ -230,6 +241,7 @@ export function SideLearningExperience() {
       });
       setSessionId(res.sessionId);
       setMainTab("learn");
+      router.replace(`/side-learning?sessionId=${encodeURIComponent(res.sessionId)}`);
     } catch (e) {
       setError(extractApiMessage(e));
     } finally {
@@ -303,6 +315,7 @@ export function SideLearningExperience() {
   const openHistorySession = (id: string) => {
     setSessionId(id);
     setMainTab("learn");
+    router.replace(`/side-learning?sessionId=${encodeURIComponent(id)}`);
   };
 
   const completedCount = sections.filter((s) => progress[s.id]).length;
@@ -387,7 +400,7 @@ export function SideLearningExperience() {
             <JarvisCard hover={false}>
               {ongoingSessions.map((s) => (
                 <div key={s.id} className={styles.sessionListRow}>
-                  <button type="button" className={styles.sessionListOpen} onClick={() => setSessionId(s.id)}>
+                  <button type="button" className={styles.sessionListOpen} onClick={() => openHistorySession(s.id)}>
                     <div className={styles.historyRowInner}>
                       <div className={styles.sessionListTextBlock}>
                         <div className={styles.sessionListHeadline}>{sessionSummaryHeadline(s)}</div>
@@ -558,10 +571,6 @@ export function SideLearningExperience() {
           <LearnHistoryTabs value={mainTab} onChange={setMainTab} />
         </div>
         {error ? <div className={styles.errorBanner}>{error}</div> : null}
-        <div className={styles.memoryBanner}>
-          Jarvis may propose memories for your review queue after you submit.{" "}
-          <Link href="/memory/review">Open memory inbox</Link>
-        </div>
         <JarvisCard hover={false}>
           <div className={styles.topicTitle}>Reflection</div>
           <p className={styles.muted}>What landed? What didn&apos;t? Any questions or new interests?</p>
@@ -602,10 +611,6 @@ export function SideLearningExperience() {
             <p className={styles.muted}>Your reflection was saved.</p>
           ) : null}
         </JarvisCard>
-        <div className={styles.memoryBanner}>
-          Jarvis may have added suggestions to your memory inbox.{" "}
-          <Link href="/memory/review">Review in memory inbox</Link>
-        </div>
         <JarvisButton label="Start another session" variant="primary" onClick={resetFlow} />
       </div>
     );
@@ -636,10 +641,6 @@ export function SideLearningExperience() {
             <h2 className={styles.h2}>{sec.label}</h2>
           </div>
           <ProgressBar value={pct} showVal={false} />
-          <div className={styles.memoryBanner}>
-            After you finish, Jarvis may propose updates worth reviewing in your{" "}
-            <Link href="/memory/review">memory inbox</Link>.
-          </div>
           <JarvisCard hover={false}>
             {sec.content ? <p className={styles.body}>{sec.content}</p> : null}
             {sec.example ? (

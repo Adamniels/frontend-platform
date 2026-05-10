@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach } from "vitest";
 import { describe, expect, it } from "vitest";
+import { NotificationProvider } from "@/components/layout/NotificationsContext";
 import { PendingInputProvider } from "@/components/layout/PendingInputContext";
 import { DashboardView } from "@/modules/dashboard";
 import { NewsView } from "@/modules/news";
@@ -18,7 +19,11 @@ import type { MemoryInsight } from "@/lib/api/adapters/insights";
 import type { InputNeededItem } from "@/lib/api/adapters/input-needed";
 
 function withShell(node: ReactElement) {
-  return render(<PendingInputProvider>{node}</PendingInputProvider>);
+  return render(
+    <PendingInputProvider>
+      <NotificationProvider>{node}</NotificationProvider>
+    </PendingInputProvider>,
+  );
 }
 
 afterEach(() => {
@@ -48,7 +53,7 @@ describe("route group: content (news + side learning)", () => {
   });
 
   it("renders side learning topics", () => {
-    render(<SideLearningExperience />);
+    withShell(<SideLearningExperience />);
     expect(screen.getByRole("heading", { name: /learning topics/i })).toBeInTheDocument();
     expect(screen.getByText(/Start a learning session/i)).toBeInTheDocument();
   });

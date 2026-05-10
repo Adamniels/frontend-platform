@@ -6,8 +6,10 @@ import { useRouter } from "next/navigation";
 import { AccessGateProvider, useAccessGate } from "./AccessGateProvider";
 import { BootOverlay } from "./BootOverlay";
 import { MainNav } from "./MainNav";
+import { NotificationProvider, useNotifications } from "./NotificationsContext";
 import { PendingInputProvider } from "./PendingInputContext";
 import { SearchOverlay } from "./SearchOverlay";
+import { SideLearningNotificationWatcher } from "./SideLearningNotificationWatcher";
 import { TopBar } from "./TopBar";
 import { UnlockOverlay } from "./UnlockOverlay";
 import { BrandLogo } from "./BrandLogo";
@@ -28,7 +30,11 @@ type AppShellProps = {
 export function AppShell({ children }: AppShellProps) {
   return (
     <AccessGateProvider>
-      <AppShellFrame>{children}</AppShellFrame>
+      <PendingInputProvider>
+        <NotificationProvider>
+          <AppShellFrame>{children}</AppShellFrame>
+        </NotificationProvider>
+      </PendingInputProvider>
     </AccessGateProvider>
   );
 }
@@ -64,7 +70,7 @@ function AppShellFrame({ children }: AppShellProps) {
   }, []);
 
   return (
-    <PendingInputProvider>
+    <>
       {status === "booting" ? (
         <BootOverlay key={bootRunId} onComplete={completeBoot} />
       ) : null}
@@ -119,6 +125,8 @@ function AppShellFrame({ children }: AppShellProps) {
           </aside>
         ) : null}
       </div>
+      <SideLearningNotificationWatcher />
+      <GlobalToastStack />
       {status === "checking" || status === "locked" || status === "unlocking" ? (
         <UnlockOverlay
           checking={status === "checking"}
@@ -128,7 +136,56 @@ function AppShellFrame({ children }: AppShellProps) {
         />
       ) : null}
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
-    </PendingInputProvider>
+    </>
+  );
+}
+
+export function GlobalToastStack() {
+  const router = useRouter();
+  const { notifications, dismiss } = useNotifications();
+
+  if (notifications.length === 0) return null;
+
+  return (
+    <div className={styles.toastViewport} aria-live="polite" aria-atomic="false">
+      {notifications.map((notification) => (
+        <section
+          key={notification.id}
+          className={`${styles.toastCard} ${styles[`toastTone_${notification.tone ?? "info"}`]}`}
+          role="status"
+        >
+          <div className={styles.toastHeader}>
+            <div className={styles.toastCopy}>
+              <strong className={styles.toastTitle}>{notification.title}</strong>
+              <p className={styles.toastMessage}>{notification.message}</p>
+            </div>
+            <button
+              type="button"
+              className={styles.toastClose}
+              onClick={() => dismiss(notification.id)}
+              aria-label={`Dismiss ${notification.title}`}
+            >
+              ×
+            </button>
+          </div>
+          {notification.actionLabel ? (
+            <div className={styles.toastActions}>
+              <button
+                type="button"
+                className={styles.toastAction}
+                onClick={() => {
+                  if (notification.href) router.push(notification.href);
+                  notification.onAction?.();
+                  dismiss(notification.id);
+                }}
+              >
+                {notification.actionLabel}
+              </button>
+            </div>
+          ) : null}
+        </section>
+      ))}
+    </div>
   );
 }
 

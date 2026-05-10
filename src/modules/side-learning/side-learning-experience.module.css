@@ -253,21 +253,6 @@
   gap: 10px;
 }
 
-.memoryBanner {
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 149, 0, 0.28);
-  background: rgba(255, 149, 0, 0.06);
-  font-size: 13px;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-}
-
-.memoryBanner a {
-  color: var(--accent);
-  font-weight: 600;
-}
-
 .link {
   color: var(--accent);
 }
