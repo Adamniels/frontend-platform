@@ -3,6 +3,8 @@ export type NewsItemSummary = {
   title: string;
   source: string;
   publishedAt: string;
+  url?: string | null;
+  body?: string | null;
 };
 
 export type SideLearningSessionSummary = {
