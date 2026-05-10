@@ -1,5 +1,5 @@
-import { StartScreen } from "@/modules/start";
+import { redirect } from "next/navigation";
 
 export default async function HomePage() {
-  return <StartScreen />;
+  redirect("/jarvis");
 }
