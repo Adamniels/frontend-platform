@@ -30,10 +30,15 @@ export type SidebarNavSection = {
 
 export const sidebarPrimarySections: SidebarNavSection[] = [
   {
-    heading: "Main",
+    heading: "Home",
     items: [
       { kind: "link", href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-      { kind: "link", href: "/jarvis", label: "Jarvis", icon: "jarvis", indent: true },
+      { kind: "link", href: "/jarvis", label: "Jarvis", icon: "jarvis" },
+    ],
+  },
+  {
+    heading: "Content",
+    items: [
       { kind: "link", href: "/news", label: "News", icon: "news" },
       { kind: "link", href: "/side-learning", label: "Learn", icon: "learn" },
       { kind: "link", href: "/saved-items", label: "Saved", icon: "saved" },
@@ -41,16 +46,16 @@ export const sidebarPrimarySections: SidebarNavSection[] = [
     ],
   },
   {
-    heading: "Platform",
+    heading: "Personal",
     items: [
-      { kind: "link", href: "/memory", label: "Memory", icon: "brain" },
       { kind: "link", href: "/profile", label: "Profile", icon: "profile" },
+      { kind: "link", href: "/stats", label: "Stats", icon: "stats" },
+      { kind: "link", href: "/memory", label: "Memory", icon: "brain" },
     ],
   },
   {
     heading: "Operations",
     items: [
-      { kind: "link", href: "/stats", label: "Stats", icon: "stats", indent: true },
       { kind: "link", href: "/workflow-runs", label: "Workflow runs", icon: "workflow" },
     ],
   },
