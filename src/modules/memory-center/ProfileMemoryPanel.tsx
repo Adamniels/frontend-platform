@@ -66,11 +66,21 @@ export function ProfileMemoryPanel() {
     setSaved(false);
   };
 
+  const normalizeForSave = (body: UpdateProfileMemoryV1): UpdateProfileMemoryV1 => ({
+    ...body,
+    activeProjects: body.activeProjects
+      .map((p) => ({
+        name: p.name.trim(),
+        externalId: p.externalId?.trim() ? p.externalId.trim() : null,
+      }))
+      .filter((p) => p.name.length > 0),
+  });
+
   const onSave = async () => {
     setErr(null);
     setSaving(true);
     try {
-      const updated = await putExplicitProfile(CURRENT_USER_ID, d);
+      const updated = await putExplicitProfile(CURRENT_USER_ID, normalizeForSave(d));
       setCommitted(toUpdate(updated));
       setDraft(null);
       setSaved(true);
@@ -123,6 +133,62 @@ export function ProfileMemoryPanel() {
             value={joinLines(d.secondaryInterests)}
             onChange={(e) => update({ ...d, secondaryInterests: lines(e.target.value) })}
             rows={3}
+          />
+        </div>
+        <div className={styles.field}>
+          <div className={styles.label}>Active projects</div>
+          <p className={styles.sectionLead} style={{ marginTop: 0, marginBottom: 10 }}>
+            Short labels for what you are working on now. Used for personalization (e.g. news ranking).
+          </p>
+          <div className={styles.projectList}>
+            {d.activeProjects.map((p, i) => (
+              <div key={i} className={styles.projectRow}>
+                <input
+                  className={styles.input}
+                  aria-label={`Active project ${i + 1} name`}
+                  placeholder="Project name"
+                  value={p.name}
+                  onChange={(e) => {
+                    const next = d.activeProjects.map((x, j) =>
+                      j === i ? { ...x, name: e.target.value } : x,
+                    );
+                    update({ ...d, activeProjects: next });
+                  }}
+                />
+                <input
+                  className={styles.input}
+                  aria-label={`Active project ${i + 1} external id (optional)`}
+                  placeholder="External id (optional)"
+                  value={p.externalId ?? ""}
+                  onChange={(e) => {
+                    const next = d.activeProjects.map((x, j) =>
+                      j === i ? { ...x, externalId: e.target.value || null } : x,
+                    );
+                    update({ ...d, activeProjects: next });
+                  }}
+                />
+                <JarvisButton
+                  type="button"
+                  variant="ghost"
+                  label="Remove"
+                  onClick={() => {
+                    const next = d.activeProjects.filter((_, j) => j !== i);
+                    update({ ...d, activeProjects: next.length > 0 ? next : [{ name: "", externalId: null }] });
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+          <JarvisButton
+            type="button"
+            variant="ghost"
+            label="Add project"
+            onClick={() =>
+              update({
+                ...d,
+                activeProjects: [...d.activeProjects, { name: "", externalId: null }],
+              })
+            }
           />
         </div>
         <JarvisButton

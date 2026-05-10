@@ -3,6 +3,7 @@
 import type { UserProfile } from "@/lib/api/adapters/profile";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
 import { JarvisTag } from "@/components/jarvis/JarvisTag";
+import { ProfileMemoryPanel } from "@/modules/memory-center/ProfileMemoryPanel";
 import styles from "./profile-experience.module.css";
 
 type ProfileClientProps = { profile: UserProfile };
@@ -35,14 +36,14 @@ export function ProfileClient({ profile }: ProfileClientProps) {
           </div>
         </div>
       </JarvisCard>
-      <JarvisCard hover={false} className={styles.cardMuted}>
-        <div className={styles.sectionTitle}>Learning preferences</div>
-        <p className={styles.placeholderBody}>
-          Interests, content depth, and session length are <strong>not stored</strong> by{" "}
-          <code className={styles.inlineCode}>GET /api/v1/profile</code> yet. This section will become editable when
-          the backend exposes those fields or dedicated settings endpoints.
+      <div className={styles.interestBlock}>
+        <div className={styles.sectionTitle}>Interests &amp; goals</div>
+        <p className={styles.interestLead}>
+          High-trust fields used for personalization. Stored as explicit profile memory; same data as Memory →
+          Profile.
         </p>
-      </JarvisCard>
+        <ProfileMemoryPanel />
+      </div>
     </div>
   );
 }

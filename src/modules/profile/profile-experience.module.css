@@ -93,6 +93,17 @@
   flex-wrap: wrap;
 }
 
+.interestBlock {
+  margin-top: 8px;
+}
+
+.interestLead {
+  margin: 0 0 12px;
+  font-size: var(--fs-body-sm);
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
 .sectionTitle {
   font-size: var(--fs-label-sm);
   font-weight: 600;

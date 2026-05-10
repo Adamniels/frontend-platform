@@ -411,6 +411,26 @@
   min-height: auto;
 }
 
+.projectList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.projectRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 560px) {
+  .projectRow {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Score / bar elements ───────────────────────────────────────── */
 
 .scoreBlock {
