@@ -5,6 +5,8 @@ export type NewsItemSummary = {
   publishedAt: string;
   url?: string | null;
   body?: string | null;
+  /** Cosine similarity against the user's interest profile (0–1). Null when no profile exists yet. */
+  relevanceScore?: number | null;
 };
 
 export type SideLearningSessionSummary = {

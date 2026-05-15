@@ -27,6 +27,28 @@ function formatPublished(iso: string): string {
   }
 }
 
+function RelevancePill({ score }: { score: number | null | undefined }) {
+  if (score == null) return null;
+  const pct = Math.round(score * 100);
+  // Colour ramp: below 40 = muted, 40-70 = moderate, above 70 = strong signal
+  const color =
+    pct >= 70 ? "#0f6e56" : pct >= 40 ? "#8a4e0a" : "#6b6b6b";
+  return (
+    <span
+      style={{
+        fontSize: "0.72rem",
+        fontFamily: "monospace",
+        color,
+        opacity: 0.85,
+        marginLeft: "0.5rem",
+      }}
+      title={`Relevance: ${pct}%`}
+    >
+      {pct}% match
+    </span>
+  );
+}
+
 type NewsViewProps = { items: NewsItemSummary[] } | { loadError: string };
 
 export function NewsView(props: NewsViewProps) {
@@ -119,7 +141,10 @@ export function NewsView(props: NewsViewProps) {
             <JarvisTag label={selected.source} />
           </div>
           <h2 className={styles.title}>{selected.title}</h2>
-          <div className={styles.meta}>{formatPublished(selected.publishedAt)}</div>
+          <div className={styles.meta}>
+            {formatPublished(selected.publishedAt)}
+            <RelevancePill score={selected.relevanceScore} />
+          </div>
         </JarvisCard>
         {selected.body ? (
           <JarvisCard className={`${styles.block} ${styles.relevanceBlock}`} hover={false}>
@@ -212,7 +237,10 @@ export function NewsView(props: NewsViewProps) {
                   <JarvisTag label={a.source} />
                 </div>
                 <h3 className={styles.cardTitle}>{a.title}</h3>
-                <div className={styles.cardMeta}>{formatPublished(a.publishedAt)}</div>
+                <div className={styles.cardMeta}>
+                  {formatPublished(a.publishedAt)}
+                  <RelevancePill score={a.relevanceScore} />
+                </div>
               </div>
             </button>
           </div>
