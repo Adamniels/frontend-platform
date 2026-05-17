@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { NewsItemSummary } from "@/types/content";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
@@ -10,6 +10,7 @@ import { JarvisTag } from "@/components/jarvis/JarvisTag";
 import { SegmentedControl } from "@/components/jarvis/SegmentedControl";
 import { deleteNewsItems } from "@/lib/api/adapters/news";
 import { formatLoadError } from "@/lib/utils/error-message";
+import { postNewsInteraction } from "./api/post-news-interaction";
 import styles from "./news-experience.module.css";
 
 const NO_ITEMS: NewsItemSummary[] = [];
@@ -57,8 +58,13 @@ export function NewsView(props: NewsViewProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState("All");
   const [markedIds, setMarkedIds] = useState<Set<string>>(() => new Set());
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => new Set());
+  const [savedIds, setSavedIds] = useState<Set<string>>(() => new Set());
   const [deleteErr, setDeleteErr] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Tracks the timestamp when the current article detail was opened, for dwell measurement.
+  const dwellStartRef = useRef<number | null>(null);
 
   const sourceOptions = useMemo(() => {
     const sources = [...new Set(items.map((i) => i.source).filter(Boolean))].sort();
@@ -66,9 +72,9 @@ export function NewsView(props: NewsViewProps) {
   }, [items]);
 
   const filtered = useMemo(() => {
-    if (filter === "All") return items;
-    return items.filter((i) => i.source === filter);
-  }, [items, filter]);
+    const base = filter === "All" ? items : items.filter((i) => i.source === filter);
+    return base.filter((i) => !dismissedIds.has(i.id));
+  }, [items, filter, dismissedIds]);
 
   const selected = selectedId ? items.find((i) => i.id === selectedId) : null;
 
@@ -96,6 +102,43 @@ export function NewsView(props: NewsViewProps) {
       return next;
     });
     setDeleteErr(null);
+  };
+
+  const openArticle = (id: string) => {
+    dwellStartRef.current = Date.now();
+    setSelectedId(id);
+  };
+
+  const goBack = () => {
+    if (selectedId && dwellStartRef.current != null) {
+      const dwellSeconds = Math.max(1, Math.round((Date.now() - dwellStartRef.current) / 1000));
+      dwellStartRef.current = null;
+      void postNewsInteraction({
+        newsItemId: selectedId,
+        type: "read",
+        dwellSeconds,
+      }).catch(() => {
+        // Fire-and-forget — interaction loss is acceptable
+      });
+    }
+    setSelectedId(null);
+  };
+
+  const handleSave = (id: string) => {
+    setSavedIds((prev) => new Set(prev).add(id));
+    void postNewsInteraction({ newsItemId: id, type: "save" }).catch(() => {});
+  };
+
+  const handleDismiss = (id: string) => {
+    setDismissedIds((prev) => new Set(prev).add(id));
+    void postNewsInteraction({ newsItemId: id, type: "dismiss" }).catch(() => {});
+  };
+
+  const handleDismissDetail = () => {
+    if (!selectedId) return;
+    dwellStartRef.current = null;
+    handleDismiss(selectedId);
+    setSelectedId(null);
   };
 
   const deleteSelected = async () => {
@@ -131,11 +174,28 @@ export function NewsView(props: NewsViewProps) {
   }
 
   if (selected) {
+    const isSaved = savedIds.has(selected.id);
     return (
       <div className={`${styles.page} screenEnter`}>
-        <button type="button" className={styles.back} onClick={() => setSelectedId(null)}>
-          ← Back to feed
-        </button>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+          <button type="button" className={styles.back} style={{ margin: 0 }} onClick={goBack}>
+            ← Back to feed
+          </button>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <JarvisButton
+              type="button"
+              variant="outline"
+              label={isSaved ? "Saved ✓" : "Save"}
+              onClick={() => handleSave(selected.id)}
+            />
+            <JarvisButton
+              type="button"
+              variant="outline"
+              label="Dismiss"
+              onClick={handleDismissDetail}
+            />
+          </div>
+        </div>
         <JarvisCard className={styles.block} hover={false}>
           <div className={styles.tags}>
             <JarvisTag label={selected.source} />
@@ -224,13 +284,13 @@ export function NewsView(props: NewsViewProps) {
                 type="checkbox"
                 checked={markedIds.has(a.id)}
                 onChange={() => toggleMarked(a.id)}
-                aria-label={`Select “${a.title.slice(0, 80)}”`}
+                aria-label={`Select "${a.title.slice(0, 80)}"`}
               />
             </label>
             <button
               type="button"
               className={styles.cardOpenBtn}
-              onClick={() => setSelectedId(a.id)}
+              onClick={() => openArticle(a.id)}
             >
               <div className={styles.cardMain}>
                 <div className={styles.tags}>
@@ -243,6 +303,40 @@ export function NewsView(props: NewsViewProps) {
                 </div>
               </div>
             </button>
+            <div className={styles.cardActions}>
+              <button
+                type="button"
+                className={styles.saveBtn}
+                title={savedIds.has(a.id) ? "Saved" : "Save article"}
+                onClick={(e) => { e.stopPropagation(); handleSave(a.id); }}
+                style={{
+                  background: "none",
+                  border: `1px solid ${savedIds.has(a.id) ? "var(--accent)" : "var(--color-border)"}`,
+                  borderRadius: "var(--radius-sm)",
+                  color: savedIds.has(a.id) ? "var(--accent)" : "var(--color-text-muted)",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-sans)",
+                }}
+              >
+                {savedIds.has(a.id) ? "✓ Saved" : "Save"}
+              </button>
+              <button
+                type="button"
+                className={styles.saveBtn}
+                title="Dismiss article"
+                onClick={(e) => { e.stopPropagation(); handleDismiss(a.id); }}
+                style={{
+                  background: "none",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-sm)",
+                  color: "var(--color-text-muted)",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-sans)",
+                }}
+              >
+                Dismiss
+              </button>
+            </div>
           </div>
         </JarvisCard>
       ))}
