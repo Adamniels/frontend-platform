@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 import type { NewsItemSummary } from "@/types/content";
 import { JarvisButton } from "@/components/jarvis/JarvisButton";
 import { JarvisCard } from "@/components/jarvis/JarvisCard";
@@ -214,7 +215,9 @@ export function NewsView(props: NewsViewProps) {
         {selected.body ? (
           <JarvisCard className={`${styles.block} ${styles.relevanceBlock}`} hover={false}>
             <div className={styles.relevanceLabel}>Summary</div>
-            <p className={styles.body}>{selected.body}</p>
+            <div className={styles.markdown}>
+              <ReactMarkdown>{selected.body}</ReactMarkdown>
+            </div>
             {selected.url ? (
               <a
                 href={selected.url}
