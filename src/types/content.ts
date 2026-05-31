@@ -7,6 +7,8 @@ export type NewsItemSummary = {
   body?: string | null;
   /** Cosine similarity against the user's interest profile (0–1). Null when no profile exists yet. */
   relevanceScore?: number | null;
+  /** LLM-generated one-sentence explanation of why this article is relevant. Present only when the Phase 5 ranked feed exists. */
+  relevanceExplanation?: string | null;
 };
 
 export type SideLearningSessionSummary = {

@@ -205,6 +205,11 @@ export function NewsView(props: NewsViewProps) {
             {formatPublished(selected.publishedAt)}
             <RelevancePill score={selected.relevanceScore} />
           </div>
+          {selected.relevanceExplanation ? (
+            <p style={{ marginTop: "10px", fontSize: "13px", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
+              {selected.relevanceExplanation}
+            </p>
+          ) : null}
         </JarvisCard>
         {selected.body ? (
           <JarvisCard className={`${styles.block} ${styles.relevanceBlock}`} hover={false}>
@@ -297,10 +302,13 @@ export function NewsView(props: NewsViewProps) {
                   <JarvisTag label={a.source} />
                 </div>
                 <h3 className={styles.cardTitle}>{a.title}</h3>
-                <div className={styles.cardMeta}>
+                <div className={styles.cardMeta} suppressHydrationWarning>
                   {formatPublished(a.publishedAt)}
                   <RelevancePill score={a.relevanceScore} />
                 </div>
+                {a.relevanceExplanation ? (
+                  <p className={styles.cardSummary}>{a.relevanceExplanation}</p>
+                ) : null}
               </div>
             </button>
             <div className={styles.cardActions}>
